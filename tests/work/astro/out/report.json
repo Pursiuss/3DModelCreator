@@ -1,0 +1,79 @@
+{
+ "params": {
+  "refs": "tests/work/astro/refs",
+  "out": "tests/work/astro/out",
+  "parts": "tests/work/astro/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "note": "underside fill",
+  "skip_view": []
+ },
+ "method": "blockout (15 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (4.82 mm voxels), smoothed; kept 1 of 4 mesh pieces",
+ "voxel_mm": 4.82,
+ "triangles": 162200,
+ "extent_m": {
+  "width": 1.062,
+  "length": 0.308,
+  "height": 1.32
+ },
+ "subject_m": {
+  "height": 1.35,
+  "width": 1.11,
+  "length": 0.408,
+  "scale_by": "height"
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.64: pose differs between views"
+ ],
+ "texture_views": {
+  "front": 0.273,
+  "back": 0.189,
+  "side": 0.075,
+  "side_mirror": 0.106,
+  "top": 0.0,
+  "unseen_filled": 0.357,
+  "duplicate_features_removed": 7,
+  "uv_islands": 20,
+  "texel_mm": 0.85,
+  "palette_colours": 9
+ },
+ "self_check": {
+  "untextured_shape": 0.594,
+  "textured_shape": 0.594,
+  "colour_match": 0.709,
+  "views": {
+   "front": {
+    "iou": 0.83,
+    "reference_missed": 0.146,
+    "model_outside": 0.033
+   },
+   "back": {
+    "iou": 0.484,
+    "reference_missed": 0.435,
+    "model_outside": 0.228
+   },
+   "side": {
+    "iou": 0.544,
+    "reference_missed": 0.325,
+    "model_outside": 0.262
+   },
+   "top": {
+    "iou": 0.517,
+    "reference_missed": 0.48,
+    "model_outside": 0.01
+   }
+  }
+ },
+ "seconds": 98.1
+}

@@ -1,0 +1,24 @@
+start: mean outline overlap 0.919
+sweep 1: overlap 0.921 (3 changes)
+sweep 2: overlap 0.921 (1 changes)
+sweep 3: overlap 0.921 (1 changes)
+sweep 4: overlap 0.923 (3 changes)
+sweep 5: overlap 0.923 (0 changes)
+outline overlap per view (before -> after): front 0.94 -> 0.94, back 0.93 -> 0.93, side 0.94 -> 0.94, top 0.88 -> 0.89
+  body: unchanged
+  lower body: center[z] +0.188->+0.185; radii[z] +0.133->+0.137; rotate[x] +9.000->+11.880
+  neck: unchanged
+  head: unchanged
+  beak: unchanged
+  flipper: unchanged
+  tail: radii[y] +0.064->+0.054; radii[z] +0.013->+0.016
+  leg: unchanged
+  foot pad: unchanged
+  toe inner: unchanged
+  toe middle: unchanged
+  toe outer: unchanged
+  claw inner: unchanged
+  claw middle: unchanged
+  claw outer: unchanged
+part checks:
+  no problems found

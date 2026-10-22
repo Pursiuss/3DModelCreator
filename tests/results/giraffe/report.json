@@ -1,0 +1,73 @@
+{
+ "params": {
+  "refs": "tests/animals/giraffe",
+  "out": "C:\\Users\\paris\\Documents\\School\\Algoma CS\\Sem 3\\Software Engineering\\penguin-challenge-kit\\tests\\results\\giraffe",
+  "round": 2.0,
+  "res": 280,
+  "blur": 1.5,
+  "smooth": 12,
+  "tol": 3,
+  "note": "",
+  "skip_view": []
+ },
+ "voxel_mm": 16.25,
+ "triangles": 94476,
+ "extent_m": {
+  "width": 0.697,
+  "length": 2.498,
+  "height": 4.547
+ },
+ "subject_m": {
+  "height": 4.552,
+  "length": 2.497,
+  "width": 0.709,
+  "backdrop": [
+   0.55,
+   0.7,
+   0.85
+  ]
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.169,
+  "back": 0.158,
+  "side": 0.297,
+  "side_mirror": 0.297,
+  "top": 0.08,
+  "unseen": 0.073
+ },
+ "self_check": {
+  "untextured_shape": 0.953,
+  "textured_shape": 0.953,
+  "colour_match": 0.536,
+  "views": {
+   "front": {
+    "iou": 0.94,
+    "reference_missed": 0.0,
+    "model_outside": 0.06
+   },
+   "back": {
+    "iou": 0.94,
+    "reference_missed": 0.0,
+    "model_outside": 0.06
+   },
+   "side": {
+    "iou": 0.961,
+    "reference_missed": 0.0,
+    "model_outside": 0.039
+   },
+   "top": {
+    "iou": 0.971,
+    "reference_missed": 0.0,
+    "model_outside": 0.029
+   }
+  }
+ },
+ "seconds": 7.2
+}

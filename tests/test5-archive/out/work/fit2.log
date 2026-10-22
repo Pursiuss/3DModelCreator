@@ -1,0 +1,26 @@
+start: mean outline overlap 0.911
+sweep 1: overlap 0.922 (29 changes)
+sweep 2: overlap 0.926 (12 changes)
+sweep 3: overlap 0.935 (9 changes)
+sweep 4: overlap 0.935 (4 changes)
+sweep 5: overlap 0.936 (4 changes)
+sweep 6: overlap 0.937 (7 changes)
+outline overlap per view (before -> after): front 0.92 -> 0.94, back 0.92 -> 0.94, side 0.93 -> 0.95, top 0.87 -> 0.92
+  body: unchanged
+  lower body: center[z] +0.184->+0.188; radii[x] +0.090->+0.095; radii[y] +0.088->+0.083; radii[z] +0.126->+0.133; rotate[x] +9.000->+9.320
+  neck: a[y] +0.000->-0.011; a[z] +0.470->+0.488; b[z] +0.615->+0.630; ra +0.064->+0.074
+  head: center[z] +0.636->+0.638; radii[x] +0.053->+0.054; radii[y] +0.064->+0.066
+  beak: unchanged
+  flipper: unchanged
+  tail: center[y] +0.113->+0.106; center[z] +0.075->+0.083; radii[x] +0.028->+0.027; radii[y] +0.062->+0.063; radii[z] +0.012->+0.014; rotate[x] -48.000->-56.000
+  leg: a[x] +0.050->+0.056; a[y] +0.012->+0.002; b[x] +0.050->+0.042; rb +0.019->+0.017
+  foot pad: center[x] +0.050->+0.053
+  toe inner: a[z] +0.026->+0.035; b[x] +0.026->+0.017; rb +0.008->+0.009
+  toe middle: a[y] +0.000->-0.006; a[z] +0.026->+0.036; b[x] +0.057->+0.068; b[y] -0.078->-0.088; b[z] +0.013->+0.023; ra +0.011->+0.013; rb +0.008->+0.009
+  toe outer: a[x] +0.056->+0.060; a[z] +0.028->+0.037; b[x] +0.088->+0.106; b[y] -0.066->-0.070; b[z] +0.016->+0.017; ra +0.011->+0.010
+  claw inner: b[y] -0.097->-0.094; b[z] +0.003->+0.006
+  claw middle: a[x] +0.058->+0.061; a[z] +0.013->+0.016; b[x] +0.062->+0.064
+  claw outer: b[z] +0.008->+0.015
+part checks:
+  flipper: 20% of it lies outside the front outline: too big, or in the wrong place
+wrote out/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/work

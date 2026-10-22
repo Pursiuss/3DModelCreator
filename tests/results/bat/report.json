@@ -1,0 +1,73 @@
+{
+ "params": {
+  "refs": "tests/animals/bat",
+  "out": "C:\\Users\\paris\\Documents\\School\\Algoma CS\\Sem 3\\Software Engineering\\penguin-challenge-kit\\tests\\results\\bat",
+  "round": 2.0,
+  "res": 280,
+  "blur": 1.5,
+  "smooth": 12,
+  "tol": 3,
+  "note": "",
+  "skip_view": []
+ },
+ "voxel_mm": 1.36,
+ "triangles": 91384,
+ "extent_m": {
+  "width": 0.379,
+  "length": 0.047,
+  "height": 0.157
+ },
+ "subject_m": {
+  "height": 0.157,
+  "length": 0.046,
+  "width": 0.38,
+  "backdrop": [
+   0.55,
+   0.7,
+   0.85
+  ]
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.425,
+  "back": 0.428,
+  "side": 0.061,
+  "side_mirror": 0.058,
+  "top": 0.028,
+  "unseen": 0.0
+ },
+ "self_check": {
+  "untextured_shape": 0.932,
+  "textured_shape": 0.932,
+  "colour_match": 0.329,
+  "views": {
+   "front": {
+    "iou": 0.984,
+    "reference_missed": 0.001,
+    "model_outside": 0.015
+   },
+   "back": {
+    "iou": 0.984,
+    "reference_missed": 0.001,
+    "model_outside": 0.015
+   },
+   "side": {
+    "iou": 0.943,
+    "reference_missed": 0.004,
+    "model_outside": 0.053
+   },
+   "top": {
+    "iou": 0.818,
+    "reference_missed": 0.037,
+    "model_outside": 0.156
+   }
+  }
+ },
+ "seconds": 8.2
+}

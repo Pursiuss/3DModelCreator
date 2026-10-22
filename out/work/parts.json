@@ -1,0 +1,299 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "ellipsoid",
+   "center": [
+    0,
+    0.01,
+    0.32
+   ],
+   "radii": [
+    0.102,
+    0.097,
+    0.29
+   ],
+   "rotate": [
+    8,
+    0,
+    0
+   ]
+  },
+  {
+   "name": "lower belly",
+   "type": "ellipsoid",
+   "center": [
+    0,
+    0.035,
+    0.12
+   ],
+   "radii": [
+    0.088,
+    0.085,
+    0.1
+   ],
+   "blend": 0.07
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [
+    0,
+    -0.005,
+    0.46
+   ],
+   "b": [
+    0,
+    -0.02,
+    0.6
+   ],
+   "ra": 0.078,
+   "rb": 0.052,
+   "blend": 0.06,
+   "fit": false
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [
+    0,
+    -0.03,
+    0.625
+   ],
+   "radii": [
+    0.056,
+    0.062,
+    0.068
+   ],
+   "blend": 0.04,
+   "fit": false
+  },
+  {
+   "name": "beak",
+   "type": "capsule",
+   "a": [
+    0,
+    -0.085,
+    0.648
+   ],
+   "b": [
+    0,
+    -0.14,
+    0.636
+   ],
+   "ra": 0.0145,
+   "rb": 0.005,
+   "blend": 0.012,
+   "fit": false
+  },
+  {
+   "name": "flipper",
+   "type": "ellipsoid",
+   "center": [
+    0.11,
+    0.015,
+    0.35
+   ],
+   "radii": [
+    0.009,
+    0.035,
+    0.16
+   ],
+   "rotate": [
+    10,
+    -8,
+    0
+   ],
+   "mirror": true,
+   "blend": 0.006,
+   "fit": false
+  },
+  {
+   "name": "tail",
+   "type": "ellipsoid",
+   "center": [
+    0,
+    0.12,
+    0.07
+   ],
+   "radii": [
+    0.035,
+    0.012,
+    0.07
+   ],
+   "rotate": [
+    45,
+    0,
+    0
+   ],
+   "blend": 0.02,
+   "fit": false
+  },
+  {
+   "name": "leg",
+   "type": "capsule",
+   "a": [
+    0.045,
+    0.02,
+    0.09
+   ],
+   "b": [
+    0.05,
+    0.0,
+    0.03
+   ],
+   "ra": 0.02,
+   "rb": 0.017,
+   "mirror": true,
+   "blend": 0.015,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "foot",
+   "type": "ellipsoid",
+   "center": [
+    0.05,
+    -0.025,
+    0.018
+   ],
+   "radii": [
+    0.03,
+    0.04,
+    0.016
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "toe inner",
+   "type": "capsule",
+   "a": [
+    0.045,
+    -0.045,
+    0.016
+   ],
+   "b": [
+    0.033,
+    -0.095,
+    0.008
+   ],
+   "ra": 0.009,
+   "rb": 0.006,
+   "mirror": true,
+   "blend": 0.004,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "toe middle",
+   "type": "capsule",
+   "a": [
+    0.052,
+    -0.05,
+    0.016
+   ],
+   "b": [
+    0.058,
+    -0.1,
+    0.008
+   ],
+   "ra": 0.009,
+   "rb": 0.006,
+   "mirror": true,
+   "blend": 0.004,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "toe outer",
+   "type": "capsule",
+   "a": [
+    0.06,
+    -0.045,
+    0.016
+   ],
+   "b": [
+    0.083,
+    -0.09,
+    0.008
+   ],
+   "ra": 0.009,
+   "rb": 0.006,
+   "mirror": true,
+   "blend": 0.004,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "claw inner",
+   "type": "capsule",
+   "a": [
+    0.032,
+    -0.097,
+    0.008
+   ],
+   "b": [
+    0.03,
+    -0.108,
+    0.002
+   ],
+   "ra": 0.0055,
+   "rb": 0.0025,
+   "mirror": true,
+   "blend": 0.002,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "claw middle",
+   "type": "capsule",
+   "a": [
+    0.058,
+    -0.102,
+    0.008
+   ],
+   "b": [
+    0.06,
+    -0.113,
+    0.002
+   ],
+   "ra": 0.0055,
+   "rb": 0.0025,
+   "mirror": true,
+   "blend": 0.002,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "claw outer",
+   "type": "capsule",
+   "a": [
+    0.084,
+    -0.092,
+    0.008
+   ],
+   "b": [
+    0.09,
+    -0.102,
+    0.002
+   ],
+   "ra": 0.0055,
+   "rb": 0.0025,
+   "mirror": true,
+   "blend": 0.002,
+   "ignore_views": [
+    "back"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+{"parts": [
+ {"name": "body", "type": "ellipsoid", "center": [0, 0.04, 0.045], "radii": [0.075, 0.055, 0.022]},
+ {"name": "eye stalk", "type": "capsule", "a": [0.02, -0.005, 0.055], "b": [0.025, -0.02, 0.072], "ra": 0.004, "rb": 0.004, "mirror": true, "blend": 0.003},
+ {"name": "arm", "type": "capsule", "a": [0.05, 0.0, 0.04], "b": [0.08, -0.05, 0.045], "ra": 0.008, "rb": 0.008, "mirror": true, "blend": 0.005},
+ {"name": "claw", "type": "ellipsoid", "center": [0.085, -0.07, 0.045], "radii": [0.02, 0.03, 0.015], "mirror": true, "blend": 0.005},
+ {"name": "leg 1", "type": "capsule", "a": [0.065, 0.007, 0.035], "b": [0.14, 0.012, 0.002], "ra": 0.006, "rb": 0.006, "mirror": true, "blend": 0.004},
+ {"name": "leg 2", "type": "capsule", "a": [0.065, 0.034, 0.035], "b": [0.14, 0.039, 0.002], "ra": 0.006, "rb": 0.006, "mirror": true, "blend": 0.004},
+ {"name": "leg 3", "type": "capsule", "a": [0.065, 0.061, 0.035], "b": [0.14, 0.066, 0.002], "ra": 0.006, "rb": 0.006, "mirror": true, "blend": 0.004},
+ {"name": "leg 4", "type": "capsule", "a": [0.065, 0.089, 0.035], "b": [0.14, 0.094, 0.002], "ra": 0.006, "rb": 0.006, "mirror": true, "blend": 0.004}
+]}

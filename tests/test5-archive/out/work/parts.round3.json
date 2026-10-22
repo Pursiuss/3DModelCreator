@@ -1,0 +1,17 @@
+{"parts": [
+ {"name": "body", "type": "ellipsoid", "center": [0, 0.001, 0.35], "radii": [0.095, 0.097, 0.26], "rotate": [7, 0, 0], "fit": false},
+ {"name": "lower body", "type": "ellipsoid", "center": [0, 0.028, 0.188], "radii": [0.093, 0.084, 0.133], "rotate": [9, 0, 0], "blend": 0.04},
+ {"name": "neck", "type": "capsule", "a": [0, -0.011, 0.488], "b": [0, -0.029, 0.625], "ra": 0.07, "rb": 0.052, "blend": 0.03},
+ {"name": "head", "type": "ellipsoid", "center": [0, -0.04, 0.638], "radii": [0.054, 0.066, 0.056], "rotate": [2, 0, 0], "blend": 0.025},
+ {"name": "beak", "type": "capsule", "a": [0, -0.09, 0.641], "b": [0, -0.147, 0.638], "ra": 0.011, "rb": 0.003, "blend": 0.006, "fit": false},
+ {"name": "flipper", "type": "ellipsoid", "center": [0.101, 0.012, 0.335], "radii": [0.011, 0.037, 0.152], "rotate": [-3, -6, -10], "mirror": true, "blend": 0.004, "fit": false},
+ {"name": "tail", "type": "ellipsoid", "center": [0, 0.108, 0.08], "radii": [0.027, 0.064, 0.013], "rotate": [-54, 0, 0], "blend": 0.01},
+ {"name": "leg", "type": "capsule", "a": [0.048, 0.015, 0.10], "b": [0.048, 0.015, 0.025], "ra": 0.019, "rb": 0.017, "mirror": true, "blend": 0.015, "fit": false, "ignore_views": ["back"]},
+ {"name": "foot pad", "type": "ellipsoid", "center": [0.05, -0.02, 0.015], "radii": [0.02, 0.025, 0.009], "mirror": true, "blend": 0.008, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "toe inner", "type": "capsule", "a": [0.045, 0.005, 0.03], "b": [0.021, -0.066, 0.017], "ra": 0.012, "rb": 0.009, "mirror": true, "blend": 0.006, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "toe middle", "type": "capsule", "a": [0.05, 0.005, 0.03], "b": [0.059, -0.075, 0.015], "ra": 0.012, "rb": 0.009, "mirror": true, "blend": 0.006, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "toe outer", "type": "capsule", "a": [0.055, 0.005, 0.03], "b": [0.094, -0.066, 0.019], "ra": 0.012, "rb": 0.009, "mirror": true, "blend": 0.006, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "claw inner", "type": "capsule", "a": [0.02, -0.07, 0.019], "b": [0.011, -0.09, 0.006], "ra": 0.0055, "rb": 0.003, "mirror": true, "blend": 0.002, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "claw middle", "type": "capsule", "a": [0.06, -0.079, 0.016], "b": [0.065, -0.1, 0.003], "ra": 0.0055, "rb": 0.003, "mirror": true, "blend": 0.002, "fit": false, "ignore_views": ["back", "top"]},
+ {"name": "claw outer", "type": "capsule", "a": [0.096, -0.07, 0.021], "b": [0.112, -0.09, 0.011], "ra": 0.0055, "rb": 0.003, "mirror": true, "blend": 0.002, "fit": false, "ignore_views": ["back", "top"]}
+]}

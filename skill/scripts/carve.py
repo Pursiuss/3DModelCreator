@@ -1,0 +1,288 @@
+"""Shape from the four silhouettes: visual hull, rounded cross-sections, smooth closed mesh.
+
+usage: python carve.py REFS_DIR OUT.glb [--res 280] [--round 2] [--blur 1.5] [--smooth 12] [--masks]
+
+1. Visual hull. Each view is mapped exactly as score_glb.py maps it. Orthographic axis-aligned views make it separable:
+     keep(x, y, z) = front(x, z) & back(x, z) & side(y, z) & top(x, y)
+2. Rounding. A hull from four straight-on views has box-like cross-sections. In every horizontal slice, each connected
+   region is intersected with the superellipse inscribed in its bounding box (|u|^p + |v|^p <= 1; p = 2 is an ellipse,
+   larger p is boxier, 0 turns rounding off). Bodies become round; outlines barely change.
+3. Mesh. Marching cubes on the voxels, then Taubin smoothing (smooths stair-steps without shrinking thin parts).
+"""
+import argparse, os, sys
+import numpy as np
+from scipy import ndimage, sparse
+from skimage import measure
+sys.path.insert(0, os.path.dirname(__file__))
+from views import VIEWS, AX, ViewMap, load_subject, silhouette
+from glb_io import write_glb
+
+
+def sample(vm, axes):
+    """This view's silhouette on the grid axes it sees, indexed [h, v]."""
+    ha, _, va, _ = VIEWS[vm.view]
+    P_h = np.zeros((len(axes[ha]), 3)); P_h[:, AX[ha]] = axes[ha]
+    P_v = np.zeros((len(axes[va]), 3)); P_v[:, AX[va]] = axes[va]
+    c = np.floor(vm.project(P_h)[0]).astype(int)
+    r = np.floor(vm.project(P_v)[1]).astype(int)
+    ok_c = (c >= 0) & (c < vm.sil.shape[1]); ok_r = (r >= 0) & (r < vm.sil.shape[0])
+    out = np.zeros((len(c), len(r)), bool)
+    out[np.ix_(ok_c, ok_r)] = vm.sil[np.ix_(r[ok_r], c[ok_c])].T
+    return out
+
+
+def make_grid(maps, size, res):
+    half_x = max(maps[v].half_h for v in ("front", "back", "top"))
+    half_y = max(maps["side"].half_h, maps["top"].span_v / 2)
+    top = max(maps[v].span_v for v in ("front", "back", "side"))
+    voxel = max(2 * half_x, 2 * half_y, top) / res
+    axes = {"x": np.arange(-half_x * 1.08, half_x * 1.08, voxel) + voxel / 2,
+            "y": np.arange(-half_y * 1.08, half_y * 1.08, voxel) + voxel / 2,
+            "z": np.arange(0, top * 1.04, voxel) + voxel / 2}
+    return axes, voxel
+
+
+def visual_hull(maps, axes, skip=()):
+    """skip: views left out of the carving (e.g. a back view drawn in a different pose). Each skipped view stops
+    constraining the shape, so only skip one that clearly disagrees with the others."""
+    L = {v: sample(maps[v], axes) for v in VIEWS}
+    occ = np.ones((len(axes["x"]), len(axes["y"]), len(axes["z"])), bool)
+    if "front" not in skip: occ &= L["front"][:, None, :]
+    if "back" not in skip: occ &= L["back"][:, None, :]
+    if "side" not in skip: occ &= L["side"][None, :, :]
+    if "top" not in skip: occ &= L["top"][:, :, None]
+    return occ
+
+
+def round_slices(occ, p):
+    if p <= 0: return occ
+    out = np.zeros_like(occ)
+    for k in range(occ.shape[2]):
+        s = occ[:, :, k]
+        if not s.any(): continue
+        lab, n = ndimage.label(s)
+        for i, sl in enumerate(ndimage.find_objects(lab), 1):
+            comp = lab[sl] == i
+            nx, ny = comp.shape
+            u = (np.arange(nx) + 0.5) / nx * 2 - 1; v = (np.arange(ny) + 0.5) / ny * 2 - 1
+            ell = (np.abs(u)[:, None] ** p + np.abs(v)[None, :] ** p) <= 1.0
+            if nx <= 2 or ny <= 2: ell[:] = True        # too thin to round
+            out[:, :, k][sl] |= comp & ell
+    return out
+
+
+def taubin(V, F, iters=12, lam=0.5, mu=-0.53):
+    n = len(V)
+    e = np.r_[F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]]
+    A = sparse.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n)).tocsr()
+    A = ((A + A.T) > 0).astype(float)
+    deg = np.asarray(A.sum(1)).ravel(); Dinv = sparse.diags(1 / np.maximum(deg, 1))
+    W = Dinv @ A
+    for _ in range(iters):
+        V = V + lam * (W @ V - V)
+        V = V + mu * (W @ V - V)
+    return V
+
+
+def soft_volume(occ, blur):
+    """Blurred occupancy for marching cubes. Parts thinner than the blur would vanish, so they are kept at full strength."""
+    vol = occ.astype(np.float32)
+    if blur <= 0: return vol
+    r = max(1, int(round(blur * 1.5)))
+    thin = occ & ~ndimage.binary_opening(occ, structure=np.ones((3, 3, 3)), iterations=r)
+    soft = ndimage.gaussian_filter(vol, blur)
+    return np.maximum(soft, 0.6 * thin)
+
+
+def to_mesh(occ, axes, voxel, smooth_iters=12, blur=1.5):
+    vol = np.pad(soft_volume(occ, blur), 1)
+    verts, faces, _, _ = measure.marching_cubes(vol, 0.5)
+    V = (verts - 1) * voxel + np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
+    F = faces[:, ::-1].astype(np.int64)      # outward-facing winding
+    if smooth_iters: V = taubin(V, F, smooth_iters)
+    return V, F
+
+
+def recentre(V):
+    """What the scorer assumes: feet at z = 0, centred sideways and lengthwise on the model's own extent."""
+    shift = np.array([-(V[:, 0].min() + V[:, 0].max()) / 2, -(V[:, 1].min() + V[:, 1].max()) / 2, -V[:, 2].min()])
+    return V + shift
+
+
+def build_shape(refs, res=280, roundness=2.0, use_masks=False, smooth_iters=12, blur=1.5, skip=()):
+    size, _ = load_subject(refs)
+    sils, notes = {}, {}
+    for v in VIEWS: sils[v], notes[v] = silhouette(refs, v, use_masks)
+    maps = {v: ViewMap(v, sils[v], size) for v in VIEWS}
+    axes, voxel = make_grid(maps, size, res)
+    hull = visual_hull(maps, axes, skip)
+    occ = round_slices(hull, roundness)
+    V, F = to_mesh(occ, axes, voxel, smooth_iters, blur)
+    return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F)
+
+
+def signed_distance(occ, voxel):
+    """Metres to the surface of a voxel solid: negative inside, positive outside."""
+    return (ndimage.distance_transform_edt(~occ) - ndimage.distance_transform_edt(occ)) * voxel
+
+
+def smoothed_outline_distance(vm, rel_sigma=0.025, rel_close=0.012):
+    """Signed distance to a reference outline in pixels (negative inside), cleaned of the drawing's wobble.
+    Trimming only ever removes material, so only the outline's dents matter: the notches between feather tips on a
+    tail, or between tufts of fur, cut grooves across the model. A morphological closing fills dents narrower than
+    about 2.4% of the animal (it never removes anything, so thin parts survive it). Then, where the animal is thick,
+    the outline is smoothed as well, which irons out the gentle scallops along a feathered belly; thin parts (wing
+    membranes, legs, antennae) keep their exact outline, so smoothing never cuts them away."""
+    b = vm.box; extent = max(b[2] - b[0], b[3] - b[1])
+    sil = vm.sil
+    r = int(round(rel_close * extent))
+    if r >= 1:
+        yy, xx = np.mgrid[-r:r + 1, -r:r + 1]; disk = xx * xx + yy * yy <= r * r
+        sil = ndimage.binary_closing(np.pad(sil, r + 1), disk)[r + 1:-r - 1, r + 1:-r - 1] | sil
+    d = ndimage.distance_transform_edt(~sil) - ndimage.distance_transform_edt(sil)
+    sigma = rel_sigma * extent
+    if sigma < 1: return d
+    # Blurring a distance field moves a curved surface inwards by sigma^2/2 times its curvature (a head of radius R by
+    # sigma^2/R); add that back, measured on a coarser blur so that it follows the overall form, not the dips.
+    smooth = ndimage.gaussian_filter(d, sigma) - 0.5 * sigma ** 2 * ndimage.gaussian_laplace(d, 2 * sigma)
+    half = ndimage.grey_dilation(np.maximum(-d, 0), size=int(6 * sigma) | 1)   # local half-thickness nearby
+    w = np.clip((half - 2 * sigma) / (2 * sigma), 0, 1)
+    return w * smooth + (1 - w) * d
+
+
+def hull_distance(maps, axes, skip=(), ignore=None):
+    """Smooth signed distance (metres) to the visual hull, built from each outline's 2-D distance map at full image
+    resolution: the hull is the intersection of the outlines pushed straight back, so its distance is the largest of
+    the per-view distances. No voxel steps, and thin parts keep their full width.
+    ignore: {view: boolean grid} of voxels that view must not trim (parts that list it in ignore_views)."""
+    out = None; shape = (len(axes["x"]), len(axes["y"]), len(axes["z"]))
+    for v, vm in maps.items():
+        if v in skip: continue
+        d2 = smoothed_outline_distance(vm) / vm.sc
+        ha, _, va, _ = VIEWS[v]
+        P_h = np.zeros((len(axes[ha]), 3)); P_h[:, AX[ha]] = axes[ha]
+        P_v = np.zeros((len(axes[va]), 3)); P_v[:, AX[va]] = axes[va]
+        c = vm.project(P_h)[0] - 0.5; r = vm.project(P_v)[1] - 0.5         # pixel centres
+        C, R = np.meshgrid(c, r, indexing="ij")
+        s = ndimage.map_coordinates(d2, [R.ravel(), C.ravel()], order=1, mode="nearest").reshape(C.shape)
+        s = s.astype(np.float32)                                            # indexed [h, v]
+        if (ha, va) == ("x", "z"): e = s[:, None, :]
+        elif (ha, va) == ("y", "z"): e = s[None, :, :]
+        else: e = s[:, :, None]
+        if ignore is not None and v in ignore:
+            e = np.where(ignore[v], np.float32(-1e3), np.broadcast_to(e, shape))
+        out = e if out is None else np.maximum(out, e)
+    return np.broadcast_to(out, shape)
+
+
+def field_normals(field, V, origin, voxel):
+    """Unit normals from the gradient of the smooth distance field (not from the mesh facets), so the shading does not
+    show the faint terraces that marching cubes leaves on gently sloping surfaces."""
+    g = np.gradient(field, voxel)
+    idx = ((V - origin) / voxel).T
+    N = np.stack([ndimage.map_coordinates(gi, idx, order=1, mode="nearest") for gi in g], 1)
+    return N / np.maximum(np.linalg.norm(N, axis=1, keepdims=True), 1e-12)
+
+
+def keep_main_pieces(V, F, min_share=0.02):
+    """Drop loose fragments: mesh pieces with under min_share of the largest piece's triangles."""
+    from scipy.sparse.csgraph import connected_components
+    n = len(V); e = np.r_[F[:, [0, 1]], F[:, [1, 2]]]
+    g = sparse.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n))
+    _, lab = connected_components(g, directed=False)
+    fl = lab[F[:, 0]]; counts = np.bincount(fl)
+    keep = counts[fl] >= min_share * counts.max()
+    used = np.unique(F[keep]); remap = -np.ones(n, np.int64); remap[used] = np.arange(len(used))
+    return V[used], remap[F[keep]], int((counts >= min_share * counts.max()).sum()), int(len(counts))
+
+
+TRUNK_THICK = 0.06       # a part at least this thick (share of the animal's largest size) belongs to the trunk
+TRUNK_SIGMA = 0.035      # smoothing scale of the trunk (share of the animal's largest size)
+
+
+def fair_trunk(parts, P, blk, pid, size, voxel):
+    """Smooth the trunk: the thick parts (body, belly, chest, neck, head) as one surface. Several ellipsoids stacked
+    along a body never line up exactly: where a lower one is wider than the one above, the outline swells, pinches
+    in and swells again, and that prints a ring round the animal however the joins are blended. A sculptor would
+    smooth such a trunk as one form. So the thick parts' combined distance field is blurred at 3.5% of the animal's
+    size (a dip several centimetres long fills in), the shrinking that blurring causes is added back, and the result
+    is used wherever one of them is the nearest surface. Thin parts (beaks, flippers, ears, legs, toes, claws, tails) are
+    left exactly as written."""
+    import parts as PT
+    big_size = max(size["width"], size["length"], size["height"])
+    trunk = [i for i, p in enumerate(parts) if PT.thinnest(p) >= TRUNK_THICK * big_size]
+    sigma = TRUNK_SIGMA * big_size / voxel
+    if len(trunk) < 2 or sigma < 1: return blk
+    d = PT.sdf([parts[i] for i in trunk], P).reshape(blk.shape).astype(np.float32)
+    # Blurring a distance field moves a curved surface inwards by sigma^2/2 times its curvature (a head of radius R by
+    # sigma^2/R); add that back, measured on a coarser blur so that it follows the overall form, not the dips.
+    smooth = ndimage.gaussian_filter(d, sigma) - 0.5 * sigma ** 2 * ndimage.gaussian_laplace(d, 2 * sigma)
+    w = ndimage.gaussian_filter(np.isin(pid, trunk).astype(np.float32), 1.5)   # soft edge where thin parts take over
+    return blk + w * (smooth - d)
+
+
+def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, skip=()):
+    """Blockout first, then trim where it sticks out of the outlines.
+    shape = blockout (optionally grown by `grow`) intersected with the visual hull, with the cut edges rounded.
+    The blockout decides what exists and gives the surface its shape; the hull only shaves off what pokes outside an
+    outline. Growing makes the outlines match more closely but lets the flat hull surfaces take over (a body grown by
+    1.4 cm came out boxy), so keep grow at 0 and fix gaps by adding or adjusting parts."""
+    import parts as PT
+    size, _ = load_subject(refs)
+    sils, notes = {}, {}
+    for v in VIEWS: sils[v], notes[v] = silhouette(refs, v)
+    maps = {v: ViewMap(v, sils[v], size) for v in VIEWS}
+    axes, voxel = make_grid(maps, size, res)
+    grow = grow or 0.0
+    hull = visual_hull(maps, axes, skip)
+    X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij")
+    P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
+    blk, pid = PT.sdf_with_parts(parts, P, grow=grow)
+    blk = blk.reshape(hull.shape).astype(np.float32); pid = pid.reshape(hull.shape)
+    blk = fair_trunk(parts, P, blk, pid, size, voxel)
+    del P, X, Y, Z
+    ignore = {}
+    for v in VIEWS:
+        ids = [i for i, p in enumerate(parts) if v in p.get("ignore", [])]
+        if ids: ignore[v] = np.isin(pid, ids)
+    # Trim only where the blockout sticks out by more than 1% of the animal's size: drawn outlines wobble (feather tufts,
+    # fur), and trimming right to them copies the wobble across the surface as ridges. Thin parts (a beak, toes, a
+    # flipper) are trimmed closer, to 15% of their thickness, or a toe drawn 1 cm thick could stay 2 cm thick.
+    tol_max = 0.01 * max(size["width"], size["length"], size["height"])
+    tol_part = np.array([min(tol_max, 0.15 * PT.thinnest(p)) for p in parts], np.float32)
+    tol = ndimage.gaussian_filter(tol_part[pid], 2.0)
+    del pid
+    hd = hull_distance(maps, axes, skip, ignore) - tol
+    del tol
+    k = 2 * voxel                                             # rounded cut instead of a sharp crease
+    h = np.clip(k - np.abs(blk - hd), 0, None) / k
+    field = np.maximum(blk, hd) + h * h * k / 4
+    del hd, h
+    if blur > 0: field = ndimage.gaussian_filter(field, blur)
+    vol = np.pad(field, 1, constant_values=voxel * 4)
+    verts, faces, _, _ = measure.marching_cubes(vol, 0.0)
+    V = (verts - 1) * voxel + np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
+    F = faces[:, ::-1].astype(np.int64)
+    V, F, kept, pieces = keep_main_pieces(V, F)
+    if smooth_iters: V = taubin(V, F, smooth_iters)
+    origin = np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
+    N = field_normals(field, V, origin, voxel)
+    occ = field < 0
+    return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
+                grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore)
+
+
+def main():
+    ap = argparse.ArgumentParser(); ap.add_argument("refs"); ap.add_argument("out")
+    ap.add_argument("--res", type=int, default=280); ap.add_argument("--round", type=float, default=2.0)
+    ap.add_argument("--smooth", type=int, default=12); ap.add_argument("--blur", type=float, default=1.5)
+    ap.add_argument("--masks", action="store_true")
+    a = ap.parse_args()
+    S = build_shape(a.refs, a.res, a.round, a.masks, a.smooth, a.blur)
+    write_glb(a.out, recentre(S["V"]), S["F"])
+    print(f"voxel {S['voxel'] * 1000:.2f} mm, grid {S['occ'].shape}, hull {S['hull'].sum()} -> rounded {S['occ'].sum()} voxels,"
+          f" {len(S['F'])} triangles")
+
+
+if __name__ == "__main__":
+    main()

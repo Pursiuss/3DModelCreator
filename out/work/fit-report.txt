@@ -1,0 +1,29 @@
+start: mean outline overlap 0.889
+sweep 1: overlap 0.904 (35 changes)
+sweep 2: overlap 0.909 (17 changes)
+sweep 3: overlap 0.909 (6 changes)
+sweep 4: overlap 0.913 (5 changes)
+sweep 5: overlap 0.914 (6 changes)
+sweep 6: overlap 0.916 (6 changes)
+outline overlap per view (before -> after): front 0.89 -> 0.92, back 0.92 -> 0.93, side 0.89 -> 0.93, top 0.85 -> 0.88
+  body: center[y] +0.010->+0.002; center[z] +0.320->+0.328; radii[x] +0.102->+0.109; radii[y] +0.097->+0.094; radii[z] +0.290->+0.287
+  lower belly: center[y] +0.035->+0.042; center[z] +0.120->+0.141; radii[x] +0.088->+0.086; radii[y] +0.085->+0.070; radii[z] +0.100->+0.092; rotate[x] +0.000->+16.000
+  neck: unchanged
+  head: unchanged
+  beak: unchanged
+  flipper: unchanged
+  tail: unchanged
+  leg: a[y] +0.020->+0.025; b[x] +0.050->+0.047; b[y] +0.000->+0.006; b[z] +0.030->+0.022; rb +0.017->+0.020
+  foot: center[y] -0.025->-0.027; center[z] +0.018->+0.023; radii[x] +0.030->+0.034; radii[y] +0.040->+0.046; radii[z] +0.016->+0.018; rotate[x] +0.000->-8.000; rotate[y] +0.000->-8.000
+  toe inner: a[x] +0.045->+0.039; a[z] +0.016->+0.028; b[z] +0.008->+0.024
+  toe middle: a[y] -0.050->-0.062; b[x] +0.058->+0.064; b[y] -0.100->-0.102; ra +0.009->+0.010
+  toe outer: a[x] +0.060->+0.066; a[y] -0.045->-0.051; a[z] +0.016->+0.018; b[x] +0.083->+0.083; b[y] -0.090->-0.100; b[z] +0.008->+0.022; ra +0.009->+0.010; rb +0.006->+0.008
+  claw inner: b[y] -0.108->-0.105
+  claw middle: a[x] +0.058->+0.060; b[x] +0.060->+0.062; b[y] -0.113->-0.111
+  claw outer: b[x] +0.090->+0.088; b[z] +0.002->+0.004
+part checks:
+  flipper: 29% of it lies outside the front outline: too big, or in the wrong place
+  tail: 24% of it lies outside the front outline: too big, or in the wrong place
+  tail: 23% of it lies outside the side outline: too big, or in the wrong place
+  tail: 35% of it lies outside the top outline: too big, or in the wrong place
+  toe middle: 27% of it lies outside the side outline: too big, or in the wrong place

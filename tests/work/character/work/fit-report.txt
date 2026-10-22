@@ -1,0 +1,26 @@
+start: mean outline overlap 0.640
+sweep 1: overlap 0.675 (52 changes)
+sweep 2: overlap 0.684 (21 changes)
+sweep 3: overlap 0.692 (21 changes)
+sweep 4: overlap 0.695 (16 changes)
+sweep 5: overlap 0.700 (16 changes)
+sweep 6: overlap 0.701 (11 changes)
+outline overlap per view (before -> after): front 0.86 -> 0.94, back 0.88 -> 0.94, side 0.82 -> 0.92, top 0.00 -> 0.00
+  chest: center[y] -0.065->-0.027; center[z] +0.970->+0.994; radii[x] +0.112->+0.108; radii[y] +0.080->+0.092; radii[z] +0.200->+0.230; rotate[x] +0.000->-5.120
+  hips: center[z] +0.760->+0.810; radii[x] +0.138->+0.126; radii[z] +0.100->+0.098
+  neck: unchanged
+  helmet: center[y] -0.035->-0.037; radii[x] +0.138->+0.135; radii[y] +0.155->+0.153; radii[z] +0.145->+0.147; rotate[x] +0.000->-4.800
+  face: center[y] -0.070->-0.078; center[z] +1.255->+1.259; radii[x] +0.090->+0.094; radii[z] +0.075->+0.079
+  ear disc: center[x] +0.135->+0.128; radii[x] +0.022->+0.019; radii[z] +0.056->+0.048; rotate[y] +0.000->+8.000
+  hair spike: a[x] +0.070->+0.091; a[z] +1.250->+1.237; b[x] +0.168->+0.147; b[y] +0.185->+0.164; b[z] +1.238->+1.259; ra +0.028->+0.030
+  backpack: center[y] +0.055->+0.067; center[z] +1.060->+1.072; half[x] +0.072->+0.083; half[z] +0.100->+0.115
+  shoulder pad: center[x] +0.140->+0.127; center[y] -0.065->-0.054; center[z] +1.080->+1.105; radii[x] +0.052->+0.044; radii[y] +0.070->+0.060; radii[z] +0.065->+0.075; rotate[y] +0.000->-24.000; rotate[z] +0.000->-8.000
+  upper arm: a[x] +0.165->+0.141; a[z] +1.040->+1.059; b[x] +0.185->+0.188; b[z] +0.880->+0.907; ra +0.042->+0.038; rb +0.040->+0.039
+  gauntlet: a[y] -0.065->-0.049; b[x] +0.232->+0.238; b[y] -0.065->-0.062; ra +0.064->+0.061; rb +0.040->+0.034
+  fist: center[x] +0.228->+0.235
+  thigh: a[x] +0.075->+0.077; a[y] -0.060->-0.049; a[z] +0.720->+0.721; b[x] +0.120->+0.131; b[y] -0.040->-0.025; b[z] +0.460->+0.461; ra +0.068->+0.072; rb +0.055->+0.052
+  boot cuff: center[x] +0.152->+0.148; center[y] +0.008->+0.022; center[z] +0.415->+0.408; radii[x] +0.083->+0.095; radii[y] +0.076->+0.077; radii[z] +0.050->+0.057; rotate[x] +0.000->+8.000; rotate[y] +0.000->-9.600
+  boot: a[x] +0.158->+0.161; a[y] +0.008->-0.001; a[z] +0.390->+0.363; b[y] +0.020->+0.025; b[z] +0.100->+0.108; rb +0.055->+0.053
+  foot: center[x] +0.218->+0.229; center[y] -0.020->-0.039; center[z] +0.045->+0.053; radii[x] +0.072->+0.085; radii[y] +0.115->+0.139; radii[z] +0.045->+0.055; rotate[x] +0.000->+10.880; rotate[y] +0.000->+8.000; rotate[z] +0.000->-1.037
+part checks:
+  no problems found

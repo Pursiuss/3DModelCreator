@@ -1,0 +1,73 @@
+{
+ "params": {
+  "refs": "tests/animals/turtle",
+  "out": "C:\\Users\\paris\\Documents\\School\\Algoma CS\\Sem 3\\Software Engineering\\penguin-challenge-kit\\tests\\results\\turtle",
+  "round": 2.0,
+  "res": 280,
+  "blur": 1.5,
+  "smooth": 12,
+  "tol": 3,
+  "note": "",
+  "skip_view": []
+ },
+ "voxel_mm": 1.62,
+ "triangles": 238994,
+ "extent_m": {
+  "width": 0.317,
+  "length": 0.455,
+  "height": 0.135
+ },
+ "subject_m": {
+  "height": 0.135,
+  "length": 0.454,
+  "width": 0.332,
+  "backdrop": [
+   0.55,
+   0.7,
+   0.85
+  ]
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.181,
+  "back": 0.127,
+  "side": 0.176,
+  "side_mirror": 0.176,
+  "top": 0.34,
+  "unseen": 0.116
+ },
+ "self_check": {
+  "untextured_shape": 0.97,
+  "textured_shape": 0.97,
+  "colour_match": 0.755,
+  "views": {
+   "front": {
+    "iou": 0.974,
+    "reference_missed": 0.013,
+    "model_outside": 0.014
+   },
+   "back": {
+    "iou": 0.974,
+    "reference_missed": 0.013,
+    "model_outside": 0.014
+   },
+   "side": {
+    "iou": 0.985,
+    "reference_missed": 0.0,
+    "model_outside": 0.015
+   },
+   "top": {
+    "iou": 0.949,
+    "reference_missed": 0.038,
+    "model_outside": 0.014
+   }
+  }
+ },
+ "seconds": 17.7
+}

@@ -1,0 +1,70 @@
+{
+ "params": {
+  "refs": "penguin",
+  "out": "tests/results/penguin-skipback",
+  "round": 2.0,
+  "res": 280,
+  "blur": 1.5,
+  "smooth": 12,
+  "tol": 3,
+  "note": "skip-view test",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "voxel_mm": 2.49,
+ "triangles": 223628,
+ "extent_m": {
+  "width": 0.251,
+  "length": 0.295,
+  "height": 0.693
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.262,
+  "back": 0.275,
+  "side": 0.214,
+  "side_mirror": 0.217,
+  "top": 0.032,
+  "unseen": 0.064
+ },
+ "self_check": {
+  "untextured_shape": 0.979,
+  "textured_shape": 0.979,
+  "colour_match": 0.215,
+  "views": {
+   "front": {
+    "iou": 0.984,
+    "reference_missed": 0.003,
+    "model_outside": 0.013
+   },
+   "back": {
+    "iou": 0.969,
+    "reference_missed": 0.016,
+    "model_outside": 0.015
+   },
+   "side": {
+    "iou": 0.988,
+    "reference_missed": 0.004,
+    "model_outside": 0.008
+   },
+   "top": {
+    "iou": 0.977,
+    "reference_missed": 0.014,
+    "model_outside": 0.009
+   }
+  }
+ },
+ "seconds": 17.1
+}

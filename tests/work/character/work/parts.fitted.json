@@ -1,0 +1,367 @@
+{
+ "parts": [
+  {
+   "name": "chest",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.0266,
+    0.994
+   ],
+   "radii": [
+    0.1084,
+    0.092,
+    0.23
+   ],
+   "rotate": [
+    -5.12,
+    0.0,
+    0.0
+   ],
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hips",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.06,
+    0.8097
+   ],
+   "radii": [
+    0.1256,
+    0.082,
+    0.0977
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.05,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.055,
+    1.12
+   ],
+   "b": [
+    0.0,
+    -0.055,
+    1.22
+   ],
+   "ra": 0.048,
+   "rb": 0.045,
+   "blend": 0.03,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "helmet",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.0374,
+    1.355
+   ],
+   "radii": [
+    0.1353,
+    0.1532,
+    0.1467
+   ],
+   "rotate": [
+    -4.8,
+    0.0,
+    0.0
+   ],
+   "blend": 0.02,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "face",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.0778,
+    1.2589
+   ],
+   "radii": [
+    0.0942,
+    0.075,
+    0.079
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.015,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "ear disc",
+   "type": "ellipsoid",
+   "center": [
+    0.1283,
+    0.0,
+    1.3
+   ],
+   "radii": [
+    0.0187,
+    0.056,
+    0.0476
+   ],
+   "rotate": [
+    0.0,
+    8.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.006,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hair spike",
+   "type": "capsule",
+   "a": [
+    0.0911,
+    0.04,
+    1.2374
+   ],
+   "b": [
+    0.1469,
+    0.1639,
+    1.2591
+   ],
+   "ra": 0.0298,
+   "rb": 0.004,
+   "mirror": true,
+   "blend": 0.01,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "backpack",
+   "type": "box",
+   "center": [
+    0.0,
+    0.067,
+    1.072
+   ],
+   "half": [
+    0.0828,
+    0.04,
+    0.115
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "round": 0.02,
+   "blend": 0.01,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "shoulder pad",
+   "type": "ellipsoid",
+   "center": [
+    0.1266,
+    -0.0536,
+    1.1052
+   ],
+   "radii": [
+    0.0442,
+    0.0595,
+    0.0748
+   ],
+   "rotate": [
+    0.0,
+    -24.0,
+    -8.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "upper arm",
+   "type": "capsule",
+   "a": [
+    0.1415,
+    -0.065,
+    1.0593
+   ],
+   "b": [
+    0.1875,
+    -0.065,
+    0.9074
+   ],
+   "ra": 0.0382,
+   "rb": 0.0391,
+   "mirror": true,
+   "blend": 0.02,
+   "ignore_views": [
+    "side",
+    "top"
+   ]
+  },
+  {
+   "name": "gauntlet",
+   "type": "capsule",
+   "a": [
+    0.198,
+    -0.0489,
+    0.895
+   ],
+   "b": [
+    0.2378,
+    -0.0615,
+    0.765
+   ],
+   "ra": 0.0605,
+   "rb": 0.034,
+   "mirror": true,
+   "blend": 0.01,
+   "ignore_views": [
+    "side",
+    "top"
+   ]
+  },
+  {
+   "name": "fist",
+   "type": "ellipsoid",
+   "center": [
+    0.2346,
+    -0.065,
+    0.69
+   ],
+   "radii": [
+    0.045,
+    0.05,
+    0.055
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.015,
+   "ignore_views": [
+    "side",
+    "top"
+   ]
+  },
+  {
+   "name": "thigh",
+   "type": "capsule",
+   "a": [
+    0.0775,
+    -0.0486,
+    0.7213
+   ],
+   "b": [
+    0.1314,
+    -0.0251,
+    0.4613
+   ],
+   "ra": 0.0724,
+   "rb": 0.0522,
+   "mirror": true,
+   "blend": 0.04,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "boot cuff",
+   "type": "ellipsoid",
+   "center": [
+    0.148,
+    0.0215,
+    0.4078
+   ],
+   "radii": [
+    0.0954,
+    0.0769,
+    0.0575
+   ],
+   "rotate": [
+    8.0,
+    -9.6,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "boot",
+   "type": "capsule",
+   "a": [
+    0.1607,
+    -0.0011,
+    0.3632
+   ],
+   "b": [
+    0.205,
+    0.0246,
+    0.1085
+   ],
+   "ra": 0.064,
+   "rb": 0.0528,
+   "mirror": true,
+   "blend": 0.02,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "foot",
+   "type": "ellipsoid",
+   "center": [
+    0.2288,
+    -0.0393,
+    0.0529
+   ],
+   "radii": [
+    0.0855,
+    0.1394,
+    0.0545
+   ],
+   "rotate": [
+    10.88,
+    8.0,
+    -1.0368
+   ],
+   "mirror": true,
+   "blend": 0.02,
+   "ignore_views": [
+    "top"
+   ]
+  }
+ ]
+}

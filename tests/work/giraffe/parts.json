@@ -1,0 +1,9 @@
+{"parts": [
+ {"name": "body", "type": "ellipsoid", "center": [0, 0.29, 2.05], "radii": [0.34, 0.8, 0.4]},
+ {"name": "neck", "type": "capsule", "a": [0, -0.3, 2.25], "b": [0, -0.72, 4.0], "ra": 0.17, "rb": 0.15, "blend": 0.12},
+ {"name": "head", "type": "ellipsoid", "center": [0, -0.9, 4.1], "radii": [0.13, 0.32, 0.14], "rotate": [-10, 0, 0], "blend": 0.06},
+ {"name": "ossicone", "type": "capsule", "a": [0.06, -0.78, 4.2], "b": [0.06, -0.74, 4.52], "ra": 0.03, "rb": 0.03, "mirror": true, "blend": 0.02},
+ {"name": "front leg", "type": "capsule", "a": [0.2, -0.28, 1.85], "b": [0.2, -0.28, 0.035], "ra": 0.067, "rb": 0.06, "mirror": true, "blend": 0.06},
+ {"name": "hind leg", "type": "capsule", "a": [0.2, 0.82, 1.85], "b": [0.2, 0.82, 0.035], "ra": 0.067, "rb": 0.06, "mirror": true, "blend": 0.06},
+ {"name": "tail", "type": "capsule", "a": [0, 1.0, 2.2], "b": [0, 1.22, 1.33], "ra": 0.03, "rb": 0.03, "blend": 0.03}
+]}

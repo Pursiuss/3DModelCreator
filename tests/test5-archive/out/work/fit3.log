@@ -1,0 +1,26 @@
+start: mean outline overlap 0.920
+sweep 1: overlap 0.923 (7 changes)
+sweep 2: overlap 0.924 (3 changes)
+sweep 3: overlap 0.924 (1 changes)
+sweep 4: overlap 0.926 (4 changes)
+sweep 5: overlap 0.926 (1 changes)
+sweep 6: overlap 0.926 (5 changes)
+outline overlap per view (before -> after): front 0.94 -> 0.94, back 0.93 -> 0.93, side 0.94 -> 0.94, top 0.88 -> 0.89
+  body: unchanged
+  lower body: center[z] +0.188->+0.187; radii[z] +0.133->+0.137; rotate[x] +9.000->+11.880
+  neck: a[z] +0.488->+0.492; b[y] -0.029->-0.033; b[z] +0.625->+0.642; ra +0.070->+0.071
+  head: center[z] +0.638->+0.639; radii[x] +0.054->+0.046; radii[y] +0.066->+0.067; radii[z] +0.056->+0.051; rotate[x] +2.000->-6.000
+  beak: unchanged
+  flipper: unchanged
+  tail: center[z] +0.080->+0.082; radii[y] +0.064->+0.054; radii[z] +0.013->+0.016
+  leg: unchanged
+  foot pad: unchanged
+  toe inner: unchanged
+  toe middle: unchanged
+  toe outer: unchanged
+  claw inner: unchanged
+  claw middle: unchanged
+  claw outer: unchanged
+part checks:
+  no problems found
+wrote out/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/work

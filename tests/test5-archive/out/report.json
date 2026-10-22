@@ -1,0 +1,73 @@
+{
+ "params": {
+  "refs": "refs/penguin",
+  "out": "out",
+  "parts": "out/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "note": "round-4 blockout; legs/feet/toes/claws ignore back (user: feet drawn wrong way) and top (toe spread disagrees with front)",
+  "skip_view": []
+ },
+ "method": "blockout (15 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (2.49 mm voxels), smoothed; kept 1 of 1 mesh pieces",
+ "voxel_mm": 2.49,
+ "triangles": 189080,
+ "extent_m": {
+  "width": 0.24,
+  "length": 0.285,
+  "height": 0.685
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.249,
+  "back": 0.265,
+  "side": 0.205,
+  "side_mirror": 0.204,
+  "top": 0.02,
+  "unseen_filled": 0.057,
+  "duplicate_features_removed": 10
+ },
+ "self_check": {
+  "untextured_shape": 0.899,
+  "textured_shape": 0.899,
+  "colour_match": 0.217,
+  "views": {
+   "front": {
+    "iou": 0.914,
+    "reference_missed": 0.061,
+    "model_outside": 0.028
+   },
+   "back": {
+    "iou": 0.914,
+    "reference_missed": 0.066,
+    "model_outside": 0.023
+   },
+   "side": {
+    "iou": 0.922,
+    "reference_missed": 0.05,
+    "model_outside": 0.031
+   },
+   "top": {
+    "iou": 0.846,
+    "reference_missed": 0.126,
+    "model_outside": 0.036
+   }
+  }
+ },
+ "seconds": 258.5
+}

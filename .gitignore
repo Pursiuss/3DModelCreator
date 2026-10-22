@@ -1,0 +1,5 @@
+# Python environments and caches (rebuilt automatically)
+.venv/
+.venv-skill/
+__pycache__/
+*.pyc

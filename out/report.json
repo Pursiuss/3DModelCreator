@@ -1,0 +1,73 @@
+{
+ "params": {
+  "refs": "penguin",
+  "out": "out",
+  "parts": "out/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "note": "v4: angle-aware joins, round cones, wedge tail, flipper stands off",
+  "skip_view": []
+ },
+ "method": "blockout (15 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (2.49 mm voxels), smoothed; kept 1 of 1 mesh pieces",
+ "voxel_mm": 2.49,
+ "triangles": 188160,
+ "extent_m": {
+  "width": 0.254,
+  "length": 0.29,
+  "height": 0.686
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "texture_views": {
+  "front": 0.248,
+  "back": 0.268,
+  "side": 0.201,
+  "side_mirror": 0.201,
+  "top": 0.022,
+  "unseen_filled": 0.06,
+  "duplicate_features_removed": 14
+ },
+ "self_check": {
+  "untextured_shape": 0.92,
+  "textured_shape": 0.92,
+  "colour_match": 0.218,
+  "views": {
+   "front": {
+    "iou": 0.929,
+    "reference_missed": 0.037,
+    "model_outside": 0.037
+   },
+   "back": {
+    "iou": 0.936,
+    "reference_missed": 0.038,
+    "model_outside": 0.028
+   },
+   "side": {
+    "iou": 0.905,
+    "reference_missed": 0.06,
+    "model_outside": 0.04
+   },
+   "top": {
+    "iou": 0.909,
+    "reference_missed": 0.065,
+    "model_outside": 0.029
+   }
+  }
+ },
+ "seconds": 95.8
+}

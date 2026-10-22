@@ -1,0 +1,352 @@
+{
+ "parts": [
+  {
+   "name": "torso",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.045,
+    0.7525
+   ],
+   "radii": [
+    0.1079,
+    0.0862,
+    0.1781
+   ],
+   "rotate": [
+    -8.0,
+    0.0,
+    0.0
+   ],
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hips",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.0268,
+    0.6195
+   ],
+   "radii": [
+    0.1212,
+    0.088,
+    0.115
+   ],
+   "rotate": [
+    16.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.05,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.045,
+    0.9
+   ],
+   "b": [
+    0.0,
+    -0.0342,
+    0.99
+   ],
+   "ra": 0.038,
+   "rb": 0.036,
+   "blend": 0.03,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.038,
+    1.135
+   ],
+   "radii": [
+    0.135,
+    0.152,
+    0.16
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.03,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "nose",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.183,
+    1.0
+   ],
+   "radii": [
+    0.014,
+    0.014,
+    0.014
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.008,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "ear",
+   "type": "ellipsoid",
+   "center": [
+    0.135,
+    -0.015,
+    1.03
+   ],
+   "radii": [
+    0.014,
+    0.02,
+    0.026
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.006,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "upright hair horn",
+   "type": "capsule",
+   "a": [
+    -0.085,
+    -0.07,
+    1.2
+   ],
+   "b": [
+    -0.135,
+    -0.05,
+    1.335
+   ],
+   "ra": 0.045,
+   "rb": 0.004,
+   "blend": 0.02,
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "swept hair horn",
+   "type": "capsule",
+   "a": [
+    0.09,
+    -0.02,
+    1.19
+   ],
+   "b": [
+    0.235,
+    -0.01,
+    1.21
+   ],
+   "ra": 0.05,
+   "rb": 0.004,
+   "blend": 0.02,
+   "fit": false,
+   "ignore_views": [
+    "side",
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "upper arm",
+   "type": "capsule",
+   "a": [
+    0.095,
+    -0.045,
+    0.895
+   ],
+   "b": [
+    0.27,
+    -0.045,
+    0.79
+   ],
+   "ra": 0.046,
+   "rb": 0.04,
+   "mirror": true,
+   "blend": 0.02,
+   "fit": false,
+   "ignore_views": [
+    "side",
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "forearm",
+   "type": "capsule",
+   "a": [
+    0.27,
+    -0.045,
+    0.79
+   ],
+   "b": [
+    0.415,
+    -0.045,
+    0.7
+   ],
+   "ra": 0.04,
+   "rb": 0.032,
+   "mirror": true,
+   "blend": 0.01,
+   "fit": false,
+   "ignore_views": [
+    "side",
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hand",
+   "type": "ellipsoid",
+   "center": [
+    0.465,
+    -0.045,
+    0.655
+   ],
+   "radii": [
+    0.075,
+    0.02,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    32.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "fit": false,
+   "ignore_views": [
+    "side",
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "leg",
+   "type": "capsule",
+   "a": [
+    0.0817,
+    -0.0496,
+    0.5448
+   ],
+   "b": [
+    0.057,
+    0.0131,
+    0.3424
+   ],
+   "ra": 0.046,
+   "rb": 0.0448,
+   "mirror": true,
+   "blend": 0.03,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "boot cuff",
+   "type": "ellipsoid",
+   "center": [
+    0.0606,
+    -0.0228,
+    0.366
+   ],
+   "radii": [
+    0.0782,
+    0.0774,
+    0.03
+   ],
+   "rotate": [
+    12.8,
+    0.0,
+    -1.728
+   ],
+   "mirror": true,
+   "blend": 0.008,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "boot",
+   "type": "capsule",
+   "a": [
+    0.0875,
+    -0.0168,
+    0.3913
+   ],
+   "b": [
+    0.1053,
+    -0.01,
+    0.0728
+   ],
+   "ra": 0.0631,
+   "rb": 0.0631,
+   "mirror": true,
+   "blend": 0.015,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "boot foot",
+   "type": "ellipsoid",
+   "center": [
+    0.1381,
+    -0.0911,
+    0.0601
+   ],
+   "radii": [
+    0.0978,
+    0.1275,
+    0.0612
+   ],
+   "rotate": [
+    0.0,
+    10.88,
+    16.0
+   ],
+   "mirror": true,
+   "blend": 0.02,
+   "ignore_views": [
+    "top"
+   ]
+  }
+ ]
+}
