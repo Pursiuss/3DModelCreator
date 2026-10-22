@@ -14,7 +14,7 @@ You get one folder path, `REFS`, holding:
 | File | What |
 |---|---|
 | `front.png`, `side.png`, `back.png`, `top.png` | orthographic reference views of the animal, usually with a transparent background |
-| `final.png` | the finished look: the texture target |
+| `final.png` | the finished look, in a scene: what the expert reviewers compare the texture with (the scoring script compares it with the four views instead) |
 | `subject.json` | real size in metres: `{"height": .., "length": .., "width": ..}` (may also hold a `backdrop` colour) |
 
 You must write, in `out/` under the current working directory unless the task names another place:
@@ -243,8 +243,12 @@ Open the two previews next to the references. The model passes when:
   closed; nothing shows that the references hide (legs under feathers);
 - each eye, marking and colour patch appears once, where the references have it, and no part carries another
   part's colour (black flipper smudges on a white chest, beak red on the face);
-- `report.json`: `self_check.untextured_shape` is 0.88 or more and every `self_check.views[*].iou` is 0.82 or more
-  (the outline match; the judges' bar is 0.80 with their own masks), and `warnings` is empty or dealt with.
+- `report.json` (the self-check runs the judges' scoring script, kit v0.2, against masks made from the references):
+  `self_check.untextured_shape` is 0.85 or more, `self_check.gross_errors` is empty, `self_check.colour_score` is
+  0.85 or more, and `warnings` is empty or dealt with. The judges' bar is 0.80 on shape and colour with their own
+  masks; both scores are the mean of the best two of the front, side and top views, and a gross error (more than 2%
+  of a view's picture wrong by more than 3% of the animal's size: a missing or misplaced head, foot, tail) fails
+  the shape test whatever the score.
 
 If it does not pass, fix the cause:
 
@@ -278,7 +282,7 @@ Append to `out/run-log.md` (keep what the scripts wrote):
 - Models used: <your exact model name and version>, effort: <your reasoning effort setting>
 - Animal: <what it is>, body plan, parts modelled (and any left out, with why)
 - Blockout rounds: <n>, what changed each round; build runs: <n>, options of the final build
-- Final self-check: shape <..>, per view <..>, colour match <..>
+- Final self-check: shape <..>, gross errors <..>, colour <..>, per view IoU and colour <..>
 - What failed or looks weak: <be specific: missing or simplified parts, texture seams, view disagreements>
 ```
 

@@ -47,7 +47,7 @@ def check_refs(refs, S):
 def self_score(model, refs, maps, out_dir, textured):
     md = os.path.join(out_dir, "selfcheck"); os.makedirs(md, exist_ok=True)
     for v, vm in maps.items(): Image.fromarray((vm.sil * 255).astype(np.uint8)).save(os.path.join(md, f"{v}-mask.png"))
-    for f in ("subject.json", "final.png"):
+    for f in ("subject.json", "front.png", "side.png", "back.png", "top.png"):     # pictures: for the colour score
         src = os.path.join(refs, f)
         if os.path.exists(src): open(os.path.join(md, f), "wb").write(open(src, "rb").read())
     cmd = [sys.executable, os.path.join(HERE, "score_glb.py"), model, md] + (["--textured"] if textured else [])
@@ -91,8 +91,8 @@ def main():
               "extent_m": {"width": round(ext[0], 3), "length": round(ext[1], 3), "height": round(ext[2], 3)},
               "subject_m": S["size"], "silhouettes": S["notes"], "warnings": warnings,
               "texture_views": tstats, "self_check": {"untextured_shape": s_shape["shape_score"],
-              "textured_shape": s_tex["shape_score"], "colour_match": s_tex.get("colour_match"),
-              "views": s_shape["views"]}, "seconds": round(time.time() - t0, 1)}
+              "textured_shape": s_tex["shape_score"], "gross_errors": s_shape.get("gross_errors", []),
+              "colour_score": s_tex.get("colour_score"), "views": s_tex["views"]}, "seconds": round(time.time() - t0, 1)}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)
 
     log = os.path.join(a.out, "run-log.md"); new = not os.path.exists(log)
@@ -104,8 +104,9 @@ def main():
         f.write(f"- Command: `build.py {args}`\n")
         f.write(f"- Shape: {method}\n")
         f.write(f"- Texture: projected from the reference views (share per view, and share filled from neighbours): {tstats}\n")
-        f.write(f"- Self-check (own masks): shape {report['self_check']['untextured_shape']}, textured shape "
-                f"{report['self_check']['textured_shape']}, colour match {report['self_check']['colour_match']}\n")
+        sc = report["self_check"]
+        f.write(f"- Self-check (own masks, kit v0.2 scorer): shape {sc['untextured_shape']} (textured "
+                f"{sc['textured_shape']}), gross errors {', '.join(sc['gross_errors']) or 'none'}, colour {sc['colour_score']}\n")
         f.write(f"- Warnings: {'; '.join(warnings) if warnings else 'none'}\n- Time: {report['seconds']} s\n\n")
     print(json.dumps(report, indent=1))
 

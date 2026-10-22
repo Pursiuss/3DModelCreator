@@ -28,8 +28,8 @@ def main():
                                                      capture_output=True, text=True, check=True).stdout)
         a, b = s("untextured.glb"), s("textured.glb", "--textured")
         views = " ".join(f"{k} {v['iou']}" for k, v in a["views"].items())
-        ok = a["shape_score"] >= 0.8 and (b.get("colour_match") or 0) >= 0.8
-        rows.append(f"| {name} | {a['shape_score']} | {b.get('colour_match')} | {'pass' if ok else 'FAIL'} | {views} | "
+        ok = a["shape_score"] >= 0.8 and not a.get("gross_errors") and (b.get("colour_score") or 0) >= 0.8
+        rows.append(f"| {name} | {a['shape_score']} | {b.get('colour_score')} | {'pass' if ok else 'FAIL'} | {views} | "
                     f"{rep['seconds']} s; {'; '.join(rep['warnings']) or 'no warnings'} |")
         print(rows[-1], flush=True)
     with open(os.path.join(KIT, "tests", "results", "summary.md"), "w", encoding="utf-8") as f:
