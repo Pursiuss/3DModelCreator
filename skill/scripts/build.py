@@ -14,7 +14,7 @@ import argparse, datetime, json, os, subprocess, sys, time
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS
+from views import VIEWS, load_subject
 from carve import build_shape, build_shape_parts, recentre
 from texture import texture_mesh
 from glb_io import write_glb
@@ -47,7 +47,9 @@ def check_refs(refs, S):
 def self_score(model, refs, maps, out_dir, textured):
     md = os.path.join(out_dir, "selfcheck"); os.makedirs(md, exist_ok=True)
     for v, vm in maps.items(): Image.fromarray((vm.sil * 255).astype(np.uint8)).save(os.path.join(md, f"{v}-mask.png"))
-    for f in ("subject.json", "front.png", "side.png", "back.png", "top.png"):     # pictures: for the colour score
+    size, _ = load_subject(refs)                                    # the scorer reads only the three sizes
+    json.dump({k: size[k] for k in ("height", "length", "width")}, open(os.path.join(md, "subject.json"), "w"))
+    for f in ("front.png", "side.png", "back.png", "top.png"):     # pictures: for the colour score
         src = os.path.join(refs, f)
         if os.path.exists(src): open(os.path.join(md, f), "wb").write(open(src, "rb").read())
     cmd = [sys.executable, os.path.join(HERE, "score_glb.py"), model, md] + (["--textured"] if textured else [])

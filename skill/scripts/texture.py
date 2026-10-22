@@ -19,7 +19,7 @@ Choosing the view for a triangle:
    as flat swatches of that part's own main colours. Nothing is smeared on from a view that cannot see the spot.
 The texture atlas is the four reference images cropped to the animal, side by side, plus a strip of swatches.
 """
-import warnings
+import os, warnings
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage
@@ -116,13 +116,16 @@ def paddle_shadow(parts, pid_face, cen, n, cand, size, rel=0.02):
     face, the flank under it) drawn in the gap. The model's paddle never sits exactly where it is drawn, so those
     gap colours land on the body next to it, or on the paddle's edge: white slivers on a black flank. So the body
     within about 2% of the animal's size of a paddle, and the paddle's own inner face (the side towards the body),
-    take no colour from any picture; they are flood-filled from the colour regions around them."""
+    take no colour from any picture; they are flood-filled from the colour regions around them. Not around the
+    paddle's root: the shoulder it grows out of is drawn as it is."""
     import parts as PT
     reach = rel * max(size["width"], size["length"], size["height"])
     for i, p in enumerate(parts):
         if p["type"] != "paddle": continue
         d = PT.sdf_part(p, cen)
-        cand[(pid_face != i) & (d < reach)] = False
+        root = np.min([np.linalg.norm(cen - inst["a"], axis=1) for inst in PT.instances(p)], 0)
+        away = root > float(p["ra"]) + 2 * reach          # around the root the body is drawn as it is (shoulder)
+        cand[(pid_face != i) & (d < reach) & away] = False
         mine = np.nonzero(pid_face == i)[0]
         for inst in PT.instances(p):
             fn = PT.paddle_frame(inst)[2]
@@ -184,13 +187,32 @@ def dedupe_features(refs, maps, cand, facing, cen, names, vis_face, size, F):
     return removed, kept
 
 
-def solid_rgb(refs, view):
+_SOLID = {}
+
+
+def solid_rgb(refs, view, stray=70.0):
     """The reference's colours with every not-fully-opaque pixel (soft edges, which carry odd fringe colours) replaced
-    by the nearest fully opaque one."""
+    by the nearest fully opaque one, and stray specks removed: a tiny patch (under 0.01% of the animal's picture, a
+    few pixels) whose colour is far from every colour of the animal's palette, such as a green fringe left inside
+    the cut-out. Eyes, claws and other small marks are close to a palette colour, or bigger, and stay."""
+    key = (os.path.abspath(refs), view)
+    if key in _SOLID: return _SOLID[key].copy()
     a = np.array(load_rgba(refs, view)); solid = a[..., 3] >= 250
-    if not solid.any() or solid.all(): return a[..., :3].copy()
+    if not solid.any() or solid.all():
+        _SOLID[key] = a[..., :3].copy(); return _SOLID[key].copy()
+    _, feat, pal_f = palette(refs)
+    rgb = a[..., :3].astype(float)
+    far = np.zeros(solid.shape, bool)
+    ys, xs = np.nonzero(solid)
+    far[ys, xs] = np.sqrt(((feat(rgb[ys, xs])[:, None] - pal_f[None]) ** 2).sum(2)).min(1) > stray
+    lab, nl = ndimage.label(far)
+    if nl:
+        sizes = ndimage.sum(far, lab, range(1, nl + 1))
+        speck = np.isin(lab, 1 + np.nonzero(sizes <= max(12, 1e-4 * solid.sum()))[0])
+        solid = solid & ~ndimage.binary_dilation(speck, iterations=1)
     _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
-    return a[..., :3][iy, ix]
+    _SOLID[key] = a[..., :3][iy, ix]
+    return _SOLID[key].copy()
 
 
 def build_atlas(refs, maps, height=1024, pad=10):
@@ -449,6 +471,7 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
     vc = np.zeros((len(V), 3)); cnt = np.zeros(len(V))                 # part colour where no picture sees
     np.add.at(vc, F.reshape(-1), np.repeat(fcol, 3, 0)); np.add.at(cnt, F.reshape(-1), 1)
     vc /= np.maximum(cnt, 1)[:, None]
+    for _ in range(6): vc = 0.5 * vc + 0.5 * (A @ vc) / deg[:, None]     # soft, not stepped, where fills meet
     raw_t += Wt[:, K, None] * (vc[F[t]] * w[..., None]).sum(1)
     raw_v += Wv[:, K, None] * vc
 

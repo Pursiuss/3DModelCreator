@@ -220,11 +220,17 @@ What it does:
   pictures agree. A feature two pictures would paint twice (an eye) is painted once. A paddle takes colours only
   from pictures that see its flat faces. A part whose tip points at a camera (a beak seen from the front) takes no
   colours from that camera, and neither does the area just around its base in that picture. A small mirrored
-  group (one foot with its toes and claws) is coloured from at most two pictures.
+  group (one foot with its toes and claws) is coloured from at most two pictures. No picture colours surfaces facing
+  downward (drawings show the shadow under a body there), a paddle's inner face (the side towards the body), or the
+  body just beside a paddle away from its root (the drawings show the gap between them there). Tiny specks in a
+  picture whose colour is far from every palette colour (a green fringe left in the cut-out) are ignored.
+- Spots no picture colours are not guessed: each is flood-filled flat with the average colour of its part, taken
+  per colour region from the area's border (white where it meets the white belly, black where it meets the black
+  back), so it stays consistent with the figure.
 - Texture: each part is unrolled along its own shape (tubes like sleeves, egg shapes like a world map) into one
   texture image, with the cuts on the back or underneath. Where a picture sees a spot squarely and away from other
   parts, the drawing is kept as drawn (eyes, faces, emblems, spots); elsewhere (slanted views, part edges,
-  handovers between pictures, unseen soles and undersides) a colour plan takes over: the animal's few colours as
+  handovers between pictures) a colour plan takes over: the animal's few colours as
   smooth regions on each part, with the drawing's fine detail on top. Parts with a `"colour"` are painted in it.
   One picture's area fades into the next's over about a centimetre.
 

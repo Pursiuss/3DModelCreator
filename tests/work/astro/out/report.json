@@ -10,7 +10,7 @@
   "blur": null,
   "smooth": null,
   "tol": 3,
-  "note": "underside fill",
+  "note": "speck clean-up",
   "skip_view": []
  },
  "method": "blockout (15 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (4.82 mm voxels), smoothed; kept 1 of 4 mesh pieces",
@@ -49,31 +49,47 @@
   "palette_colours": 9
  },
  "self_check": {
-  "untextured_shape": 0.594,
-  "textured_shape": 0.594,
-  "colour_match": 0.709,
+  "untextured_shape": 0.687,
+  "textured_shape": 0.687,
+  "gross_errors": [
+   "side",
+   "top"
+  ],
+  "colour_score": 0.812,
   "views": {
    "front": {
     "iou": 0.83,
     "reference_missed": 0.146,
-    "model_outside": 0.033
+    "model_outside": 0.033,
+    "scored": true,
+    "off_target": 0.0005,
+    "colour": 0.903
    },
    "back": {
     "iou": 0.484,
     "reference_missed": 0.435,
-    "model_outside": 0.228
+    "model_outside": 0.228,
+    "scored": false,
+    "off_target": 0.2819,
+    "colour": 0.605
    },
    "side": {
     "iou": 0.544,
     "reference_missed": 0.325,
-    "model_outside": 0.262
+    "model_outside": 0.262,
+    "scored": true,
+    "off_target": 0.0646,
+    "colour": 0.722
    },
    "top": {
     "iou": 0.517,
     "reference_missed": 0.48,
-    "model_outside": 0.01
+    "model_outside": 0.01,
+    "scored": true,
+    "off_target": 0.1608,
+    "colour": 0.305
    }
   }
  },
- "seconds": 98.1
+ "seconds": 94.1
 }
