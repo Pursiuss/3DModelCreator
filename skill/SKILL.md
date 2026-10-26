@@ -15,10 +15,11 @@ You get one folder path, `REFS`, holding:
 |---|---|
 | `front.png`, `side.png`, `back.png`, `top.png` | orthographic reference views of the animal, usually with a transparent background |
 | `final.png` | the finished look, in a scene: what the expert reviewers compare the texture with (the scoring script compares it with the four views instead) |
-| `subject.json` | real size in metres: `{"height": .., "length": .., "width": ..}` (may also hold a `backdrop` colour) |
+| `subject.json` | real size in metres: `{"height": .., "length": .., "width": ..}` |
 
 You must write, in `out/` under the current working directory unless the task names another place:
-`out/untextured.glb`, `out/textured.glb`, `out/run-log.md` (models used, effort, steps, what failed).
+`out/untextured.glb`, `out/textured.glb`, `out/run-log.md` (models used, effort, steps, what failed, and every
+image-generation call; this skill makes none, and the log must say so).
 Working files go in `out/work/`.
 
 Rules: **never edit an output file by hand**, and never edit, flip or replace the reference images. Every change goes
@@ -289,6 +290,7 @@ Append to `out/run-log.md` (keep what the scripts wrote):
 - Animal: <what it is>, body plan, parts modelled (and any left out, with why)
 - Blockout rounds: <n>, what changed each round; build runs: <n>, options of the final build
 - Final self-check: shape <..>, gross errors <..>, colour <..>, per view IoU and colour <..>
+- Image-generation calls: none (no AI image tool was used to repair or generate views)
 - What failed or looks weak: <be specific: missing or simplified parts, texture seams, view disagreements>
 ```
 
