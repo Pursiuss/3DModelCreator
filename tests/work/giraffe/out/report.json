@@ -1,0 +1,100 @@
+{
+ "params": {
+  "refs": "tests/animals/giraffe",
+  "out": "tests/work/giraffe/out",
+  "parts": "tests/work/giraffe/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "final build",
+  "skip_view": [
+   "top",
+   "back"
+  ]
+ },
+ "method": "blockout (22 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 2 of 2 mesh pieces",
+ "voxel_mm": 17.86,
+ "triangles": 106256,
+ "extent_m": {
+  "width": 0.899,
+  "length": 3.096,
+  "height": 4.984
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 3.221,
+  "width": 0.908
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front width 0.908 m vs top width 0.718 m disagree by more than 8% (pose or framing differs)",
+  "side length 3.221 m vs top length 3.896 m disagree by more than 8% (pose or framing differs)",
+  "front and mirrored back outlines overlap only 0.82: pose differs between views",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): lower jaw, hind hoof fwd, hind hoof back"
+ ],
+ "texture_views": {
+  "front": 0.099,
+  "back": 0.109,
+  "side": 0.302,
+  "side_mirror": 0.301,
+  "top": 0.021,
+  "unseen_filled": 0.168,
+  "duplicate_features_removed": 4,
+  "uv_islands": 25,
+  "texel_mm": 2.82,
+  "palette_colours": 5
+ },
+ "self_check": {
+  "untextured_shape": 0.828,
+  "textured_shape": 0.828,
+  "gross_errors": [
+   "top"
+  ],
+  "colour_score": 0.877,
+  "views": {
+   "front": {
+    "iou": 0.838,
+    "reference_missed": 0.116,
+    "model_outside": 0.059,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.857
+   },
+   "back": {
+    "iou": 0.655,
+    "reference_missed": 0.208,
+    "model_outside": 0.208,
+    "scored": false,
+    "off_target": 0.0061,
+    "colour": 0.845
+   },
+   "side": {
+    "iou": 0.818,
+    "reference_missed": 0.129,
+    "model_outside": 0.069,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.896
+   },
+   "top": {
+    "iou": 0.66,
+    "reference_missed": 0.14,
+    "model_outside": 0.261,
+    "scored": true,
+    "off_target": 0.0571,
+    "colour": 0.803
+   }
+  }
+ },
+ "seconds": 116.5
+}

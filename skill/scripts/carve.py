@@ -215,6 +215,8 @@ def keep_main_pieces(V, F, min_share=0.02):
     fl = lab[F[:, 0]]; counts = np.bincount(fl)
     keep = counts[fl] >= min_share * counts.max()
     used = np.unique(F[keep]); remap = -np.ones(n, np.int64); remap[used] = np.arange(len(used))
+    dropped = counts[counts < min_share * counts.max()]
+    keep_main_pieces.biggest_dropped = float(dropped.max() / counts.max()) if len(dropped) else 0.0
     return V[used], remap[F[keep]], int((counts >= min_share * counts.max()).sum()), int(len(counts))
 
 
@@ -335,6 +337,7 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
                 grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore,
                 untrimmed=[parts[i]["name"] for i in protected],
+                dropped_piece=getattr(keep_main_pieces, "biggest_dropped", 0.0),
                 auto_ignored={parts[i]["name"]: list(v) for i, v in auto.items()})
 
 

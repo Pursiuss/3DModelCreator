@@ -202,6 +202,22 @@ def part_checks(parts, f, build_voxel):
             outside = float((s & ~f.L[v]).sum() / n)
             if outside > 0.2:
                 out.append(f"  {name}: {outside:.0%} of it lies outside the {v} outline: too big, or in the wrong place")
+    # floating groups: parts not joined, through a chain of touching parts, to the biggest part. The build keeps
+    # only the main piece of the mesh, so a group that floats free (a tail and its tuft hanging behind the rump) is
+    # dropped
+    near = [D[i] < f.voxel for i in range(len(parts))]
+    root = list(range(len(parts)))
+    def find(i):
+        while root[i] != i: i = root[i]
+        return i
+    for i in range(len(parts)):
+        for j in range(i):
+            if find(i) != find(j) and (near[i] & near[j]).any(): root[find(i)] = find(j)
+    main = find(int(np.argmax([PT.scale_of(p) for p in parts])))
+    loose = [parts[i]["name"] for i in range(len(parts)) if find(i) != main]
+    if loose:
+        out.append(f"  {', '.join(loose)}: not joined to the body (no chain of touching parts reaches it), so the "
+                   f"build drops them as a loose piece: move the attachment end inside the part it grows from")
     return out or ["  no problems found"]
 
 

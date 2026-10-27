@@ -1,0 +1,466 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    0.5,
+    2.5
+   ],
+   "radii": [
+    0.45,
+    0.97,
+    0.5
+   ],
+   "rotate": [
+    -3.0,
+    0.0,
+    0.0
+   ],
+   "fit": false
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.0638,
+    3.0138
+   ],
+   "b": [
+    0.0,
+    -0.78,
+    4.32
+   ],
+   "ra": 0.3924,
+   "rb": 0.19,
+   "aspect": 0.5,
+   "droop": 0.0,
+   "blend": 0.2
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -1.13,
+    4.55
+   ],
+   "radii": [
+    0.15,
+    0.32,
+    0.16
+   ],
+   "rotate": [
+    28.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.08,
+   "fit": false
+  },
+  {
+   "name": "upper jaw",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -1.24,
+    4.44
+   ],
+   "b": [
+    0.0,
+    -1.44,
+    4.34
+   ],
+   "ra": 0.1,
+   "rb": 0.08,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.05,
+   "fit": false
+  },
+  {
+   "name": "lower jaw",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -1.24,
+    4.35
+   ],
+   "b": [
+    0.0,
+    -1.4,
+    4.29
+   ],
+   "ra": 0.065,
+   "rb": 0.05,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "ear",
+   "type": "paddle",
+   "a": [
+    0.11,
+    -0.86,
+    4.66
+   ],
+   "b": [
+    0.37,
+    -0.88,
+    4.74
+   ],
+   "ra": 0.075,
+   "rb": 0.03,
+   "thick": 0.03,
+   "normal": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "bend": 0.0,
+   "curl": 0.0,
+   "mirror": true,
+   "blend": 0.01,
+   "root_blend": 0.04,
+   "fit": false
+  },
+  {
+   "name": "ossicone",
+   "type": "capsule",
+   "a": [
+    0.07,
+    -0.96,
+    4.66
+   ],
+   "b": [
+    0.1,
+    -1.02,
+    4.94
+   ],
+   "ra": 0.045,
+   "rb": 0.042,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "ossicone tip",
+   "type": "ellipsoid",
+   "center": [
+    0.1,
+    -1.025,
+    4.96
+   ],
+   "radii": [
+    0.055,
+    0.055,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "colour": "#2c2520",
+   "fit": false
+  },
+  {
+   "name": "front shoulder fwd",
+   "type": "capsule",
+   "a": [
+    0.16,
+    -0.06,
+    2.3
+   ],
+   "b": [
+    0.17,
+    -0.03,
+    1.05
+   ],
+   "ra": 0.15,
+   "rb": 0.085,
+   "aspect": 0.8,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "front lower fwd",
+   "type": "capsule",
+   "a": [
+    0.17,
+    -0.03,
+    1.06
+   ],
+   "b": [
+    0.18,
+    -0.05,
+    0.08
+   ],
+   "ra": 0.065,
+   "rb": 0.055,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "front hoof fwd",
+   "type": "ellipsoid",
+   "center": [
+    0.18,
+    -0.11,
+    0.045
+   ],
+   "radii": [
+    0.075,
+    0.1,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.01,
+   "colour": "#2c2520",
+   "fit": false
+  },
+  {
+   "name": "front shoulder back",
+   "type": "capsule",
+   "a": [
+    -0.16,
+    0.06,
+    2.3
+   ],
+   "b": [
+    -0.17,
+    0.12,
+    1.05
+   ],
+   "ra": 0.15,
+   "rb": 0.085,
+   "aspect": 0.8,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "front lower back",
+   "type": "capsule",
+   "a": [
+    -0.17,
+    0.12,
+    1.06
+   ],
+   "b": [
+    -0.18,
+    0.13,
+    0.07
+   ],
+   "ra": 0.065,
+   "rb": 0.055,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "front hoof back",
+   "type": "ellipsoid",
+   "center": [
+    -0.18,
+    0.1,
+    0.045
+   ],
+   "radii": [
+    0.075,
+    0.1,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.01,
+   "colour": "#2c2520",
+   "fit": false
+  },
+  {
+   "name": "hind thigh fwd",
+   "type": "capsule",
+   "a": [
+    0.13,
+    1.0,
+    2.35
+   ],
+   "b": [
+    0.08,
+    1.16,
+    1.25
+   ],
+   "ra": 0.16,
+   "rb": 0.075,
+   "aspect": 0.9,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "hind lower fwd",
+   "type": "capsule",
+   "a": [
+    0.08,
+    1.18,
+    1.26
+   ],
+   "b": [
+    0.07,
+    1.1,
+    0.08
+   ],
+   "ra": 0.06,
+   "rb": 0.05,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "hind hoof fwd",
+   "type": "ellipsoid",
+   "center": [
+    0.07,
+    1.07,
+    0.045
+   ],
+   "radii": [
+    0.07,
+    0.1,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.01,
+   "colour": "#2c2520",
+   "fit": false
+  },
+  {
+   "name": "hind thigh back",
+   "type": "capsule",
+   "a": [
+    -0.13,
+    1.12,
+    2.35
+   ],
+   "b": [
+    -0.08,
+    1.3,
+    1.25
+   ],
+   "ra": 0.16,
+   "rb": 0.075,
+   "aspect": 0.9,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "hind lower back",
+   "type": "capsule",
+   "a": [
+    -0.08,
+    1.32,
+    1.26
+   ],
+   "b": [
+    -0.07,
+    1.31,
+    0.08
+   ],
+   "ra": 0.06,
+   "rb": 0.05,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "hind hoof back",
+   "type": "ellipsoid",
+   "center": [
+    -0.07,
+    1.29,
+    0.045
+   ],
+   "radii": [
+    0.07,
+    0.1,
+    0.05
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.01,
+   "colour": "#2c2520",
+   "fit": false
+  },
+  {
+   "name": "tail",
+   "type": "capsule",
+   "a": [
+    0,
+    1.3,
+    2.75
+   ],
+   "b": [
+    0,
+    1.48,
+    1.5
+   ],
+   "ra": 0.045,
+   "rb": 0.035,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "tail switch",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    1.5,
+    1.4
+   ],
+   "radii": [
+    0.065,
+    0.09,
+    0.38
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.02,
+   "colour": "#2c2520",
+   "fit": false
+  }
+ ]
+}

@@ -73,6 +73,10 @@ def main():
     if S.get("auto_ignored"):
         warnings.append("views ignored for parts they disagree with (one view would have cut deep into a part the "
                         "others draw whole): " + "; ".join(f"{k}: {', '.join(v)}" for k, v in S["auto_ignored"].items()))
+    if S.get("dropped_piece", 0) > 0.002:
+        warnings.append(f"a loose piece ({S['dropped_piece']:.1%} of the model) came off and was dropped: a part "
+                        f"(often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the "
+                        f"part it grows from")
     if S.get("untrimmed"):
         warnings.append("kept untrimmed, because trimming to the outlines would have removed most of them (they are "
                         "off their drawn place; move them onto it in parts-on-refs.png): " + ", ".join(S["untrimmed"]))

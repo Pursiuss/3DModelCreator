@@ -1,0 +1,32 @@
+start: mean outline overlap 0.835
+sweep 1: overlap 0.835 (0 changes)
+outline overlap per view (before -> after): front 0.83 -> 0.83, back 0.00 -> 0.00 (skipped), side 0.84 -> 0.84, top 0.00 -> 0.00 (skipped)
+  body: unchanged
+  neck: unchanged
+  head: unchanged
+  upper jaw: unchanged
+  lower jaw: unchanged
+  ear: unchanged
+  ossicone: unchanged
+  ossicone tip: unchanged
+  front shoulder fwd: unchanged
+  front lower fwd: unchanged
+  front hoof fwd: unchanged
+  front shoulder back: unchanged
+  front lower back: unchanged
+  front hoof back: unchanged
+  hind thigh fwd: unchanged
+  hind lower fwd: unchanged
+  hind hoof fwd: unchanged
+  hind thigh back: unchanged
+  hind lower back: unchanged
+  hind hoof back: unchanged
+  tail: unchanged
+  tail switch: unchanged
+part checks:
+  front shoulder back: 25% of it lies outside the side outline: too big, or in the wrong place
+  hind lower fwd: 25% of it lies outside the front outline: too big, or in the wrong place
+  hind lower back: 26% of it lies outside the front outline: too big, or in the wrong place
+  tail: 33% of it lies outside the side outline: too big, or in the wrong place
+  tail switch: 28% of it lies outside the front outline: too big, or in the wrong place
+  tail switch: 21% of it lies outside the side outline: too big, or in the wrong place
