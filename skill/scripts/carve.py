@@ -31,6 +31,18 @@ def sample(vm, axes):
     return out
 
 
+def capped_res(maps, size, res, max_points):
+    """res, lowered if needed so that the grid make_grid builds has at most max_points points. Grids are sized by the
+    animal's longest dimension, so a long, wide animal (a deer with spread antlers) gets many times the points of an
+    upright one at the same res; the cap keeps fitting and checking times about the same for every animal."""
+    for _ in range(4):
+        axes, _ = make_grid(maps, size, res)
+        n = len(axes["x"]) * len(axes["y"]) * len(axes["z"])
+        if n <= max_points: break
+        res = int(res * (max_points / n) ** (1 / 3))
+    return res
+
+
 def make_grid(maps, size, res):
     half_x = max(maps[v].half_h for v in ("front", "back", "top"))
     half_y = max(maps["side"].half_h, maps["top"].span_v / 2)

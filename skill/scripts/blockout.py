@@ -18,7 +18,7 @@ from scipy import ndimage
 sys.path.insert(0, os.path.dirname(__file__))
 import parts as PT
 from views import VIEWS, ViewMap, load_subject, silhouette
-from carve import make_grid, sample
+from carve import make_grid, sample, capped_res
 from render_preview import render
 
 PALETTE = np.array([(230, 90, 70), (70, 140, 230), (90, 190, 90), (240, 190, 50), (170, 100, 210), (60, 200, 200),
@@ -29,7 +29,7 @@ class Fitter:
     def __init__(self, refs, res, skip=()):
         size, _ = load_subject(refs); self.skip = tuple(skip)
         self.maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in VIEWS}
-        self.axes, self.voxel = make_grid(self.maps, size, res)
+        self.axes, self.voxel = make_grid(self.maps, size, capped_res(self.maps, size, res, 250_000))
         self.L = {v: sample(self.maps[v], self.axes) for v in VIEWS}
         self.shape = tuple(len(self.axes[a]) for a in "xyz")
         X, Y, Z = np.meshgrid(self.axes["x"], self.axes["y"], self.axes["z"], indexing="ij")
@@ -129,7 +129,8 @@ def overlay(f, parts, path):
     sheet.save(path)
 
 
-def blockout_mesh(parts, f, res_scale=1.6):
+def blockout_mesh(parts, f, res_scale=1.6, max_points=550_000):
+    n = np.prod([len(f.axes[a]) for a in "xyz"]); res_scale = min(res_scale, (max_points / n) ** (1 / 3))
     ax = {a: np.linspace(f.axes[a][0], f.axes[a][-1], int(len(f.axes[a]) * res_scale)) for a in "xyz"}
     X, Y, Z = np.meshgrid(ax["x"], ax["y"], ax["z"], indexing="ij")
     P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
@@ -300,7 +301,7 @@ def parts_on_refs(parts, refs, size, maps, path, res=200, height=520, detail_pat
     that misses its drawn shape here gets the wrong colours: a flipper painted twice, a beak smeared onto the face.
     detail_path: a second sheet, zoomed in on each group of small parts (a foot's toes and claws, a beak) and drawn
     on a fine grid, because at the whole-animal scale a claw is two or three grid cells."""
-    axes, voxel = make_grid(maps, size, res)
+    axes, voxel = make_grid(maps, size, capped_res(maps, size, res, 600_000))
     X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij")
     occ = (PT.sdf(parts, np.c_[X.ravel(), Y.ravel(), Z.ravel()], smooth=False) < 0).reshape(X.shape)
     del X, Y, Z
