@@ -230,8 +230,12 @@ Open the four images and the report:
   shrunk into the body), set that part's size right in `parts.json` and add `"fit": false` to it.
 
 To change the blockout: copy `parts.fitted.json` over `parts.json`, edit it (add, remove, move or resize parts)
-and run the fit again. Aim for every view's overlap at 0.90 or more with no large blue or red areas, but do not
-add parts that are not in the references just to cover an area.
+and run the fit again. Aim for the front and side overlaps at 0.90 or more with no large blue or red areas, but do
+not add parts that are not in the references just to cover an area.
+
+The shape and colour scores use the best two of front, side and top. Get front and side right first. The top view
+only needs to stay clear of gross errors: do not move parts away from the front and side drawings to fit a top
+view that draws them differently (flippers swept back, feet splayed, a wider head).
 
 ## 5. Build (about 1 minute)
 
