@@ -1,6 +1,6 @@
 """Run the skill's pipeline on every test animal and score it with the official scorer (using the true masks).
 
-usage: python tests/run_all.py [ANIMAL_DIRS...]   (default: penguin/)
+usage: python tests/run_all.py [ANIMAL_DIRS...]   (default: penguin/ and every folder in tests/animals/)
 Uses the blockout tests/work/<name>/parts.fitted.json (out/work/ for the penguin) when there is one, else --hull-only.
 Writes tests/results/<name>/ (the pipeline output) and tests/results/summary.md.
 """
@@ -11,7 +11,8 @@ PY = sys.executable
 
 
 def main():
-    dirs = sys.argv[1:] or [os.path.join(KIT, "penguin")]
+    dirs = sys.argv[1:] or [os.path.join(KIT, "penguin")] + sorted(
+        d for d in glob.glob(os.path.join(KIT, "tests", "animals", "*")) if os.path.isdir(d))
     rows = []
     for d in dirs:
         name = os.path.basename(os.path.normpath(d)); out = os.path.join(KIT, "tests", "results", name)

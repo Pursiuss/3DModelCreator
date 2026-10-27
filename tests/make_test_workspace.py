@@ -14,7 +14,9 @@ import os, shutil, sys
 
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_FILES = ["front.png", "side.png", "back.png", "top.png", "final.png", "subject.json"]
-ANIMALS = {"penguin": os.path.join(KIT, "penguin")}
+ANIMALS = {"penguin": os.path.join(KIT, "penguin"),
+           "cow": os.path.join(KIT, "tests", "animals", "cow"),
+           "giraffe": os.path.join(KIT, "tests", "animals", "giraffe")}
 
 
 def main():
