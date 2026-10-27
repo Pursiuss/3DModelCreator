@@ -162,12 +162,15 @@ def smoothed_outline_distance(vm, rel_sigma=0.025, rel_close=0.012):
     return w * smooth + (1 - w) * d
 
 
-def hull_distance(maps, axes, skip=(), ignore=None):
+def hull_distance(maps, axes, skip=(), ignore=None, second=False):
     """Smooth signed distance (metres) to the visual hull, built from each outline's 2-D distance map at full image
     resolution: the hull is the intersection of the outlines pushed straight back, so its distance is the largest of
     the per-view distances. No voxel steps, and thin parts keep their full width.
-    ignore: {view: boolean grid} of voxels that view must not trim (parts that list it in ignore_views)."""
+    ignore: {view: boolean grid} of voxels that view must not trim (parts that list it in ignore_views).
+    second: also return the second largest distance among the three viewing directions (front and back look along
+    the same line, so they count as one): where it is positive, two directions agree a point is outside."""
     out = None; shape = (len(axes["x"]), len(axes["y"]), len(axes["z"]))
+    by_dir = {}
     for v, vm in maps.items():
         if v in skip: continue
         d2 = smoothed_outline_distance(vm) / vm.sc
@@ -184,7 +187,14 @@ def hull_distance(maps, axes, skip=(), ignore=None):
         if ignore is not None and v in ignore:
             e = np.where(ignore[v], np.float32(-1e3), np.broadcast_to(e, shape))
         out = e if out is None else np.maximum(out, e)
-    return np.broadcast_to(out, shape)
+        k = "side" if v == "side" else "top" if v == "top" else "front"
+        by_dir[k] = e if k not in by_dir else np.maximum(by_dir[k], e)
+    if not second: return np.broadcast_to(out, shape)
+    d = [np.broadcast_to(x, shape) for x in by_dir.values()]
+    if len(d) < 2: return np.broadcast_to(out, shape), np.full(shape, -1e3, np.float32)
+    s2 = np.minimum(d[0], d[1]) if len(d) == 2 else np.maximum(np.maximum(np.minimum(d[0], d[1]),
+                                                                          np.minimum(d[0], d[2])), np.minimum(d[1], d[2]))
+    return np.broadcast_to(out, shape), s2
 
 
 def field_normals(field, V, origin, voxel):
@@ -237,6 +247,31 @@ def fair_trunk(parts, P, blk, pid, size, voxel):
     return blk + w * (smooth - d)
 
 
+def disagreeing_views(parts, maps, axes, skip, blk, pid, size, voxel, rel=0.025, share=0.03):
+    """{part index: views} where one view alone would cut deep into a part that the other viewing directions draw
+    whole: more than `share` of the part's surface lies over 2.5% of the animal's size outside that view's outline
+    while inside the others'. That view is drawn at other proportions or in another pose there (a top view with the
+    rump 15 cm short), so it is ignored for that part, as the part's ignore_views would; trimming to it would slice
+    a flat face into the body. Only the top and back views are judged this way: the front and side views set the
+    animal's scale, and a part sticking out of them is too big. Front and back count as one direction."""
+    deep = rel * max(size["width"], size["length"], size["height"])
+    surf = np.abs(blk) < 1.5 * voxel
+    e = {v: np.broadcast_to(hull_distance({v: maps[v]}, axes), blk.shape) for v in maps if v not in skip}
+    dirs = {"front": ("front", "back"), "back": ("front", "back"), "side": ("side",), "top": ("top",)}
+    out = {}
+    for i in range(len(parts)):
+        mine = surf & (pid == i); n = int(mine.sum())
+        if n < 50: continue
+        for v in e:
+            if v not in ("top", "back"): continue          # front and side set the scale: their cuts are trusted
+            others = [e[u][mine] for u in e if u not in dirs[v]]
+            if not others: continue
+            inside_others = np.max(others, 0) <= 0.3 * deep
+            if ((e[v][mine] > deep) & inside_others).sum() > share * n:
+                out.setdefault(i, []).append(v)
+    return out
+
+
 def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, skip=()):
     """Blockout first, then trim where it sticks out of the outlines.
     shape = blockout (optionally grown by `grow`) intersected with the visual hull, with the cut edges rounded.
@@ -257,9 +292,10 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     blk = blk.reshape(hull.shape).astype(np.float32); pid = pid.reshape(hull.shape)
     blk = fair_trunk(parts, P, blk, pid, size, voxel)
     del P, X, Y, Z
+    auto = disagreeing_views(parts, maps, axes, skip, blk, pid, size, voxel)
     ignore = {}
     for v in VIEWS:
-        ids = [i for i, p in enumerate(parts) if v in p.get("ignore", [])]
+        ids = [i for i, p in enumerate(parts) if v in p.get("ignore", []) or v in auto.get(i, ())]
         if ids: ignore[v] = np.isin(pid, ids)
     # Trim only where the blockout sticks out by more than 1% of the animal's size: drawn outlines wobble (feather tufts,
     # fur), and trimming right to them copies the wobble across the surface as ridges. Thin parts (a beak, toes, a
@@ -298,7 +334,8 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     occ = field < 0
     return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
                 grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore,
-                untrimmed=[parts[i]["name"] for i in protected])
+                untrimmed=[parts[i]["name"] for i in protected],
+                auto_ignored={parts[i]["name"]: list(v) for i, v in auto.items()})
 
 
 def main():

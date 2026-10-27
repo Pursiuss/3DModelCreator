@@ -230,7 +230,9 @@ What it does:
 - Shape: smooths the thick parts (body, belly, neck, head) together as one form, leaving thin parts exactly as
   written; trims the blockout where it sticks out of the outlines (by more than 1% of the animal's size on thick
   parts, closer on thin ones; notches and feather or fur wobble in the outlines are ironed out first), but never
-  deletes most of a part: a part trimming would mostly remove is kept as written and reported; smooths it and
+  deletes most of a part: a part trimming would mostly remove is kept as written and reported. Where the top or
+  back view alone would cut deep into a part the front and side draw whole (a top view drawn with the rump 15 cm
+  short), that view is ignored for that part, and the build lists it under warnings. Then it smooths the model and
   removes loose fragments.
 - Which picture colours each spot: one that sees it squarely (grazing views only where nothing better does), not
   one where the spot sits right next to another part, in large patches with their seams where neighbouring
