@@ -210,8 +210,12 @@ def fair_trunk(parts, P, blk, pid, size, voxel):
     left exactly as written."""
     import parts as PT
     big_size = max(size["width"], size["length"], size["height"])
-    trunk = [i for i, p in enumerate(parts) if PT.thinnest(p) >= TRUNK_THICK * big_size]
-    sigma = TRUNK_SIGMA * big_size / voxel
+    def slimmest(p):                                         # a tapering part counts by its thin end: a thigh
+        if p["type"] == "capsule": return float(min(p["ra"], p["rb"]))   # narrowing to a knee is a limb
+        return PT.thinnest(p)
+    trunk = [i for i, p in enumerate(parts) if slimmest(p) >= TRUNK_THICK * big_size]
+    if not trunk: return blk
+    sigma = min(TRUNK_SIGMA * big_size, min(slimmest(parts[i]) for i in trunk) / 3) / voxel   # never eats a part
     if len(trunk) < 2 or sigma < 1: return blk
     d = PT.sdf([parts[i] for i in trunk], P).reshape(blk.shape).astype(np.float32)
     # Blurring a distance field moves a curved surface inwards by sigma^2/2 times its curvature (a head of radius R by
