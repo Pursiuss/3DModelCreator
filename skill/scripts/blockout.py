@@ -26,20 +26,21 @@ PALETTE = np.array([(230, 90, 70), (70, 140, 230), (90, 190, 90), (240, 190, 50)
 
 
 class Fitter:
-    def __init__(self, refs, res):
-        size, _ = load_subject(refs)
+    def __init__(self, refs, res, skip=()):
+        size, _ = load_subject(refs); self.skip = tuple(skip)
         self.maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in VIEWS}
         self.axes, self.voxel = make_grid(self.maps, size, res)
         self.L = {v: sample(self.maps[v], self.axes) for v in VIEWS}
         self.shape = tuple(len(self.axes[a]) for a in "xyz")
         X, Y, Z = np.meshgrid(self.axes["x"], self.axes["y"], self.axes["z"], indexing="ij")
         self.P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
-        self.care = {v: np.ones_like(self.L[v]) for v in VIEWS}
+        self.care = {v: np.ones_like(self.L[v]) & (v not in self.skip) for v in VIEWS}
 
     def set_ignores(self, parts):
         """Where a part ignores a view (that view draws it wrongly), that view's outline does not count there."""
         for v in VIEWS:
             ign = [p for p in parts if v in p.get("ignore", [])]
+            if v in self.skip: continue
             if not ign: self.care[v] = np.ones_like(self.L[v]); continue
             near = self.projections(np.min([PT.sdf_part(p, self.P) for p in ign], 0) - 2 * self.voxel)[v]
             self.care[v] = ~ndimage.binary_dilation(near, iterations=2)
@@ -57,7 +58,7 @@ class Fitter:
         return out
 
     def score(self, d):
-        return float(np.mean(list(self.ious(d).values())))
+        return float(np.mean([x for v, x in self.ious(d).items() if v not in self.skip]))
 
     def fit(self, parts, sweeps=6, log=print):
         D = [PT.sdf_part(p, self.P) for p in parts]
@@ -194,7 +195,7 @@ def part_checks(parts, f, build_voxel):
                                f"in; lying along the body it reads as a stuck-on patch with a groove round it")
         pr = f.projections(D[i])
         for v in ("front", "side", "top"):
-            if v in p.get("ignore", []): continue
+            if v in p.get("ignore", []) or v in f.skip: continue
             s = pr[v]; n = s.sum()
             if n < 15: continue
             outside = float((s & ~f.L[v]).sum() / n)
@@ -350,15 +351,18 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("refs"); ap.add_argument("parts"); ap.add_argument("work")
     ap.add_argument("--sweeps", type=int, default=6); ap.add_argument("--res", type=int, default=120)
     ap.add_argument("--no-fit", action="store_true")
+    ap.add_argument("--skip-view", nargs="*", default=[], choices=list(VIEWS),
+                    help="views that disagree with the others (measure.py's view check): not fitted to")
     a = ap.parse_args(); os.makedirs(a.work, exist_ok=True)
     parts = PT.load(a.parts); start = copy.deepcopy(parts)
-    f = Fitter(a.refs, a.res); f.set_ignores(parts)
+    f = Fitter(a.refs, a.res, a.skip_view); f.set_ignores(parts)
     lines = []
     def log(s): print(s); lines.append(s)
     before = f.ious(PT.sdf(parts, f.P, smooth=False))
     if not a.no_fit: parts, _ = f.fit(parts, a.sweeps, log)
     after = f.ious(PT.sdf(parts, f.P, smooth=False))
-    log("outline overlap per view (before -> after): " + ", ".join(f"{v} {before[v]:.2f} -> {after[v]:.2f}" for v in VIEWS))
+    log("outline overlap per view (before -> after): " + ", ".join(
+        f"{v} {before[v]:.2f} -> {after[v]:.2f}" + (" (skipped)" if v in f.skip else "") for v in VIEWS))
     for p0, p1 in zip(start, parts):
         moved = []
         for k, i, kind in PT.params(p0):

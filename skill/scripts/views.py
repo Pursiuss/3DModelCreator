@@ -75,3 +75,27 @@ class ViewMap:
         col = (b[0] + b[2]) / 2 + h * self.sc
         row = b[3] + v * self.sc if va == "z" else (b[1] + b[3]) / 2 + v * self.sc
         return col, row
+
+
+def consistency(maps):
+    """Do the views agree? Returns (warnings, views to skip). Views that disagree about a shared size (after scaling,
+    in metres), or a back view drawn in another pose than the front, cut each other away when the model is trimmed
+    to all of them, and pull parts to the wrong place when it is fitted to all of them. The top view is blamed when
+    it disagrees with the front or the side (they agree with each other on the height, which the scale comes from);
+    the back view when it is not the mirror image of the front."""
+    w, skip = [], []
+    pairs = [("front height", maps["front"].span_v, "side height", maps["side"].span_v, None),
+             ("front width", 2 * maps["front"].half_h, "top width", 2 * maps["top"].half_h, "top"),
+             ("side length", 2 * maps["side"].half_h, "top length", maps["top"].span_v, "top")]
+    for a, x, b, y, blame in pairs:
+        if abs(x - y) / max(x, y) > 0.08:
+            w.append(f"{a} {x:.3f} m vs {b} {y:.3f} m disagree by more than 8% (pose or framing differs)")
+            if blame and blame not in skip: skip.append(blame)
+    f, b = maps["front"], maps["back"]
+    fb = np.array(Image.fromarray(f.sil).crop(f.box).resize((128, 256))) > 0
+    bb = np.array(Image.fromarray(b.sil).crop(b.box).resize((128, 256)))[:, ::-1] > 0
+    iou = (fb & bb).sum() / max((fb | bb).sum(), 1)
+    if iou < 0.85:
+        w.append(f"front and mirrored back outlines overlap only {iou:.2f}: pose differs between views")
+        skip.append("back")
+    return w, skip

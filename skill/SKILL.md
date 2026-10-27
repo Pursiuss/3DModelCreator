@@ -50,6 +50,11 @@ Python interpreter chosen in step 1; use it for every script.
    each height (and, from the top view, each position along the body) it lists the solid stretches of the outline in
    metres. Two stretches at one height usually mean two parts (two legs, a flipper beside the body). Its last
    line, and `out/work/palette.png`, list the few colours the animal is painted in, as `#rrggbb` codes.
+   Its **view check** (near the top) says whether the four views agree on the animal's size and pose. The pictures
+   are AI-made and may not: a top view drawn at other proportions, a back view in another pose. If it names views
+   to skip, pass `--skip-view` with them to every `blockout.py` and `build.py` run, so they neither pull parts out
+   of place nor trim the model; model from the other views, and say so in the log. (The judges score the best two
+   of the front, side and top views, so a skipped top view costs little.)
 3. For small parts (beak, snout, mouth, toes, claws, eyes, ears), make a close-up with a line every centimetre:
    `PY SKILL_DIR/scripts/measure.py REFS out/work --zoom side Y0 Z0 Y1 Z1` (front or back: X0 Z0 X1 Z1; top:
    X0 Y0 X1 Y1), which writes `out/work/zoom-side.png`. The full rulers are too coarse to place a 2 cm part.
@@ -174,7 +179,7 @@ Modelling rules that matter for how the result looks:
 ## 4. Fit and check the blockout (about 1-2 minutes per round, up to 3 rounds)
 
 ```
-PY SKILL_DIR/scripts/blockout.py REFS out/work/parts.json out/work
+PY SKILL_DIR/scripts/blockout.py REFS out/work/parts.json out/work [--skip-view VIEW ...]
 ```
 It nudges every part (within limits around what you wrote) to match the outlines and writes
 `out/work/parts.fitted.json`, `fit-report.txt`, `blockout-overlay.png`, `blockout-parts.png`,
@@ -209,7 +214,7 @@ add parts that are not in the references just to cover an area.
 ## 5. Build (about 1 minute)
 
 ```
-PY SKILL_DIR/scripts/build.py REFS out --parts out/work/parts.fitted.json --note "why this run"
+PY SKILL_DIR/scripts/build.py REFS out --parts out/work/parts.fitted.json [--skip-view VIEW ...] --note "why this run"
 ```
 What it does:
 - Shape: smooths the thick parts (body, belly, neck, head) together as one form, leaving thin parts exactly as
@@ -274,7 +279,8 @@ If it does not pass, fix the cause:
 | feet, hands or paws splotchy, or dark claw marks across the toes | in `parts-on-refs-detail.png` the toes and claws miss the drawn ones in some view: move them onto the drawing, or if two views disagree, follow the clearer one and ignore the other for those parts; drop any big foot-pad blob |
 | outline match low in one view | look for blue in `blockout-overlay.png`; add or enlarge the part there |
 | texture from the wrong view on a surface (e.g. back colours on the belly) | `--tol 2`; if hidden areas look wrong, `--tol 5` |
-| warning: two views disagree on a size, or front and mirrored back differ | add `--skip-view <the view that disagrees>` to the build |
+| warning: two views disagree on a size, or front and mirrored back differ | use `--skip-view` with the views measure.py's view check names, for the fit and the build |
+| the model is shorter or smaller than the drawings, or parts are cut off | a view that disagrees was used for trimming: see the row above |
 | the blockout cannot be made to work after 3 rounds | fallback: `build.py REFS out --hull-only` (outline carving only; boxier, can invent stubs between legs), and say so in the log |
 
 Do not raise `--grow` above 0: growing the blockout before trimming makes large flat, boxy faces.

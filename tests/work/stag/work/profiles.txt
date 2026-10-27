@@ -1,6 +1,12 @@
 subject (m): width 0.803 (x), length 1.821 (y), height 2.1 (z)
 Each line lists the solid stretches of the outline across that level (separate stretches = separate parts,
 e.g. two legs). Model coordinates in metres; nose towards -y; front view right = +x.
+view check: the views DISAGREE:
+  front width 0.803 m vs top width 0.969 m disagree by more than 8% (pose or framing differs)
+  side length 1.821 m vs top length 1.446 m disagree by more than 8% (pose or framing differs)
+  front and mirrored back outlines overlap only 0.81: pose differs between views
+  -> use --skip-view top back with blockout.py and build.py, and model the parts those views draw differently from the other views
+
 
 front view (alpha channel), top to bottom:
   z = +2.098: x [-0.318, -0.308] [+0.308, +0.315]

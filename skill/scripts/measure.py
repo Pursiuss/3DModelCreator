@@ -136,6 +136,13 @@ def main():
             pl = profile_lines(vm)
             out += pl if v != "top" else pl
             out.append("")
+    from views import consistency
+    maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in ("front", "side", "back", "top")}
+    cw, skip = consistency(maps)
+    out[3:3] = (["view check: the four views agree" if not cw else "view check: the views DISAGREE:"] +
+                [f"  {x}" for x in cw] +
+                ([f"  -> use --skip-view {' '.join(skip)} with blockout.py and build.py, and model the parts those views "
+                  f"draw differently from the other views"] if skip else []) + [""])
     codes = palette_sheet(refs, os.path.join(work, "palette.png"))
     out += ["palette (the colours the animal is painted in; see palette.png): " + "  ".join(codes), ""]
     open(os.path.join(work, "profiles.txt"), "w").write("\n".join(out))

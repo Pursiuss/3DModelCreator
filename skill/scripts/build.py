@@ -14,7 +14,7 @@ import argparse, datetime, json, os, subprocess, sys, time
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS, load_subject
+from views import VIEWS, load_subject, consistency
 from carve import build_shape, build_shape_parts, recentre
 from texture import texture_mesh
 from glb_io import write_glb
@@ -26,22 +26,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 def check_refs(refs, S):
     """Warnings about inputs that tend to break carving."""
-    w = []
-    for v in VIEWS:
-        if S["notes"][v] != "alpha channel": w.append(f"{v}: silhouette from {S['notes'][v]} - check the preview for background left on")
-    m = S["maps"]
-    # Views that disagree about a shared dimension (in metres, after scaling) carve each other away.
-    pairs = [("front height", m["front"].span_v, "side height", m["side"].span_v),
-             ("front width", 2 * m["front"].half_h, "top width", 2 * m["top"].half_h),
-             ("side length", 2 * m["side"].half_h, "top length", m["top"].span_v)]
-    for a, x, b, y in pairs:
-        if abs(x - y) / max(x, y) > 0.08: w.append(f"{a} {x:.3f} m vs {b} {y:.3f} m disagree by more than 8% (pose or framing differs)")
-    f, b = m["front"].sil, m["back"].sil
-    fb = np.array(Image.fromarray(f).crop((m["front"].box)).resize((128, 256))) > 0
-    bb = np.array(Image.fromarray(b).crop((m["back"].box)).resize((128, 256)))[:, ::-1] > 0
-    iou = (fb & bb).sum() / max((fb | bb).sum(), 1)
-    if iou < 0.85: w.append(f"front and mirrored back outlines overlap only {iou:.2f}: pose differs between views")
-    return w
+    w = [f"{v}: silhouette from {S['notes'][v]} - check the preview for background left on"
+         for v in VIEWS if S["notes"][v] != "alpha channel"]
+    cw, skip = consistency(S["maps"])
+    skip = [v for v in skip if v not in S.get("skip", ())]
+    return w + cw + ([f"not skipped although they disagree: {', '.join(skip)} (see measure.py's view check)"] if skip else [])
 
 
 def self_score(model, refs, maps, out_dir, textured):
@@ -77,7 +66,7 @@ def main():
         S = build_shape(a.refs, a.res, a.round, False, 12 if a.smooth is None else a.smooth,
                         1.5 if a.blur is None else a.blur, tuple(a.skip_view))
         method = f"outlines only (visual hull, {S['voxel'] * 1000:.2f} mm voxels, rounded slices p = {a.round})"
-    warnings = check_refs(a.refs, S)
+    S["skip"] = tuple(a.skip_view); warnings = check_refs(a.refs, S)
     shift = recentre(S["V"])[0] - S["V"][0]                     # same shift for both models
     untex = os.path.join(a.out, "untextured.glb"); tex = os.path.join(a.out, "textured.glb")
     write_glb(untex, S["V"] + shift, S["F"], normals=S.get("N"))
