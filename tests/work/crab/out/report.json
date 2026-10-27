@@ -10,7 +10,7 @@
   "blur": null,
   "smooth": null,
   "tol": 3,
-  "note": "speck clean-up",
+  "note": "trim keeps parts",
   "skip_view": []
  },
  "method": "blockout (8 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (1.04 mm voxels), smoothed; kept 1 of 1 mesh pieces",
@@ -90,5 +90,5 @@
    }
   }
  },
- "seconds": 52.9
+ "seconds": 63.6
 }

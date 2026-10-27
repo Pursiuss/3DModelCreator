@@ -10,19 +10,19 @@
   "blur": null,
   "smooth": null,
   "tol": 3,
-  "note": "torso smoothing fixed; top and back not used for trimming",
+  "note": "trimming keeps misplaced parts",
   "skip_view": [
    "top",
    "back"
   ]
  },
- "method": "blockout (23 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (7.50 mm voxels), smoothed; kept 1 of 3 mesh pieces",
+ "method": "blockout (23 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (7.50 mm voxels), smoothed; kept 1 of 2 mesh pieces",
  "voxel_mm": 7.5,
- "triangles": 191848,
+ "triangles": 198252,
  "extent_m": {
   "width": 0.733,
   "length": 1.836,
-  "height": 1.914
+  "height": 2.081
  },
  "subject_m": {
   "height": 2.1,
@@ -39,63 +39,62 @@
  "warnings": [
   "front width 0.803 m vs top width 0.969 m disagree by more than 8% (pose or framing differs)",
   "side length 1.821 m vs top length 1.446 m disagree by more than 8% (pose or framing differs)",
-  "front and mirrored back outlines overlap only 0.81: pose differs between views"
+  "front and mirrored back outlines overlap only 0.81: pose differs between views",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): antler beam top, forward branch, forward tine, upper inner tine"
  ],
  "texture_views": {
-  "front": 0.055,
-  "back": 0.092,
-  "side": 0.229,
-  "side_mirror": 0.23,
-  "top": 0.129,
-  "unseen_filled": 0.265,
+  "front": 0.057,
+  "back": 0.095,
+  "side": 0.225,
+  "side_mirror": 0.227,
+  "top": 0.125,
+  "unseen_filled": 0.272,
   "duplicate_features_removed": 13,
-  "uv_islands": 32,
-  "texel_mm": 1.48,
+  "uv_islands": 36,
+  "texel_mm": 1.54,
   "palette_colours": 2
  },
  "self_check": {
-  "untextured_shape": 0.778,
-  "textured_shape": 0.778,
+  "untextured_shape": 0.777,
+  "textured_shape": 0.777,
   "gross_errors": [
-   "front",
-   "side",
    "top"
   ],
-  "colour_score": 0.923,
+  "colour_score": 0.922,
   "views": {
    "front": {
-    "iou": 0.748,
-    "reference_missed": 0.219,
-    "model_outside": 0.054,
+    "iou": 0.74,
+    "reference_missed": 0.207,
+    "model_outside": 0.083,
     "scored": true,
-    "off_target": 0.0204,
-    "colour": 0.841
+    "off_target": 0.0031,
+    "colour": 0.84
    },
    "back": {
-    "iou": 0.566,
-    "reference_missed": 0.337,
-    "model_outside": 0.206,
+    "iou": 0.553,
+    "reference_missed": 0.336,
+    "model_outside": 0.233,
     "scored": false,
-    "off_target": 0.0566,
+    "off_target": 0.0672,
     "colour": 0.828
    },
    "side": {
-    "iou": 0.807,
-    "reference_missed": 0.167,
-    "model_outside": 0.037,
+    "iou": 0.815,
+    "reference_missed": 0.156,
+    "model_outside": 0.041,
     "scored": true,
-    "off_target": 0.0442,
-    "colour": 0.933
+    "off_target": 0.007,
+    "colour": 0.932
    },
    "top": {
-    "iou": 0.609,
+    "iou": 0.599,
     "reference_missed": 0.218,
-    "model_outside": 0.267,
+    "model_outside": 0.281,
     "scored": true,
-    "off_target": 0.137,
+    "off_target": 0.1371,
     "colour": 0.912
    }
   }
  },
- "seconds": 214.9
+ "seconds": 309.0
 }

@@ -255,13 +255,25 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     tol_max = 0.01 * max(size["width"], size["length"], size["height"])
     tol_part = np.array([min(tol_max, 0.15 * PT.thinnest(p)) for p in parts], np.float32)
     tol = ndimage.gaussian_filter(tol_part[pid], 2.0)
-    del pid
     hd = hull_distance(maps, axes, skip, ignore) - tol
     del tol
     k = 2 * voxel                                             # rounded cut instead of a sharp crease
     h = np.clip(k - np.abs(blk - hd), 0, None) / k
     field = np.maximum(blk, hd) + h * h * k / 4
     del hd, h
+    # Trimming shaves parts, it never deletes them: a part that would lose most of its volume is placed off its
+    # drawing (an antler tine a few centimetres from where one view draws it), and the animal looks wrong without
+    # it. Such a part is kept as blocked out, and reported, so the agent can move it onto the drawing.
+    protected = []
+    for i, p in enumerate(parts):
+        mine = (pid == i) & (blk < 0)
+        n = int(mine.sum())
+        if n and (field[mine] < 0).sum() < 0.5 * n:
+            protected.append(i)
+    if protected:
+        keep = ndimage.binary_dilation(np.isin(pid, protected), iterations=1)
+        field = np.where(keep, np.minimum(field, blk), field)
+    del pid
     if blur > 0: field = ndimage.gaussian_filter(field, blur)
     vol = np.pad(field, 1, constant_values=voxel * 4)
     verts, faces, _, _ = measure.marching_cubes(vol, 0.0)
@@ -273,7 +285,8 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     N = field_normals(field, V, origin, voxel)
     occ = field < 0
     return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
-                grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore)
+                grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore,
+                untrimmed=[parts[i]["name"] for i in protected])
 
 
 def main():

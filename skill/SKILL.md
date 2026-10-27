@@ -219,8 +219,9 @@ PY SKILL_DIR/scripts/build.py REFS out --parts out/work/parts.fitted.json [--ski
 What it does:
 - Shape: smooths the thick parts (body, belly, neck, head) together as one form, leaving thin parts exactly as
   written; trims the blockout where it sticks out of the outlines (by more than 1% of the animal's size on thick
-  parts, closer on thin ones; notches and feather or fur wobble in the outlines are ironed out first); smooths it
-  and removes loose fragments.
+  parts, closer on thin ones; notches and feather or fur wobble in the outlines are ironed out first), but never
+  deletes most of a part: a part trimming would mostly remove is kept as written and reported; smooths it and
+  removes loose fragments.
 - Which picture colours each spot: one that sees it squarely (grazing views only where nothing better does), not
   one where the spot sits right next to another part, in large patches with their seams where neighbouring
   pictures agree. A feature two pictures would paint twice (an eye) is painted once. A paddle takes colours only
@@ -281,6 +282,7 @@ If it does not pass, fix the cause:
 | texture from the wrong view on a surface (e.g. back colours on the belly) | `--tol 2`; if hidden areas look wrong, `--tol 5` |
 | warning: two views disagree on a size, or front and mirrored back differ | use `--skip-view` with the views measure.py's view check names, for the fit and the build |
 | the model is shorter or smaller than the drawings, or parts are cut off | a view that disagrees was used for trimming: see the row above |
+| warning: parts "kept untrimmed" | trimming would have removed most of them, so they are off their drawn place: move them onto the drawing (`parts-on-refs.png`, a `--zoom`) and build again |
 | the blockout cannot be made to work after 3 rounds | fallback: `build.py REFS out --hull-only` (outline carving only; boxier, can invent stubs between legs), and say so in the log |
 
 Do not raise `--grow` above 0: growing the blockout before trimming makes large flat, boxy faces.

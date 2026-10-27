@@ -44,3 +44,14 @@ Why this run: torso smoothing fixed; top and back not used for trimming
 - Warnings: front width 0.803 m vs top width 0.969 m disagree by more than 8% (pose or framing differs); side length 1.821 m vs top length 1.446 m disagree by more than 8% (pose or framing differs); front and mirrored back outlines overlap only 0.81: pose differs between views
 - Time: 214.9 s
 
+## Pipeline run 2026-10-27 13:48:04
+
+Why this run: trimming keeps misplaced parts
+
+- Command: `build.py tests/animals/stag tests/work/stag/out --parts tests/work/stag/work/parts.fitted.json --skip-view top back --note trimming keeps misplaced parts`
+- Shape: blockout (23 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (7.50 mm voxels), smoothed; kept 1 of 2 mesh pieces
+- Texture: projected from the reference views (share per view, and share filled from neighbours): {'front': 0.057, 'back': 0.095, 'side': 0.225, 'side_mirror': 0.227, 'top': 0.125, 'unseen_filled': 0.272, 'duplicate_features_removed': 13, 'uv_islands': 36, 'texel_mm': np.float64(1.54), 'palette_colours': 2}
+- Self-check (own masks, kit v0.2 scorer): shape 0.777 (textured 0.777), gross errors top, colour 0.922
+- Warnings: front width 0.803 m vs top width 0.969 m disagree by more than 8% (pose or framing differs); side length 1.821 m vs top length 1.446 m disagree by more than 8% (pose or framing differs); front and mirrored back outlines overlap only 0.81: pose differs between views; kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): antler beam top, forward branch, forward tine, upper inner tine
+- Time: 309.0 s
+

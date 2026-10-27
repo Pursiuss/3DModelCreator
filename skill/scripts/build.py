@@ -67,6 +67,9 @@ def main():
                         1.5 if a.blur is None else a.blur, tuple(a.skip_view))
         method = f"outlines only (visual hull, {S['voxel'] * 1000:.2f} mm voxels, rounded slices p = {a.round})"
     S["skip"] = tuple(a.skip_view); warnings = check_refs(a.refs, S)
+    if S.get("untrimmed"):
+        warnings.append("kept untrimmed, because trimming to the outlines would have removed most of them (they are "
+                        "off their drawn place; move them onto it in parts-on-refs.png): " + ", ".join(S["untrimmed"]))
     shift = recentre(S["V"])[0] - S["V"][0]                     # same shift for both models
     untex = os.path.join(a.out, "untextured.glb"); tex = os.path.join(a.out, "textured.glb")
     write_glb(untex, S["V"] + shift, S["F"], normals=S.get("N"))
