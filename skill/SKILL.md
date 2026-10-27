@@ -309,6 +309,8 @@ If it does not pass, fix the cause:
 | warning: parts "kept untrimmed" | trimming would have removed most of them, so they are off their drawn place: move them onto the drawing (`parts-on-refs.png`, a `--zoom`) and build again |
 | the blockout cannot be made to work after 3 rounds | fallback: `build.py REFS out --hull-only` (outline carving only; boxier, can invent stubs between legs), and say so in the log |
 
+Builds while you are still changing the blockout can add `--quick` (coarser mesh, smaller texture, about a fifth
+of the time, nearly the same scores); the final build must be without it.
 Do not raise `--grow` above 0: growing the blockout before trimming makes large flat, boxy faces.
 Each build overwrites `out/`: finish with a build of the best version.
 

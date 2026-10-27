@@ -51,8 +51,11 @@ def main():
     ap.add_argument("--grow", type=float); ap.add_argument("--round", type=float, default=2.0)
     ap.add_argument("--res", type=int, default=280); ap.add_argument("--blur", type=float)
     ap.add_argument("--smooth", type=int); ap.add_argument("--tol", type=int, default=3)
+    ap.add_argument("--quick", action="store_true", help="for trying things out: coarser mesh and a 1024 texture, "
+                    "about half the time; leave it off for the final build")
     ap.add_argument("--note", default=""); ap.add_argument("--skip-view", nargs="*", default=[], choices=list(VIEWS))
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); t0 = time.time()
+    if a.quick and a.res == 280: a.res = 180
     if not a.parts and not a.hull_only: ap.error("give --parts PARTS.json (normal) or --hull-only (fallback)")
 
     if a.parts:
@@ -76,6 +79,7 @@ def main():
     shift = recentre(S["V"])[0] - S["V"][0]                     # same shift for both models
     untex = os.path.join(a.out, "untextured.glb"); tex = os.path.join(a.out, "textured.glb")
     write_glb(untex, S["V"] + shift, S["F"], normals=S.get("N"))
+    if a.quick: S["bake_size"] = 1024
     V2, F2, UV, atlas, tstats, N2 = texture_mesh(a.refs, S, a.tol)
     write_glb(tex, V2 + shift, F2, UV, atlas, normals=N2)
     atlas.save(os.path.join(a.out, "texture-atlas.png"))

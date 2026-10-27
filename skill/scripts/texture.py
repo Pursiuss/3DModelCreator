@@ -440,7 +440,7 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
        one picture that shows them best, where that picture sees them, so the plan does not smooth them away."""
     import uv as UV
     from scipy import sparse
-    maps = S["maps"]; K = len(names); size = BAKE_SIZE
+    maps = S["maps"]; K = len(names); size = S.get("bake_size", BAKE_SIZE)
     big = max(S["size"][k] for k in ("width", "length", "height"))
     uvm, island = UV.unwrap(V, F, S["parts"], pid_face, cen)
     px, scale = UV.pack(uvm, island, size)
