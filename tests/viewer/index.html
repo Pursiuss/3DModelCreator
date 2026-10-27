@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model Viewer</title>
+<style>
+  :root { --bg: #e2e5ec; --panel: #ffffff; --ink: #1d2230; --muted: #5b6273; --line: #c9ced8; --accent: #2f6fd6; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1e25; --panel: #252932; --ink: #e8ebf1; --muted: #9aa2b2; --line: #3a404c; --accent: #6ea0ff; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+               font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+         padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 2; }
+  select, button { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+                   border-radius: 6px; padding: 5px 9px; }
+  select { min-width: 0; flex: 1 1 260px; }
+  button:hover { border-color: var(--accent); }
+  button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  label { display: flex; gap: 5px; align-items: center; color: var(--muted); }
+  #view { position: fixed; top: 52px; left: 0; right: 0; bottom: 0; }
+  #info { position: fixed; left: 12px; bottom: 10px; color: var(--muted); font-size: 12px; pointer-events: none; }
+  @media (max-width: 600px) { #view { top: 96px; } }
+</style>
+</head>
+<body>
+<div id="bar">
+  <select id="model" title="Model"></select>
+  <button id="reload" title="Reload the model list and the current model">Reload</button>
+  <button id="tex" class="on" title="Show the texture">Texture</button>
+  <button id="wire" title="Show the triangle mesh">Wireframe</button>
+  <button id="spin" title="Turn the model slowly">Spin</button>
+  <button data-cam="front">Front</button><button data-cam="side">Side</button>
+  <button data-cam="back">Back</button><button data-cam="top">Top</button><button data-cam="three">3/4</button>
+</div>
+<div id="view"></div>
+<div id="info">Drag to turn · scroll to zoom · right-drag to pan</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const el = document.getElementById("view");
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+el.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 1000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f99, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(-2, 3, -4); scene.add(sun);
+const grid = new THREE.GridHelper(10, 50, 0x8890a0, 0xb8bec9); grid.material.transparent = true; grid.material.opacity = 0.5;
+scene.add(grid);
+
+let model = null, size = 1, centre = new THREE.Vector3(), textured = true, wire = false, spin = false;
+const maps = new Map();
+
+function resize() {
+  const w = el.clientWidth, h = el.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resize);
+
+function applyLook() {
+  if (!model) return;
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    if (!maps.has(o)) maps.set(o, o.material.map);
+    o.material.map = textured ? maps.get(o) : null;
+    o.material.color.set(textured && maps.get(o) ? 0xffffff : 0xcfd3da);
+    o.material.wireframe = wire; o.material.side = THREE.DoubleSide; o.material.needsUpdate = true;
+  });
+}
+
+function view(name) {
+  // glTF is y-up; the nose points to +z (the scorer's -y), the animal's left is +x.
+  const d = size * 2.2, c = centre;
+  const at = { front: [0, 0.05, 1], side: [1, 0.05, 0], back: [0, 0.05, -1], top: [0, 1, 0.001], three: [0.7, 0.35, 0.7] }[name];
+  const v = new THREE.Vector3(...at).normalize().multiplyScalar(d);
+  camera.position.copy(c).add(v); controls.target.copy(c); controls.update();
+}
+
+async function load(url) {
+  if (model) { scene.remove(model); maps.clear(); }
+  const gltf = await new GLTFLoader().loadAsync(url + "?t=" + Date.now());
+  model = gltf.scene; scene.add(model);
+  const box = new THREE.Box3().setFromObject(model);
+  size = box.getSize(new THREE.Vector3()).length(); box.getCenter(centre);
+  grid.position.y = box.min.y; grid.scale.setScalar(Math.max(size / 4, 0.1));
+  camera.near = size / 200; camera.far = size * 50; camera.updateProjectionMatrix();
+  applyLook(); view("three");
+}
+
+async function list(keep) {
+  const sel = document.getElementById("model"), prev = keep ? sel.value : null;
+  const ms = await (await fetch("/models.json", { cache: "no-store" })).json();
+  sel.innerHTML = "";
+  for (const m of ms) {
+    const o = document.createElement("option"); o.value = m.url;
+    o.textContent = m.label + "  (" + new Date(m.mtime * 1000).toLocaleString() + ")"; sel.appendChild(o);
+  }
+  if (prev && ms.some(m => m.url === prev)) sel.value = prev;
+  if (sel.value) await load(sel.value);
+}
+
+document.getElementById("model").onchange = e => load(e.target.value);
+document.getElementById("reload").onclick = () => list(true);
+const toggle = (id, fn) => { const b = document.getElementById(id); b.onclick = () => b.classList.toggle("on", fn()); };
+toggle("tex", () => { textured = !textured; applyLook(); return textured; });
+toggle("wire", () => { wire = !wire; applyLook(); return wire; });
+toggle("spin", () => (spin = !spin));
+for (const b of document.querySelectorAll("[data-cam]")) b.onclick = () => view(b.dataset.cam);
+
+resize();
+renderer.setAnimationLoop(() => {
+  if (spin && model) model.rotation.y += 0.01;
+  controls.update(); renderer.render(scene, camera);
+});
+list(false);
+</script>
+</body>
+</html>
