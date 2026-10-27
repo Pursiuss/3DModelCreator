@@ -171,6 +171,18 @@ Modelling rules that matter for how the result looks:
 - Show only what the references show. A bird's upper legs are inside the body feathers: keep leg capsules short
   and mostly inside the body, and if the body stops too high, add a broad lower-body ellipsoid so the belly comes
   down to where the feet appear. Visible stilts under a body look wrong.
+- Four-legged animals: a leg is not a thin tube hanging from the belly. The upper leg (thigh, shoulder) is a big
+  mass that flows out of the body: in the back view a hoofed animal's hind thighs fill the whole width of the rump
+  down to the hocks, and in the side view they run from the hip down to the hock. Build each upper leg as a wide
+  tapered capsule from inside the body at the hip or shoulder down to the hock or knee (radius about half the
+  rump's half-width at the top; `aspect` about 0.7 when it is longer front-to-back than it is wide, which it
+  usually is), with `blend` about 0.1 of the animal's height, then a slim capsule for the lower leg and the
+  hoof or paw. Read the widths off the back and front views (`profiles.txt` lists the front; a `--zoom` of the
+  back view shows where the thighs end).
+- Chest, brisket, dewlap: no separate ball on the chest. If the front view shows a chest or brisket in front of
+  the shoulders, make it no wider than the front view draws it (usually about half the body's width) and give
+  it, the neck and the body generous blends (from 0.2 up to half the neck's radius); otherwise let
+  the body and neck form the chest. A ball as wide as the body reads as a goitre from the front.
 - Legs drawn mid-stride: if `profiles.txt` shows a pair of legs as two separate stretches at the same height in the
   side view (one leg forward, one back), do not mirror that pair; a mirrored pair at the average position matches
   neither drawn leg. Write the two legs as separate parts, each at its own drawn position, with the forward one on
