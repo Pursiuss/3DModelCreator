@@ -55,9 +55,11 @@ Python interpreter chosen in step 1; use it for every script.
    to skip, pass `--skip-view` with them to every `blockout.py` and `build.py` run, so they neither pull parts out
    of place nor trim the model; model from the other views, and say so in the log. (The judges score the best two
    of the front, side and top views, so a skipped top view costs little.)
-3. For small parts (beak, snout, mouth, toes, claws, eyes, ears), make a close-up with a line every centimetre:
+3. For small parts (beak, snout, mouth, toes, claws, eyes, ears, antler tines), make a close-up with a fine grid:
    `PY SKILL_DIR/scripts/measure.py REFS out/work --zoom side Y0 Z0 Y1 Z1` (front or back: X0 Z0 X1 Z1; top:
-   X0 Y0 X1 Y1), which writes `out/work/zoom-side.png`. The full rulers are too coarse to place a 2 cm part.
+   X0 Y0 X1 Y1), which writes `out/work/zoom-side.png` (rename it before the next zoom of that view). The grid is
+   every centimetre for a box up to 25 cm across, coarser for bigger boxes; keep boxes small to place small parts.
+   The full rulers are too coarse to place a 2 cm part.
 
 Model coordinates: metres; **z** up from the ground (feet at 0); **y** along the animal with the **nose at -y**;
 **x** across, where image-right in the front view is +x. The animal is centred on x = 0 and on the middle of its
@@ -169,6 +171,14 @@ Modelling rules that matter for how the result looks:
 - Show only what the references show. A bird's upper legs are inside the body feathers: keep leg capsules short
   and mostly inside the body, and if the body stops too high, add a broad lower-body ellipsoid so the belly comes
   down to where the feet appear. Visible stilts under a body look wrong.
+- Legs drawn mid-stride: if `profiles.txt` shows a pair of legs as two separate stretches at the same height in the
+  side view (one leg forward, one back), do not mirror that pair; a mirrored pair at the average position matches
+  neither drawn leg. Write the two legs as separate parts, each at its own drawn position, with the forward one on
+  whichever side the front or back view shows it (if they cannot tell, put it on the +x side). A lifted hoof or paw
+  is drawn off the ground: keep it there.
+- Antlers, horns and branching parts: one capsule per straight segment of the main beam and one per tine, each
+  starting inside the segment it grows from, measured on `--zoom` close-ups of the front and side views. Thin
+  branches that sit a little off their drawn place are kept by the build, but they paint and score better on it.
 - Order: biggest first. Parts listed later blend into the ones before them.
 - Check each part against every view it appears in. If one view clearly draws a part differently from the others
   (feet or toes pointing the other way, a limb in another pose), add that view to the part's `ignore_views` and say

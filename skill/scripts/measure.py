@@ -4,7 +4,8 @@ usage: python measure.py REFS_DIR WORK_DIR
        python measure.py REFS_DIR WORK_DIR --zoom VIEW H0 V0 H1 V1   (a close-up with a 1 cm grid)
 Writes WORK_DIR/ruler-{front,side,back,top}.png, WORK_DIR/palette.png and WORK_DIR/profiles.txt (also printed).
 --zoom writes WORK_DIR/zoom-VIEW.png: the box from (H0, V0) to (H1, V1) in model metres (front/back: x, z;
-side: y, z; top: x, y), enlarged, with a line every centimetre, for small parts (beak, toes, claws, eyes, ears).
+side: y, z; top: x, y), enlarged, with a grid every centimetre (coarser for big boxes), for small parts (beak, toes,
+claws, eyes, ears, antlers).
 palette.png and the end of profiles.txt list the few colours the animal is painted in, with their "#rrggbb" codes,
 for parts' "colour" in parts.json.
 Grid labels are model coordinates (see parts.py): x across (front view: right = +x), y along (nose at -y),
@@ -87,8 +88,11 @@ def profile_lines(vm, n=20):
 
 
 def zoom(refs, vm, box, path, px=1200):
-    """A close-up of one view with a line every centimetre, labelled in model metres."""
+    """A close-up of one view with a grid labelled in model metres: a line every centimetre, or every 2, 5 or 10 cm
+    when the box is too big for that to stay readable (at most about 25 lines across)."""
     h0, v0, h1, v1 = box
+    span = max(abs(h1 - h0), abs(v1 - v0))
+    step = next((s for s in (0.005, 0.01, 0.02, 0.05, 0.1, 0.2) if span / s <= 25), 0.5)
     c, r = to_pixel(vm, np.array([h0, h1]), np.array([v0, v1]))
     c0, c1 = sorted(c); r0, r1 = sorted(r)
     im = load_rgba(refs, vm.view); bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
@@ -96,10 +100,10 @@ def zoom(refs, vm, box, path, px=1200):
     s = px / max(crop.width, crop.height)
     crop = crop.resize((max(1, int(crop.width * s)), max(1, int(crop.height * s))), Image.NEAREST)
     d = ImageDraw.Draw(crop); ha, _, va, _ = VIEWS[vm.view]
-    for hh in np.arange(np.ceil(min(h0, h1) * 100) / 100, max(h0, h1) + 1e-9, 0.01):
+    for hh in np.arange(np.ceil(min(h0, h1) / step) * step, max(h0, h1) + 1e-9, step):
         x = (to_pixel(vm, hh, None)[0] - int(c0)) * s
         d.line([(x, 0), (x, crop.height)], fill=(0, 170, 110)); d.text((x + 2, 2), f"{ha}{hh:+.2f}", fill=(0, 110, 70))
-    for vv in np.arange(np.ceil(min(v0, v1) * 100) / 100, max(v0, v1) + 1e-9, 0.01):
+    for vv in np.arange(np.ceil(min(v0, v1) / step) * step, max(v0, v1) + 1e-9, step):
         y = (to_pixel(vm, None, vv)[1] - int(r0)) * s
         d.line([(0, y), (crop.width, y)], fill=(0, 140, 255)); d.text((2, y + 2), f"{va}{vv:+.2f}", fill=(0, 90, 200))
     crop.save(path)
