@@ -9,8 +9,14 @@ parts.json:
   {"name": "beak",    "type": "capsule",   "a": [0, -0.06, 0.6], "b": [0, -0.12, 0.59], "ra": 0.015, "rb": 0.004},
   {"name": "flipper", "type": "paddle",    "a": [0.08, 0.0, 0.47], "b": [0.115, 0.02, 0.2], "ra": 0.04, "rb": 0.01,
    "thick": 0.008, "normal": [1, 0, 0], "bend": 0.01, "mirror": true, "blend": 0.004, "root_blend": 0.03},
-  {"name": "shell",   "type": "box",       "center": [0, 0, 0.1], "half": [0.1, 0.15, 0.05], "round": 0.03}
+  {"name": "shell",   "type": "box",       "center": [0, 0, 0.1], "half": [0.1, 0.15, 0.05], "round": 0.03},
+  {"name": "tail",    "type": "chain",     "joints": [[0, 0.12, 0.2, 0.02], [0, 0.18, 0.12, 0.012], [0, 0.2, 0.05, 0.03]]}
 ]}
+chain: a limb, tail or neck grown joint by joint, the way an artist extrudes one: "joints" = [x, y, z, radius] from
+the root (put it inside the part it grows from) to the tip, joined by round cones, so the segments always meet and
+fitting moves a joint together with both segments that share it. "aspect" (default 1) flattens every segment's
+cross-section as for a capsule. A chain thinner than about three build voxels somewhere (a tail strand, a leg's
+pastern) is built on its own finer grid and joined on, so it cannot break off; "fine": true forces that.
 paddle: a flat tapered plate from a to b (flippers, wings, fins, ears, flat tails): half-width ra at a narrowing to
 rb at b, half-thickness "thick", flat faces turned towards "normal" (default [1, 0, 0]: facing sideways), and
 "bend": metres the middle bows out sideways within the plate (a crescent flipper), default 0, and "curl":
@@ -26,14 +32,16 @@ A part that is not mirrored and written exactly on the centre line (x = 0) stays
 sideways or turns it about y or z, so beaks, snouts and tails stay straight.
 """
 VIEW_NAMES = ("front", "back", "side", "top")
-import json
+import json, re
 import numpy as np
 
 TYPES = {"ellipsoid": ["center", "radii", "rotate"], "capsule": ["a", "b", "ra", "rb", "aspect", "droop"],
-         "paddle": ["a", "b", "ra", "rb", "thick", "normal", "bend", "curl"], "box": ["center", "half", "rotate", "round"]}
+         "paddle": ["a", "b", "ra", "rb", "thick", "normal", "bend", "curl"], "box": ["center", "half", "rotate", "round"],
+         "chain": ["joints", "aspect"]}
 DEFAULTS = {"rotate": [0, 0, 0], "round": 0.0, "normal": [1, 0, 0], "bend": 0.0, "curl": 0.0, "aspect": 1.0,
             "droop": 0.0}
 TUBES = ("capsule", "paddle")                       # parts running from a root a to a tip b
+LONG = TUBES + ("chain",)                           # parts with a root end and a tip end (see ends())
 
 
 def rot(deg):
@@ -54,12 +62,14 @@ def load(path):
         q = {"name": p.get("name", t), "type": t, "mirror": bool(p.get("mirror", False)),
              "blend": float(p.get("blend", 0.0)), "fit": p.get("fit", True),
              "root_blend": float(p.get("root_blend", 0.0)), "colour": p.get("colour"),
-             "ignore": [str(v) for v in p.get("ignore_views", [])]}
+             "ignore": [str(v) for v in p.get("ignore_views", [])], "fine": bool(p.get("fine", False))}
         bad = [v for v in q["ignore"] if v not in VIEW_NAMES]
         if bad: raise SystemExit(f"part {q['name']}: ignore_views {bad} (use {', '.join(VIEW_NAMES)})")
         for k in TYPES[t]:
             if k not in p and k not in DEFAULTS: raise SystemExit(f"part {q['name']}: missing {k!r}")
             q[k] = np.array(p.get(k, DEFAULTS.get(k)), float)
+        if t == "chain" and (q["joints"].ndim != 2 or q["joints"].shape[1] != 4 or len(q["joints"]) < 2):
+            raise SystemExit(f"part {q['name']}: joints must be at least two [x, y, z, radius] rows")
         out.append(q)
     return out
 
@@ -75,8 +85,11 @@ def save(parts, path):
         if p.get("colour"): r["colour"] = p["colour"]
         if p["fit"] is not True: r["fit"] = p["fit"]
         if p.get("ignore"): r["ignore_views"] = p["ignore"]
+        if p.get("fine"): r["fine"] = True
         rows.append(r)
-    json.dump({"parts": rows}, open(path, "w"), indent=1)
+    text = json.dumps({"parts": rows}, indent=1)
+    text = re.sub(r"\[\s+([-\d.e,\s]+?)\s+\]", lambda m: "[" + ", ".join(m.group(1).split()).replace(",,", ",") + "]", text)
+    open(path, "w").write(text)                       # number lists on one line: [0.1, -0.03, 1.2, 0.075]
 
 
 def instances(p):
@@ -84,7 +97,8 @@ def instances(p):
     yield p
     if p["mirror"]:
         m = dict(p); M = np.diag([-1.0, 1, 1])
-        if p["type"] in TUBES:
+        if p["type"] == "chain": m["joints"] = p["joints"] * [-1, 1, 1, 1]
+        elif p["type"] in TUBES:
             m["a"] = p["a"] * [-1, 1, 1]; m["b"] = p["b"] * [-1, 1, 1]
             if p["type"] == "paddle":                # mirroring flips the frame's handedness: keep the bow's side
                 m["normal"] = p["normal"] * [-1, 1, 1]; m["bend"] = -p["bend"]
@@ -102,8 +116,23 @@ def paddle_frame(p):
     return u, np.cross(n, u), n
 
 
+def segments(p):
+    """A chain's segments, as capsules from joint to joint."""
+    J = p["joints"]
+    return [{"type": "capsule", "a": J[k, :3], "b": J[k + 1, :3], "ra": J[k, 3], "rb": J[k + 1, 3],
+             "aspect": p.get("aspect", 1.0), "droop": 0.0} for k in range(len(J) - 1)]
+
+
+def ends(p):
+    """(root, tip, root radius, tip radius) of a capsule, paddle or chain."""
+    if p["type"] == "chain": J = p["joints"]; return J[0, :3], J[-1, :3], float(J[0, 3]), float(J[-1, 3])
+    return p["a"], p["b"], float(p["ra"]), float(p["rb"])
+
+
 def sdf_one(p, P):
     t = p["type"]
+    if t == "chain":                                # round cones sharing a ball at every joint: smooth over the
+        return np.min([sdf_one(c, P) for c in segments(p)], 0)    # outside of a bend, creased inside it (a knee)
     if t == "paddle":                               # a round cone's outline in a plane, given a rounded thickness
         u, w, n = paddle_frame(p); L = float(np.linalg.norm(p["b"] - p["a"]))
         q = P - p["a"]; s = q @ u; x = q @ w; z = q @ n
@@ -190,6 +219,7 @@ def round_union(a, b, ga, gb, k):
 
 def thinnest(p):
     if p["type"] == "capsule": return float(max(p["ra"], p["rb"]))
+    if p["type"] == "chain": return float(p["joints"][:, 3].max())
     if p["type"] == "paddle": return float(p["thick"])
     return float(np.min(np.abs(p["radii" if p["type"] == "ellipsoid" else "half"])))
 
@@ -222,9 +252,9 @@ def _union(parts, P, grow=0.0, smooth=True, chunk=400_000):
                 M = np.nonzero(np.abs(d - e) < 1.5 * kmax)[0]
                 if len(M):
                     QM = Q[M]; ge = grad_part(p, QM); k = np.full(len(M), p["blend"])
-                    if p.get("root_blend", 0) > p["blend"] and p["type"] in TUBES:
-                        reach = max(p["ra"], p["rb"]) + 2 * p["root_blend"]
-                        near = np.min([np.linalg.norm(QM - inst["a"], axis=1) for inst in instances(p)], 0)
+                    if p.get("root_blend", 0) > p["blend"] and p["type"] in LONG:
+                        reach = max(ends(p)[2:]) + 2 * p["root_blend"]
+                        near = np.min([np.linalg.norm(QM - ends(inst)[0], axis=1) for inst in instances(p)], 0)
                         k = k + (p["root_blend"] - p["blend"]) * np.clip(1 - near / reach, 0, 1)
                     gd = joined_normal(parts[:i], [x[M] for x in Ds], QM, 0.5 * kmax)
                     dM = round_union(d[M], e[M], gd, ge, np.maximum(k, 1e-6))
@@ -256,13 +286,33 @@ def sdf_with_parts(parts, P, grow=0.0):
 
 def on_centre_line(p):
     if p["mirror"]: return False
+    if p["type"] == "chain": return bool(np.all(np.abs(p["joints"][:, 0]) < 1e-9))
     if p["type"] in TUBES: return abs(p["a"][0]) < 1e-9 and abs(p["b"][0]) < 1e-9
     return abs(p["center"][0]) < 1e-9
+
+
+def bounds(p):
+    """Axis-aligned box (lo, hi) around a part and its mirror copy."""
+    los, his = [], []
+    for q in instances(p):
+        if q["type"] == "chain":
+            J = q["joints"]; r = float(J[:, 3].max()); lo, hi = J[:, :3].min(0) - r, J[:, :3].max(0) + r
+        elif q["type"] in TUBES:
+            r = max(q["ra"], q["rb"]) + (abs(q["bend"]) + abs(q["curl"]) if q["type"] == "paddle" else 0)
+            lo, hi = np.minimum(q["a"], q["b"]) - r, np.maximum(q["a"], q["b"]) + r
+        else:
+            R = q.get("_R"); R = rot(q["rotate"]) if R is None else R
+            ext = np.abs(R) @ np.abs(q["radii"] if q["type"] == "ellipsoid" else q["half"])
+            lo, hi = q["center"] - ext, q["center"] + ext
+        los.append(lo); his.append(hi)
+    return np.min(los, 0), np.max(his, 0)
 
 
 # ---- parameter vectors for fitting ---------------------------------------------------------------------------------
 
 def scale_of(p):
+    if p["type"] == "chain":
+        J = p["joints"]; return max(float(np.linalg.norm(np.diff(J[:, :3], axis=0), axis=1).sum()), float(J[:, 3].max()))
     if p["type"] in TUBES: return max(np.linalg.norm(p["b"] - p["a"]), p["ra"], p["rb"])
     return float(np.max(np.abs(p["radii" if p["type"] == "ellipsoid" else "half"])))
 
@@ -271,6 +321,9 @@ def params(p):
     """(name, index or None, kind) for every tunable number of a part. kind: pos, size, angle."""
     if p["fit"] is False: return []
     axes = (1, 2) if on_centre_line(p) else (0, 1, 2)          # centre-line parts never move sideways
+    if p["type"] == "chain":
+        return [("joints", (j, i), "pos") for j in range(len(p["joints"])) for i in axes] + \
+               [("joints", (j, 3), "size") for j in range(len(p["joints"]))]
     if p["type"] in TUBES:
         out = [("a", i, "pos") for i in axes] + [("b", i, "pos") for i in axes] + [("ra", None, "size"), ("rb", None, "size")]
         return out + ([("thick", None, "size")] if p["type"] == "paddle" else [])
@@ -279,6 +332,13 @@ def params(p):
     out = [("center", i, "pos") for i in axes] + [(size, i, "size") for i in range(3)] + [("rotate", i, "angle") for i in turns]
     if p["type"] == "box": out.append(("round", None, "size"))
     return out
+
+
+def label(key, i):
+    """A tunable number's name for reports: center[x], ra, joints[2].z"""
+    if i is None: return key
+    if isinstance(i, tuple): return f"{key}[{i[0]}].{'xyzr'[i[1]]}"
+    return f"{key}[{'xyz'[i]}]"
 
 
 def get(p, key, i):

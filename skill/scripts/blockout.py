@@ -159,8 +159,8 @@ def parts_preview(parts, f, path):
 
 def long_axis(p):
     """Centre and unit direction of a part's longest axis."""
-    if p["type"] in PT.TUBES:
-        d = p["b"] - p["a"]; return (p["a"] + p["b"]) / 2, d / max(np.linalg.norm(d), 1e-9)
+    if p["type"] in PT.LONG:
+        a, b = PT.ends(p)[:2]; d = b - a; return (a + b) / 2, d / max(np.linalg.norm(d), 1e-9)
     R = PT.rot(p["rotate"]); k = int(np.argmax(np.abs(p["radii"] if p["type"] == "ellipsoid" else p["half"])))
     return p["center"], R[:, k]
 
@@ -172,13 +172,18 @@ def part_checks(parts, f, build_voxel):
     for i, p in enumerate(parts):
         name = p["name"]; thin = PT.thinnest(p)
         sizes = np.abs(p["radii"]) if p["type"] == "ellipsoid" else np.abs(p["half"]) if p["type"] == "box" else None
-        longest = float(sizes.max()) if sizes is not None else 0.5 * float(np.linalg.norm(p["b"] - p["a"])) + thin
+        longest = float(sizes.max()) if sizes is not None else 0.5 * PT.scale_of(p) + thin
         if p["type"] == "capsule": thin = 0.5 * float(p["ra"] + p["rb"])        # a cone may end in a point
         if p["type"] == "paddle": thin = float(p["thick"])
-        if thin < 1.5 * build_voxel:
+        if p["type"] == "chain":                    # thin chains are built on a grid three times finer
+            thin = float(np.median(p["joints"][:, 3]))
+            if thin < 0.5 * build_voxel:
+                out.append(f"  {name}: typical joint radius {thin * 1000:.1f} mm is under 1.5 fine-grid voxels "
+                           f"({0.5 * build_voxel * 1000:.1f} mm), so it melts into a blob; make it at least that thick")
+        elif thin < 1.5 * build_voxel:
             out.append(f"  {name}: thinnest radius {thin * 1000:.1f} mm is under 1.5 build voxels "
-                       f"({1.5 * build_voxel * 1000:.1f} mm), so it melts into a blob or a dent; make it at least "
-                       f"that thick, or drop it and let the texture show it")
+                       f"({1.5 * build_voxel * 1000:.1f} mm), so it melts into a blob or a dent; make it a chain "
+                       f"(built on a finer grid), or drop it and let the texture show it")
         bigger = [j for j in range(len(parts)) if j != i and PT.scale_of(parts[j]) > 1.5 * PT.scale_of(p)]
         if bigger and 2 * f.voxel <= thin < 0.3 * longest:            # (too thin to judge on this grid)
             others = np.min([D[j] for j in bigger], 0)
@@ -216,7 +221,7 @@ def part_checks(parts, f, build_voxel):
     main = find(int(np.argmax([PT.scale_of(p) for p in parts])))
     loose = [parts[i]["name"] for i in range(len(parts)) if find(i) != main]
     if loose:
-        out.append(f"  {', '.join(loose)}: not joined to the body (no chain of touching parts reaches it), so the "
+        out.append(f"  {', '.join(loose)}: not joined to the body (no line of touching parts reaches it), so the "
                    f"build drops them as a loose piece: move the attachment end inside the part it grows from")
     return out or ["  no problems found"]
 
@@ -280,6 +285,8 @@ def label_tile(parts, refs, vm, v, axes, lab, crop, height, name_px=30):
 
 def part_box(p):
     """Axis-aligned box around a part (as written, not its mirror copy)."""
+    if p["type"] == "chain":
+        J = p["joints"]; r = float(J[:, 3].max()); return J[:, :3].min(0) - r, J[:, :3].max(0) + r
     if p["type"] in PT.TUBES:
         r = max(p["ra"], p["rb"]) + (abs(p["bend"]) if p["type"] == "paddle" else 0)
         return (np.minimum(p["a"], p["b"]) - r, np.maximum(p["a"], p["b"]) + r)
@@ -384,7 +391,7 @@ def main():
         moved = []
         for k, i, kind in PT.params(p0):
             v0, v1 = PT.get(p0, k, i), PT.get(p1, k, i)
-            if abs(v1 - v0) > 1e-4: moved.append(f"{k}{'' if i is None else '[' + 'xyz'[i] + ']'} {v0:+.3f}->{v1:+.3f}")
+            if abs(v1 - v0) > 1e-4: moved.append(f"{PT.label(k, i)} {v0:+.3f}->{v1:+.3f}")
         log(f"  {p0['name']}: " + ("; ".join(moved) if moved else "unchanged"))
     _, build_voxel = make_grid(f.maps, load_subject(a.refs)[0], 280)
     log("part checks:"); [log(s) for s in part_checks(parts, f, build_voxel)]

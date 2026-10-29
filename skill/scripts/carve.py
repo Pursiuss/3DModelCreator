@@ -236,6 +236,7 @@ def fair_trunk(parts, P, blk, pid, size, voxel):
     big_size = max(size["width"], size["length"], size["height"])
     def slimmest(p):                                         # a tapering part counts by its thin end: a thigh
         if p["type"] == "capsule": return float(min(p["ra"], p["rb"]))   # narrowing to a knee is a limb
+        if p["type"] == "chain": return float(p["joints"][:, 3].min())
         return PT.thinnest(p)
     trunk = [i for i, p in enumerate(parts) if slimmest(p) >= TRUNK_THICK * big_size]
     if not trunk: return blk
@@ -274,6 +275,120 @@ def disagreeing_views(parts, maps, axes, skip, blk, pid, size, voxel, rel=0.025,
     return out
 
 
+FINE_VOXELS = 3.0        # a chain thinner than this many build voxels somewhere is built on a finer grid
+FINE_STEP = 3            # ... that many times finer
+FINE_MAX_POINTS = 3_000_000
+
+
+def fine_parts(parts, voxel):
+    """Indices of the parts built on a finer grid: thin chains (a tail strand, a leg down to its pastern), parts
+    marked "fine", and whatever hangs from them alone (the tuft at the end of a tail, a hoof under a thin leg), which
+    on the coarse grid would be left floating once the thin part is taken out. Never the biggest part."""
+    import parts as PT
+    fine = {i for i, p in enumerate(parts)
+            if p.get("fine") or (p["type"] == "chain" and p["joints"][:, 3].min() < FINE_VOXELS * voxel)}
+    def volume(p):
+        lo, hi = PT.bounds(p); g = [np.linspace(lo[k], hi[k], 16) for k in range(3)]
+        G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+        return float((PT.sdf_part(p, G) < 0).mean() * np.prod(hi - lo))
+    fine.discard(int(np.argmax([volume(p) for p in parts])))
+    changed = bool(fine)
+    while changed:
+        changed = False
+        for i, p in enumerate(parts):
+            if i in fine: continue
+            lo, hi = PT.bounds(p); g = [np.linspace(lo[k], hi[k], 20) for k in range(3)]
+            G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+            cell = float((hi - lo).max()) / 19
+            S = G[np.abs(PT.sdf_part(p, G)) < max(cell, voxel)]          # points on its surface
+            if not len(S): continue
+            def touch(js): return bool(js) and float(np.min([PT.sdf_part(parts[j], S) for j in js])) < voxel
+            if touch(sorted(fine)) and not touch([j for j in range(len(parts)) if j != i and j not in fine]):
+                fine.add(i); changed = True
+    return sorted(fine)
+
+
+def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore):
+    """Build the fine parts on their own grids (one box per group of touching parts) and join them to the body.
+    In each box the shape is the fine parts, trimmed to the outlines at the fine resolution, smoothly joined
+    (blend) onto the body as the coarse build made it, sunk half a coarse voxel so that the edge of the fillet lies
+    just under the body's own surface. Only the fine parts and their fillets are kept from that mesh; the body
+    surface in the box comes from the coarse mesh. occ and ignore (coarse grids) are updated in place so texturing
+    sees the fine parts. Returns (meshes [(V, F, N)], untrimmed part names, largest dropped share)."""
+    import parts as PT
+    fp = [parts[i] for i in fine]
+    kmax = max([max(p["blend"], p.get("root_blend", 0)) for p in fp] + [voxel])
+    margin = 1.5 * kmax + 2 * voxel
+    boxes = []                                       # one box per instance (mirror copies apart), merged on overlap
+    for p in fp:
+        for q in PT.instances(p):
+            lo, hi = PT.bounds(dict(q, mirror=False)); boxes.append([lo - margin, hi + margin])
+    merged = True
+    while merged:
+        merged = False
+        for a in range(len(boxes)):
+            for b in range(a + 1, len(boxes)):
+                if np.all(boxes[a][0] <= boxes[b][1]) and np.all(boxes[b][0] <= boxes[a][1]):
+                    boxes[a] = [np.minimum(boxes[a][0], boxes[b][0]), np.maximum(boxes[a][1], boxes[b][1])]
+                    del boxes[b]; merged = True; break
+            if merged: break
+    origin = np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
+    meshes, untrimmed, dropped = [], set(), 0.0
+    for lo, hi in boxes:
+        vf = max(voxel / FINE_STEP, float(np.prod(hi - lo) / FINE_MAX_POINTS) ** (1 / 3))
+        ax = {a: np.arange(lo[k], hi[k] + vf, vf) for k, a in enumerate("xyz")}
+        X, Y, Z = np.meshgrid(ax["x"], ax["y"], ax["z"], indexing="ij"); shape = X.shape
+        P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]; del X, Y, Z
+        here = [p for p in fp if np.all(PT.bounds(p)[0] <= hi) and np.all(lo <= PT.bounds(p)[1])]
+        e, pid = PT.sdf_with_parts(here, P)
+        e = e.reshape(shape).astype(np.float32); pid = pid.reshape(shape)
+        dm = ndimage.map_coordinates(field, ((P - origin) / voxel).T, order=1, mode="nearest").reshape(shape)
+        del P
+        ign = {}
+        for v in VIEWS:
+            ids = [j for j, p in enumerate(here) if v in p.get("ignore", [])]
+            if ids: ign[v] = np.isin(pid, ids)
+        def tol_of(p):                               # as for the coarse parts: 15% of its typical thickness
+            t = float(np.median(p["joints"][:, 3])) if p["type"] == "chain" else PT.thinnest(p)
+            return min(tol_max, 0.15 * t)
+        hd = hull_distance(maps, ax, skip, ign) - np.array([tol_of(p) for p in here], np.float32)[pid]
+        k = 2 * vf
+        h = np.clip(k - np.abs(e - hd), 0, None) / k
+        ft = np.maximum(e, hd) + h * h * k / 4; del hd, h
+        for j, p in enumerate(here):                 # trimming shaves, it never deletes (as for the coarse parts)
+            mine = (pid == j) & (e < 0); n = int(mine.sum())
+            if n and (ft[mine] < 0).sum() < 0.5 * n:
+                untrimmed.add(p["name"]); keep = ndimage.binary_dilation(pid == j, iterations=1)
+                ft = np.where(keep, np.minimum(ft, e), ft)
+        kb = max([max(p["blend"], p.get("root_blend", 0)) for p in here] + [2 * vf])
+        d = PT.smin(dm + 0.5 * voxel, ft, kb).astype(np.float32)
+        if not (d < 0).any(): continue
+        verts, faces, _, _ = measure.marching_cubes(np.pad(d, 1, constant_values=4 * voxel), 0.0)
+        o = np.array([ax["x"][0], ax["y"][0], ax["z"][0]])
+        V = (verts - 1) * vf + o; F = faces[:, ::-1].astype(np.int64)
+        c = (V[F].mean(1) - o) / vf
+        near = ndimage.map_coordinates(ft, c.T, order=1, mode="nearest") < kb + vf   # the fine parts and fillets,
+        F = F[near]                                                                  # not the body under them
+        if not len(F): continue
+        used = np.unique(F); remap = -np.ones(len(V), np.int64); remap[used] = np.arange(len(used))
+        V, F = V[used], remap[F]
+        V, F, _, _ = keep_main_pieces(V, F)
+        dropped = max(dropped, keep_main_pieces.biggest_dropped)
+        meshes.append((V, F, field_normals(d, V, o, vf)))
+        # the coarse grids that texturing reads: where the fine shape is, and which views ignore it there
+        sl = tuple(slice(np.searchsorted(axes[a], lo[q]), np.searchsorted(axes[a], hi[q])) for q, a in enumerate("xyz"))
+        G = np.meshgrid(*[axes[a][sl[q]] for q, a in enumerate("xyz")], indexing="ij")
+        idx = [(G[q] - o[q]) / vf for q in range(3)]
+        inside = ndimage.map_coordinates(ft, idx, order=1, mode="nearest") < 0
+        occ[sl] |= inside
+        near_pid = ndimage.map_coordinates(pid, idx, order=0, mode="nearest")
+        for v in VIEWS:
+            ids = [j for j, p in enumerate(here) if v in p.get("ignore", [])]
+            if ids:
+                ignore.setdefault(v, np.zeros(occ.shape, bool))[sl] |= inside & np.isin(near_pid, ids)
+    return meshes, sorted(untrimmed), dropped
+
+
 def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, skip=()):
     """Blockout first, then trim where it sticks out of the outlines.
     shape = blockout (optionally grown by `grow`) intersected with the visual hull, with the cut edges rounded.
@@ -288,6 +403,9 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     axes, voxel = make_grid(maps, size, res)
     grow = grow or 0.0
     hull = visual_hull(maps, axes, skip)
+    all_parts = parts
+    fine = fine_parts(parts, voxel)                  # built on their own finer grid, after the body
+    parts = [p for i, p in enumerate(parts) if i not in fine]
     X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij")
     P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
     blk, pid = PT.sdf_with_parts(parts, P, grow=grow)
@@ -331,13 +449,20 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     F = faces[:, ::-1].astype(np.int64)
     V, F, kept, pieces = keep_main_pieces(V, F)
     if smooth_iters: V = taubin(V, F, smooth_iters)
+    dropped = keep_main_pieces.biggest_dropped
     origin = np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
     N = field_normals(field, V, origin, voxel)
     occ = field < 0
+    untrimmed = [parts[i]["name"] for i in protected]
+    if fine:
+        meshes, fine_untrimmed, fine_dropped = build_fine(maps, axes, voxel, field, all_parts, fine, skip, tol_max,
+                                                          occ, ignore)
+        for Vf, Ff, Nf in meshes:
+            F = np.r_[F, Ff + len(V)]; V = np.r_[V, Vf]; N = np.r_[N, Nf]
+        untrimmed += fine_untrimmed; dropped = max(dropped, fine_dropped)
     return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
-                grow=grow, pieces=(kept, pieces), parts=parts, ignored_space=ignore,
-                untrimmed=[parts[i]["name"] for i in protected],
-                dropped_piece=getattr(keep_main_pieces, "biggest_dropped", 0.0),
+                grow=grow, pieces=(kept, pieces), parts=all_parts, ignored_space=ignore,
+                untrimmed=untrimmed, dropped_piece=dropped, fine=[all_parts[i]["name"] for i in fine],
                 auto_ignored={parts[i]["name"]: list(v) for i, v in auto.items()})
 
 

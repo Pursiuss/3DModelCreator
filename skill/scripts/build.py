@@ -64,7 +64,8 @@ def main():
                               8 if a.smooth is None else a.smooth, tuple(a.skip_view))
         method = (f"blockout ({len(parts)} parts from {os.path.basename(a.parts)}) grown {S['grow'] * 1000:.1f} mm, "
                   f"trimmed to the outlines ({S['voxel'] * 1000:.2f} mm voxels), smoothed; "
-                  f"kept {S['pieces'][0]} of {S['pieces'][1]} mesh pieces")
+                  f"kept {S['pieces'][0]} of {S['pieces'][1]} mesh pieces"
+                  + (f"; built on a finer grid and joined on: {', '.join(S['fine'])}" if S.get("fine") else ""))
     else:
         S = build_shape(a.refs, a.res, a.round, False, 12 if a.smooth is None else a.smooth,
                         1.5 if a.blur is None else a.blur, tuple(a.skip_view))
@@ -76,7 +77,8 @@ def main():
     if S.get("dropped_piece", 0) > 0.002:
         warnings.append(f"a loose piece ({S['dropped_piece']:.1%} of the model) came off and was dropped: a part "
                         f"(often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the "
-                        f"part it grows from")
+                        f"part it grows from, and build a thin tail, strand or leg as a chain (thin chains are built on "
+                        f"a finer grid, with whatever hangs from them)")
     if S.get("untrimmed"):
         warnings.append("kept untrimmed, because trimming to the outlines would have removed most of them (they are "
                         "off their drawn place; move them onto it in parts-on-refs.png): " + ", ".join(S["untrimmed"]))

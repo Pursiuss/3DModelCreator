@@ -142,20 +142,21 @@ def end_on(parts, pid_face, cen, cand, k, d):
     views often disagree by about that much on where a small part sits), close behind it."""
     import parts as PT
     for i, p in enumerate(parts):
-        if p["type"] not in PT.TUBES: continue
+        if p["type"] not in PT.LONG: continue
         for inst in PT.instances(p):
-            ab = inst["b"] - inst["a"]; L = float(np.linalg.norm(ab))
-            r = max(float(inst["ra"]), float(inst["rb"]))
-            if p["type"] == "capsule": r *= max(1.0, float(p.get("aspect", 1.0)))
+            A, B, ra, rb = PT.ends(inst)
+            ab = B - A; L = float(np.linalg.norm(ab))
+            r = max(ra, rb) if p["type"] != "chain" else float(np.median(inst["joints"][:, 3]))
+            if p["type"] in ("capsule", "chain"): r *= max(1.0, float(p.get("aspect", 1.0)))
             if L < 2 * r or (ab @ d) / L < 0.75: continue              # its tip must point at the camera ...
             others = [q for j, q in enumerate(parts) if j != i]
-            if others and PT.sdf(others, inst["b"][None], smooth=False)[0] < 0: continue   # ... and stick out
+            if others and PT.sdf(others, B[None], smooth=False)[0] < 0: continue   # ... and stick out
             cand[pid_face == i, k] = False
             def flat(X): return X - np.outer(X @ d, d)
-            a2, b2 = flat(inst["a"][None])[0], flat(inst["b"][None])[0]; q = flat(cen) - a2; e = b2 - a2
+            a2, b2 = flat(A[None])[0], flat(B[None])[0]; q = flat(cen) - a2; e = b2 - a2
             t = np.clip(q @ e / max(e @ e, 1e-12), 0, 1)
             dist = np.linalg.norm(q - np.outer(t, e), axis=1)
-            behind = np.abs((cen - inst["a"]) @ d) < L + 3 * r
+            behind = np.abs((cen - A) @ d) < L + 3 * r
             cand[(dist < 2.5 * r) & behind, k] = False
 
 

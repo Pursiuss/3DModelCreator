@@ -43,8 +43,8 @@ Python interpreter chosen in step 1; use it for every script.
 ## 2. Look and measure
 
 1. Look at the four views and `final.png`. Decide what the animal is and list its parts as a modeller would:
-   body, head, neck, snout or beak, ears, horns, limbs (one capsule per straight segment; a bent leg is two),
-   feet, paws or toes, tail, fins, flippers, wings, shell, antennae, eye stalks. Note which are thin.
+   body, head, neck, snout or beak, ears, horns, limbs and tails (a chain each, one joint at every bend), feet,
+   paws or toes, tail tufts, fins, flippers, wings, shell, antennae, eye stalks. Note which are thin.
 2. Run `PY SKILL_DIR/scripts/measure.py REFS out/work`. Open `out/work/ruler-front.png`, `ruler-side.png` and
    `ruler-top.png`: the references with a metric grid in model coordinates. Read `out/work/profiles.txt`: for
    each height (and, from the top view, each position along the body) it lists the solid stretches of the outline in
@@ -73,9 +73,9 @@ length. Read x and z from the front ruler, y and z from the side ruler, and chec
  {"name": "neck", "type": "capsule", "a": [0, -0.18, 0.50], "b": [0, -0.30, 0.62], "ra": 0.08, "rb": 0.06, "blend": 0.05},
  {"name": "head", "type": "ellipsoid", "center": [0, -0.36, 0.66], "radii": [0.07, 0.10, 0.07], "rotate": [-15, 0, 0], "blend": 0.03},
  {"name": "ear", "type": "ellipsoid", "center": [0.04, -0.33, 0.74], "radii": [0.012, 0.03, 0.05], "rotate": [0, 15, 0], "mirror": true, "blend": 0.01},
- {"name": "front leg", "type": "capsule", "a": [0.07, -0.18, 0.40], "b": [0.07, -0.17, 0.03], "ra": 0.035, "rb": 0.025, "mirror": true, "blend": 0.03},
+ {"name": "front leg", "type": "chain", "joints": [[0.07, -0.18, 0.40, 0.035], [0.07, -0.16, 0.20, 0.025], [0.07, -0.17, 0.03, 0.02]], "mirror": true, "blend": 0.03},
  {"name": "paw", "type": "ellipsoid", "center": [0.07, -0.19, 0.02], "radii": [0.03, 0.04, 0.02], "mirror": true, "blend": 0.01},
- {"name": "tail", "type": "capsule", "a": [0, 0.33, 0.50], "b": [0, 0.50, 0.35], "ra": 0.03, "rb": 0.015, "blend": 0.02}
+ {"name": "tail", "type": "chain", "joints": [[0, 0.30, 0.50, 0.03], [0, 0.42, 0.46, 0.02], [0, 0.50, 0.35, 0.012]], "blend": 0.02}
 ]}
 ```
 (An example dog-like animal, not the one you are modelling.)
@@ -92,12 +92,19 @@ Part types (all sizes in metres):
   optional `bend` (metres the middle bows within the plate: a crescent flipper; negative bows towards the nose for
   a part on the +x side) and `curl` (metres the long edges curl back towards the body, so it wraps round it). For
   flippers, wings, fins, ears, flat fan tails: anything flat that grows out of the body at one end.
+- `chain`: a limb, tail or neck grown joint by joint, the way a modeller extrudes one. `joints`: a list of
+  [x, y, z, radius] from the root (inside the part it grows from) to the tip, one joint at every bend (hip, knee,
+  hock, fetlock; the base, middle and end of a tail). Neighbouring joints are joined by round cones, so the
+  segments always meet; the fitter moves a joint and both segments that share it. Optional `aspect` as for a
+  capsule. A chain thinner than about three build voxels anywhere (a tail strand, a giraffe's lower leg) is built
+  on its own grid three times finer and joined on, together with whatever hangs from it alone (the tuft at the
+  end of the tail, the hoof under the leg), so it cannot break off; `"fine": true` forces that on any part.
 - `box`: `center`, `half` [x, y, z] (half-sizes), `round` (edge radius), optional `rotate`. Shells, flat or
   blocky parts.
 - On any part: `"mirror": true` adds the matching part at -x (write the +x one); `"blend"`: size in metres of the
   rounded fillet where it meets the parts listed before it (0 = sharp; where two surfaces meet at a shallow angle
   the build automatically spreads the join out instead of adding a bulge); `"fit": false` stops the fitter from
-  changing it; `"root_blend"` (capsules and paddles): a larger blend used only near the root `a`, so the part flows
+  changing it; `"root_blend"` (capsules, paddles, chains): a larger blend used only near the root, so the part flows
   out of the body there and stays a separate shape everywhere else; `"colour"`: the part is one colour, either a
   `#rrggbb` code from the palette or `"drawn"` (see the colour rule below); `"ignore_views": ["back"]` (any of
   front, back, side, top) tells every script to ignore that reference view for this part, for a view that draws
@@ -128,7 +135,13 @@ Modelling rules that matter for how the result looks:
   head up and back, or tilt it, until the side overlay is clean there.
 - Keep thin things thin: give a flipper, fin, wing or ear its thickness from the view where it looks thinnest.
   But nothing thinner than the fit report's minimum (about 1.5 build voxels, 3-4 mm on a 70 cm animal): thinner
-  parts melt into blobs. For claws that small, use that minimum radius at the root.
+  parts melt into blobs. For claws that small, use that minimum radius at the root. Round parts that are long and
+  thin (tails, tail strands, slim legs, antennae, whiskers) are chains: those are built on a finer grid, so they can
+  be as thin as drawn (down to a third of that minimum).
+- Tails: one chain from inside the rump to the tip, as thick as drawn all the way. A tuft or switch at the end is
+  a second chain (or an ellipsoid) that starts inside the tail's last joint, with its own `"colour"`; it is built
+  together with the tail. Do not exempt a tail from a view's trimming to keep it: if it breaks off, it is not a
+  chain, or does not start inside the rump.
 - Feet, hands and paws: build them the way they are drawn: one capsule per toe or finger, all starting together at
   the ankle or wrist, with at most a small flat pad where they join. No big rounded foot blob under the toes: it
   reads as a slipper, and its large underside is seen by no picture, so it gets no real colour. Claws, nails and
@@ -176,8 +189,9 @@ Modelling rules that matter for how the result looks:
   down to the hocks, and in the side view they run from the hip down to the hock. Build each upper leg as a wide
   tapered capsule from inside the body at the hip or shoulder down to the hock or knee (radius about half the
   rump's half-width at the top; `aspect` about 0.7 when it is longer front-to-back than it is wide, which it
-  usually is), with `blend` about 0.1 of the animal's height, then a slim capsule for the lower leg and the
-  hoof or paw. Read the widths off the back and front views (`profiles.txt` lists the front; a `--zoom` of the
+  usually is), with `blend` about 0.1 of the animal's height, then the lower leg as one chain from inside the
+  upper leg's lower end through the knee or hock and the fetlock down to the hoof or paw (an ellipsoid with its
+  own `"colour"`, starting inside the chain's last joint). Read the widths off the back and front views (`profiles.txt` lists the front; a `--zoom` of the
   back view shows where the thighs end).
 - Chest, brisket, dewlap: no separate ball on the chest. If the front view shows a chest or brisket in front of
   the shoulders, make it no wider than the front view draws it (usually about half the body's width) and give
@@ -188,8 +202,8 @@ Modelling rules that matter for how the result looks:
   neither drawn leg. Write the two legs as separate parts, each at its own drawn position, with the forward one on
   whichever side the front or back view shows it (if they cannot tell, put it on the +x side). A lifted hoof or paw
   is drawn off the ground: keep it there.
-- Antlers, horns and branching parts: one capsule per straight segment of the main beam and one per tine, each
-  starting inside the segment it grows from, measured on `--zoom` close-ups of the front and side views. Thin
+- Antlers, horns and branching parts: the main beam as a chain (a joint wherever it bends) and one capsule or
+  chain per tine, each starting inside the beam, measured on `--zoom` close-ups of the front and side views. Thin
   branches that sit a little off their drawn place are kept by the build, but they paint and score better on it.
 - Order: biggest first. Parts listed later blend into the ones before them.
 - Check each part against every view it appears in. If one view clearly draws a part differently from the others
@@ -244,7 +258,8 @@ PY SKILL_DIR/scripts/build.py REFS out --parts out/work/parts.fitted.json [--ski
 ```
 What it does:
 - Shape: smooths the thick parts (body, belly, neck, head) together as one form, leaving thin parts exactly as
-  written; trims the blockout where it sticks out of the outlines (by more than 1% of the animal's size on thick
+  written; builds thin chains, and what hangs from them, on a three times finer grid and joins them on with their
+  blend (the method line in `report.json` names them); trims the blockout where it sticks out of the outlines (by more than 1% of the animal's size on thick
   parts, closer on thin ones; notches and feather or fur wobble in the outlines are ironed out first), but never
   deletes most of a part: a part trimming would mostly remove is kept as written and reported. Where the top or
   back view alone would cut deep into a part the front and side draw whole (a top view drawn with the rump 15 cm
@@ -310,13 +325,13 @@ If it does not pass, fix the cause:
 | texture from the wrong view on a surface (e.g. back colours on the belly) | `--tol 2`; if hidden areas look wrong, `--tol 5` |
 | warning: two views disagree on a size, or front and mirrored back differ | use `--skip-view` with the views measure.py's view check names, for the fit and the build |
 | the model is shorter or smaller than the drawings, or parts are cut off | a view that disagrees was used for trimming: see the row above |
-| warning: a loose piece came off and was dropped, or fit report: parts "not joined to the body" | a part (tail, tuft, ear, horn) hangs on only where trimming cuts it: start it inside the part it grows from, and run a tail down into its tuft |
+| warning: a loose piece came off and was dropped, or fit report: parts "not joined to the body" | a part (tail, tuft, ear, horn) hangs on only where trimming cuts it: start it inside the part it grows from; make a thin tail, strand or leg a chain, with its tuft or hoof starting inside its last joint |
 | warning: parts "kept untrimmed" | trimming would have removed most of them, so they are off their drawn place: move them onto the drawing (`parts-on-refs.png`, a `--zoom`) and build again |
 | the blockout cannot be made to work after 3 rounds | fallback: `build.py REFS out --hull-only` (outline carving only; boxier, can invent stubs between legs), and say so in the log |
 
 Builds while you are still changing the blockout can add `--quick` (coarser mesh, smaller texture, about a fifth
-of the time, nearly the same scores); the final build must be without it. A quick build can lose a very thin part
-(a tail a few voxels wide breaks off); judge those on the full build.
+of the time, nearly the same scores); the final build must be without it. Thin chains are built fine in quick
+builds too, but a thin part that is not a chain can break off in a quick build; judge those on the full build.
 Do not raise `--grow` above 0: growing the blockout before trimming makes large flat, boxy faces.
 Each build overwrites `out/`: finish with a build of the best version.
 

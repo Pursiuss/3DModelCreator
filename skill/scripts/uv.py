@@ -4,6 +4,7 @@ Every triangle belongs to the blockout part it lies on (each side of a mirrored 
 unrolled along its own shape:
 - capsule (limb, neck, beak, toe): unrolled like a sleeve: across = around the tube, along = down the tube, with the
   rounded ends continuing the strip;
+- chain (a limb or tail of several segments): the same sleeve, following the bends from joint to joint;
 - ellipsoid (body, head, flipper): a sinusoidal map, like a world map that does not stretch near the poles: along
   = from end to end along its longest axis, across = around it, shrinking towards the ends;
 - box: one flat piece per face.
@@ -47,10 +48,21 @@ class Unroller:
 
     def __init__(self, inst):
         self.p = inst; t = inst["type"]; self.kind = t
-        if t in PT.TUBES:
+        if t == "chain":
+            J = inst["joints"]; self.ra, self.rb = float(J[0, 3]), float(J[-1, 3])
+            d = np.diff(J[:, :3], axis=0); ln = np.maximum(np.linalg.norm(d, axis=1), 1e-6)
+            self.A, self.len = J[:-1, :3], ln; self.cum = np.r_[0, np.cumsum(ln)[:-1]]; self.L = float(ln.sum())
+            self.axs = d / ln[:, None]; e1 = -_seam_dir(self.axs[0]); E1 = []
+            for ax in self.axs:                                           # carry the seam along the bends
+                e1 = e1 - (e1 @ ax) * ax
+                e1 = e1 / np.linalg.norm(e1) if np.linalg.norm(e1) > 1e-6 else -_seam_dir(ax)
+                E1.append(e1)
+            self.E1 = np.array(E1); self.E2 = np.cross(self.axs, self.E1)
+            self.segs = PT.segments(inst)
+        elif t in PT.TUBES:
             self.kind = t = "capsule"                                     # a paddle unrolls like a flat sleeve
             a, b = inst["a"], inst["b"]; L = float(np.linalg.norm(b - a))
-            self.a, self.L = a, max(L, 1e-6)
+            self.a, self.L = a, max(L, 1e-6); self.ra, self.rb = float(inst["ra"]), float(inst["rb"])
             self.ax = (b - a) / self.L if L > 1e-9 else np.array([0, 0, 1.0])
             sd = _seam_dir(self.ax); self.e1 = -sd; self.e2 = np.cross(self.ax, self.e1)
         elif t == "ellipsoid":
@@ -72,6 +84,13 @@ class Unroller:
             w = X - self.a; s = w @ self.ax; w = w - s[:, None] * self.ax
             th = np.arctan2(w @ self.e2, w @ self.e1)
             return th, s, np.zeros(len(X), int), np.linalg.norm(w, axis=1)
+        if self.kind == "chain":
+            j = np.argmin([PT.sdf_one(c, X) for c in self.segs], 0); n = len(self.segs)
+            w = X - self.A[j]; s = (w * self.axs[j]).sum(1)
+            s = np.where(j > 0, np.maximum(s, 0), s); s = np.where(j < n - 1, np.minimum(s, self.len[j]), s)
+            w = w - s[:, None] * self.axs[j]
+            th = np.arctan2((w * self.E2[j]).sum(1), (w * self.E1[j]).sum(1))
+            return th, self.cum[j] + s, np.zeros(len(X), int), np.linalg.norm(w, axis=1)
         if self.kind == "ellipsoid":
             Q = (X - self.c) @ self.R; q = Q / self.r
             t = np.arctan2(q[:, self.j], q[:, self.i]) - self.t_seam - np.pi
@@ -85,13 +104,13 @@ class Unroller:
     def to_metres(self, th, along, rho):
         """Unrolled coordinates in metres from angles (th may have been unwrapped past +-pi); rho = distance from
         the axis (capsules only)."""
-        if self.kind == "capsule":
-            s = along; p = self.p
+        if self.kind in ("capsule", "chain"):
+            s = along
             u = th * rho
             v = s.copy()
             lo = s < 0; hi = s > self.L
-            v[lo] = -p["ra"] * np.arctan2(-s[lo], rho[lo])
-            v[hi] = self.L + p["rb"] * np.arctan2(s[hi] - self.L, rho[hi])
+            v[lo] = -self.ra * np.arctan2(-s[lo], rho[lo])
+            v[hi] = self.L + self.rb * np.arctan2(s[hi] - self.L, rho[hi])
             return np.c_[u, v]
         if self.kind == "ellipsoid":
             phi = along
