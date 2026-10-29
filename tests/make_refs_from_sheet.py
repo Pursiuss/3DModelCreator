@@ -1,11 +1,13 @@
 """Turn a character turnaround sheet (front, side and back figures on a white page) into a refs folder.
 
 usage: python make_refs_from_sheet.py SHEET.jpg OUT_DIR --height 1.5 --front C0 C1 --side C0 C1 --back C0 C1
-           [--top C0 C1 [--top-head-down]] [--side-faces-right] [--line-art | --colour]
+           [--top C0 C1 [--top-rows R0 R1] [--top-head-down | --top-head-left]] [--side-faces-right]
+           [--line-art | --colour]
 Each --view gives the column range of that figure on the sheet; the figure is the largest drawing in that range,
 so small insets beside it (close-ups, separate parts) are left out, and so are thin pointer lines to notes.
 --top: the sheet has a top view; --top-head-down if its head is at the bottom of the picture (it is turned round so
-the nose is at the top, as the skill expects). Without --top, top.png is made from the front and side outlines (the
+the nose is at the top, as the skill expects); --top-head-left if it lies sideways with the head on the left;
+--top-rows if it sits in its own row of the sheet, below or above other figures in the same columns. Without --top, top.png is made from the front and side outlines (the
 outline of the shape those two views allow, seen from above); it carries no information of its own, and its colour
 is a flat grey: every part should list "top" in ignore_views.
 --line-art: the figures are outline drawings on white (no fill), so the animal is everything inside its outline:
@@ -23,7 +25,7 @@ from PIL import Image
 from scipy import ndimage
 
 
-def figure(rgb, c0, c1, pad=8, line_art=False, colour=False):
+def figure(rgb, c0, c1, pad=8, line_art=False, colour=False, rows=None):
     if colour:                                                     # differs from the background (median border)
         border = np.r_[rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]]
         ink = np.abs(rgb - np.median(border, 0)).max(2) > 12
@@ -41,8 +43,8 @@ def figure(rgb, c0, c1, pad=8, line_art=False, colour=False):
         fg = ndimage.binary_opening(fg, iterations=1 if colour else 2)   # drop thin pointer lines to notes, the
     lab, n = ndimage.label(fg)                                     # sheet's grid
     sizes = ndimage.sum(fg, lab, range(1, n + 1))
-    centre = np.array([ndimage.center_of_mass(lab == i + 1)[1] for i in range(n)])
-    inside = [i for i in range(n) if c0 <= centre[i] < c1]
+    centre = np.array([ndimage.center_of_mass(lab == i + 1) for i in range(n)])
+    inside = [i for i in range(n) if c0 <= centre[i][1] < c1 and (rows is None or rows[0] <= centre[i][0] < rows[1])]
     k = max(inside, key=lambda i: sizes[i]) + 1
     m = lab == k
     ys, xs = np.nonzero(m)
@@ -63,6 +65,7 @@ def main():
                     "the nose is on the left, as the skill expects")
     for v in ("front", "side", "back"): ap.add_argument(f"--{v}", type=int, nargs=2, required=True)
     ap.add_argument("--top", type=int, nargs=2); ap.add_argument("--top-head-down", action="store_true")
+    ap.add_argument("--top-head-left", action="store_true"); ap.add_argument("--top-rows", type=int, nargs=2)
     ap.add_argument("--line-art", action="store_true"); ap.add_argument("--colour", action="store_true")
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     rgb = np.array(Image.open(a.sheet).convert("RGB")).astype(int)
@@ -75,8 +78,9 @@ def main():
     ppm_f = (fb[3] - fb[1]) / a.height; ppm_s = (sb[3] - sb[1]) / a.height
     width = (fb[2] - fb[0]) / ppm_f; length = (sb[2] - sb[0]) / ppm_s
     if a.top:
-        img, _ = figure(rgb, *a.top, line_art=a.line_art, colour=a.colour)
+        img, _ = figure(rgb, *a.top, line_art=a.line_art, colour=a.colour, rows=a.top_rows)
         if a.top_head_down: img = img[::-1, ::-1]
+        if a.top_head_left: img = np.rot90(img, -1).copy()             # a quarter turn clockwise: head at the top
         Image.fromarray(img).save(os.path.join(a.out, "top.png"))
         for v in ("front", "side", "back", "top"):                 # masks, as in the kit (white = animal)
             al = np.array(Image.open(os.path.join(a.out, f"{v}.png")))[..., 3]

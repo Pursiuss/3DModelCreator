@@ -87,6 +87,21 @@ def profile_lines(vm, n=20):
     return lines
 
 
+def column_lines(vm, n=24):
+    """Side view, nose end to tail end: the solid stretches up and down at each position along the body (a loft's
+    stations: the torso's top and bottom are the ends of its stretch above the legs)."""
+    b = vm.box; lines = []
+    for k in range(n + 1):
+        col = int(round(b[0] + (b[2] - b[0] - 1) * k / n))
+        y, _ = to_model(vm, col=col + 0.5)
+        segs = []
+        for r0, r1 in runs(vm.sil[:, col]):
+            _, z0 = to_model(vm, row=r1); _, z1 = to_model(vm, row=r0)
+            segs.append((min(z0, z1), max(z0, z1)))
+        lines.append(f"  y = {y:+.3f}: z " + " ".join(f"[{a:+.3f}, {c:+.3f}]" for a, c in sorted(segs, reverse=True)))
+    return lines
+
+
 def zoom(refs, vm, box, path, px=1200):
     """A close-up of one view with a grid labelled in model metres: a line every centimetre, or every 2, 5 or 10 cm
     when the box is too big for that to stay readable (at most about 25 lines across)."""
@@ -137,9 +152,12 @@ def main():
         ruler(refs, vm, os.path.join(work, f"ruler-{v}.png"))
         if v != "back":
             out.append(f"{v} view ({how}), top to bottom:" if v != "top" else f"top view ({how}), nose end (-y) to tail end:")
-            pl = profile_lines(vm)
-            out += pl if v != "top" else pl
+            out += profile_lines(vm)
             out.append("")
+            if v == "side":
+                out.append("side view, nose end (-y) to tail end, stretches top to bottom (a loft's stations: the torso's "
+                           "top and bottom):")
+                out += column_lines(vm); out.append("")
     from views import consistency
     maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in ("front", "side", "back", "top")}
     cw, skip = consistency(maps)

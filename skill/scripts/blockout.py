@@ -66,14 +66,14 @@ class Fitter:
         log(f"start: mean outline overlap {best:.3f}")
         steps = []
         for p in parts:
-            s = PT.scale_of(p)
+            s = PT.fit_scale(p)
             steps.append({(k, i): (0.12 * s if kind == "pos" else 0.15 if kind == "size" else 8.0)
                           for k, i, kind in PT.params(p)})
         # Limits around what was written, so a part keeps its role (a beak must not swell to fill the head):
         # position within 25% of the part's size, size between 0.8x and 1.25x, rotation within 25 degrees.
         limits = []
         for p in parts:
-            s = PT.scale_of(p); lim = {}
+            s = PT.fit_scale(p); lim = {}
             for k, i, kind in PT.params(p):
                 v0 = PT.get(p, k, i)
                 if kind == "pos": lim[(k, i)] = (v0 - 0.25 * s - 2 * self.voxel, v0 + 0.25 * s + 2 * self.voxel)
@@ -159,8 +159,9 @@ def parts_preview(parts, f, path):
 
 def long_axis(p):
     """Centre and unit direction of a part's longest axis."""
-    if p["type"] in PT.LONG:
-        a, b = PT.ends(p)[:2]; d = b - a; return (a + b) / 2, d / max(np.linalg.norm(d), 1e-9)
+    if p["type"] in PT.LONG + ("loft",):
+        a, b = (PT.joints(p)[[0, -1], :3] if p["type"] == "loft" else PT.ends(p)[:2])
+        d = b - a; return (a + b) / 2, d / max(np.linalg.norm(d), 1e-9)
     R = PT.rot(p["rotate"]); k = int(np.argmax(np.abs(p["radii"] if p["type"] == "ellipsoid" else p["half"])))
     return p["center"], R[:, k]
 
@@ -285,8 +286,7 @@ def label_tile(parts, refs, vm, v, axes, lab, crop, height, name_px=30):
 
 def part_box(p):
     """Axis-aligned box around a part (as written, not its mirror copy)."""
-    if p["type"] == "chain":
-        J = p["joints"]; r = float(J[:, 3].max()); return J[:, :3].min(0) - r, J[:, :3].max(0) + r
+    if p["type"] in ("chain", "loft"): return PT.bounds(dict(p, mirror=False))
     if p["type"] in PT.TUBES:
         r = max(p["ra"], p["rb"]) + (abs(p["bend"]) if p["type"] == "paddle" else 0)
         return (np.minimum(p["a"], p["b"]) - r, np.maximum(p["a"], p["b"]) + r)

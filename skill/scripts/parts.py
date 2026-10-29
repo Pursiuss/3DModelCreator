@@ -17,6 +17,13 @@ the root (put it inside the part it grows from) to the tip, joined by round cone
 fitting moves a joint together with both segments that share it. "aspect" (default 1) flattens every segment's
 cross-section as for a capsule. A chain thinner than about three build voxels somewhere (a tail strand, a leg's
 pastern) is built on its own finer grid and joined on, so it cannot break off; "fine": true forces that.
+loft: a torso built slice by slice, the way a modeller lofts one from blueprints: "stations" =
+[x, y, z, half_width, half_height] from the front end to the back end (y increasing); each station is an upright
+slice across the animal at that y, an ellipse half_width wide (x) and half_height tall (z) around (x, z), and a
+smooth surface runs through the stations. Read each station's top and bottom straight off the side view at its y,
+and its width off the top or front view: the back can slope, the belly tuck up, the chest be deep and narrow, all in
+one part. "caps": [front, back] metres the ends round off beyond the first and last station (default 0: as far as
+the end slice is thin). Not for necks or anything running steeply up or down: use a capsule or chain there.
 paddle: a flat tapered plate from a to b (flippers, wings, fins, ears, flat tails): half-width ra at a narrowing to
 rb at b, half-thickness "thick", flat faces turned towards "normal" (default [1, 0, 0]: facing sideways), and
 "bend": metres the middle bows out sideways within the plate (a crescent flipper), default 0, and "curl":
@@ -37,9 +44,9 @@ import numpy as np
 
 TYPES = {"ellipsoid": ["center", "radii", "rotate"], "capsule": ["a", "b", "ra", "rb", "aspect", "droop"],
          "paddle": ["a", "b", "ra", "rb", "thick", "normal", "bend", "curl"], "box": ["center", "half", "rotate", "round"],
-         "chain": ["joints", "aspect"]}
+         "chain": ["joints", "aspect"], "loft": ["stations", "caps"]}
 DEFAULTS = {"rotate": [0, 0, 0], "round": 0.0, "normal": [1, 0, 0], "bend": 0.0, "curl": 0.0, "aspect": 1.0,
-            "droop": 0.0}
+            "droop": 0.0, "caps": [0.0, 0.0]}
 TUBES = ("capsule", "paddle")                       # parts running from a root a to a tip b
 LONG = TUBES + ("chain",)                           # parts with a root end and a tip end (see ends())
 
@@ -70,6 +77,10 @@ def load(path):
             q[k] = np.array(p.get(k, DEFAULTS.get(k)), float)
         if t == "chain" and (q["joints"].ndim != 2 or q["joints"].shape[1] != 4 or len(q["joints"]) < 2):
             raise SystemExit(f"part {q['name']}: joints must be at least two [x, y, z, radius] rows")
+        if t == "loft" and (q["stations"].ndim != 2 or q["stations"].shape[1] != 5 or len(q["stations"]) < 2):
+            raise SystemExit(f"part {q['name']}: stations must be at least two [x, y, z, half_width, half_height] rows")
+        if t == "loft" and np.any(np.diff(q["stations"][:, 1]) <= 0):
+            raise SystemExit(f"part {q['name']}: stations must run from the front end to the back end (y increasing)")
         out.append(q)
     return out
 
@@ -98,6 +109,7 @@ def instances(p):
     if p["mirror"]:
         m = dict(p); M = np.diag([-1.0, 1, 1])
         if p["type"] == "chain": m["joints"] = p["joints"] * [-1, 1, 1, 1]
+        elif p["type"] == "loft": m["stations"] = p["stations"] * [-1, 1, 1, 1, 1]
         elif p["type"] in TUBES:
             m["a"] = p["a"] * [-1, 1, 1]; m["b"] = p["b"] * [-1, 1, 1]
             if p["type"] == "paddle":                # mirroring flips the frame's handedness: keep the bow's side
@@ -116,9 +128,16 @@ def paddle_frame(p):
     return u, np.cross(n, u), n
 
 
+def joints(p):
+    """A chain's joints; for a loft, its stations as joints of the same cross-section area."""
+    if p["type"] == "loft":
+        S = p["stations"]; return np.c_[S[:, :3], np.sqrt(np.abs(S[:, 3] * S[:, 4]))]
+    return p["joints"]
+
+
 def segments(p):
-    """A chain's segments, as capsules from joint to joint."""
-    J = p["joints"]
+    """A chain's segments (a loft's, roughly), as capsules from joint to joint."""
+    J = joints(p)
     return [{"type": "capsule", "a": J[k, :3], "b": J[k + 1, :3], "ra": J[k, 3], "rb": J[k + 1, 3],
              "aspect": p.get("aspect", 1.0), "droop": 0.0} for k in range(len(J) - 1)]
 
@@ -129,8 +148,50 @@ def ends(p):
     return p["a"], p["b"], float(p["ra"]), float(p["rb"])
 
 
+LOFT_STEPS = 8           # samples per span between two stations
+
+
+def loft_slices(p):
+    """The loft's stations with smooth curves (Catmull-Rom) through them, sampled LOFT_STEPS times per span."""
+    S = np.asarray(p["stations"], float); n = len(S)
+    E = np.r_[[2 * S[0] - S[1]], S, [2 * S[-1] - S[-2]]]
+    out = []
+    for i in range(n - 1):
+        P0, P1, P2, P3 = E[i], E[i + 1], E[i + 2], E[i + 3]
+        for t in np.arange(LOFT_STEPS) / LOFT_STEPS:
+            out.append(0.5 * (2 * P1 + (P2 - P0) * t + (2 * P0 - 5 * P1 + 4 * P2 - P3) * t * t
+                              + (3 * P1 - P0 - 3 * P2 + P3) * t ** 3))
+    out.append(S[-1]); out = np.array(out); out[:, 3:] = np.maximum(np.abs(out[:, 3:]), 1e-3)
+    out[:, 1] = np.maximum.accumulate(out[:, 1])                  # slices stay in order along the body
+    return out
+
+
+def _ellipse_d(u, v, rw, rh):
+    """Distance to an ellipse (approximate away from it, exact on it): negative inside."""
+    g = np.sqrt((u / rw) ** 2 + (v / rh) ** 2); k = np.sqrt((u / rw ** 2) ** 2 + (v / rh ** 2) ** 2)
+    return np.where(k > 1e-12, g * (g - 1) / np.maximum(k, 1e-12), -np.minimum(rw, rh))
+
+
+def sdf_loft(p, P):
+    """Distance to a loft: at each point's y, the slice there (centre and half-sizes read off the smooth curves
+    through the stations), closed beyond the first and last station by half-ellipsoid caps."""
+    D = loft_slices(p); y = P[:, 1]
+    xc, zc, rw, rh = (np.interp(y, D[:, 1], D[:, k]) for k in (0, 2, 3, 4))
+    dr = _ellipse_d(P[:, 0] - xc, P[:, 2] - zc, rw, rh)
+    ds = np.maximum(D[0, 1] - y, y - D[-1, 1])
+    out = np.minimum(np.maximum(dr, ds), 0) + np.hypot(np.maximum(dr, 0), np.maximum(ds, 0))
+    caps = np.asarray(p.get("caps", [0.0, 0.0]), float)
+    for k, cap in ((0, caps[0]), (-1, caps[1])):                  # rounded ends
+        r = np.array([D[k, 3], float(cap) if cap > 0 else float(min(D[k, 3], D[k, 4])), D[k, 4]])
+        q = (P - D[k, :3]) / r; q2 = (P - D[k, :3]) / r ** 2
+        k0 = np.linalg.norm(q, axis=1); k1 = np.linalg.norm(q2, axis=1)
+        out = np.minimum(out, np.where(k1 > 1e-12, k0 * (k0 - 1) / np.maximum(k1, 1e-12), -r.min()))
+    return out
+
+
 def sdf_one(p, P):
     t = p["type"]
+    if t == "loft": return sdf_loft(p, P)
     if t == "chain":                                # round cones sharing a ball at every joint: smooth over the
         return np.min([sdf_one(c, P) for c in segments(p)], 0)    # outside of a bend, creased inside it (a knee)
     if t == "paddle":                               # a round cone's outline in a plane, given a rounded thickness
@@ -220,6 +281,7 @@ def round_union(a, b, ga, gb, k):
 def thinnest(p):
     if p["type"] == "capsule": return float(max(p["ra"], p["rb"]))
     if p["type"] == "chain": return float(p["joints"][:, 3].max())
+    if p["type"] == "loft": return float(np.median(p["stations"][:, 3:].min(1)))
     if p["type"] == "paddle": return float(p["thick"])
     return float(np.min(np.abs(p["radii" if p["type"] == "ellipsoid" else "half"])))
 
@@ -287,6 +349,7 @@ def sdf_with_parts(parts, P, grow=0.0):
 def on_centre_line(p):
     if p["mirror"]: return False
     if p["type"] == "chain": return bool(np.all(np.abs(p["joints"][:, 0]) < 1e-9))
+    if p["type"] == "loft": return bool(np.all(np.abs(p["stations"][:, 0]) < 1e-9))
     if p["type"] in TUBES: return abs(p["a"][0]) < 1e-9 and abs(p["b"][0]) < 1e-9
     return abs(p["center"][0]) < 1e-9
 
@@ -297,6 +360,9 @@ def bounds(p):
     for q in instances(p):
         if q["type"] == "chain":
             J = q["joints"]; r = float(J[:, 3].max()); lo, hi = J[:, :3].min(0) - r, J[:, :3].max(0) + r
+        elif q["type"] == "loft":
+            S = q["stations"]; r = float(S[:, 3:].max()) + float(np.max(q.get("caps", [0, 0])))
+            lo, hi = S[:, :3].min(0) - r, S[:, :3].max(0) + r
         elif q["type"] in TUBES:
             r = max(q["ra"], q["rb"]) + (abs(q["bend"]) + abs(q["curl"]) if q["type"] == "paddle" else 0)
             lo, hi = np.minimum(q["a"], q["b"]) - r, np.maximum(q["a"], q["b"]) + r
@@ -311,6 +377,8 @@ def bounds(p):
 # ---- parameter vectors for fitting ---------------------------------------------------------------------------------
 
 def scale_of(p):
+    if p["type"] == "loft":
+        S = p["stations"]; return max(float(np.linalg.norm(np.diff(S[:, :3], axis=0), axis=1).sum()), float(S[:, 3:].max()))
     if p["type"] == "chain":
         J = p["joints"]; return max(float(np.linalg.norm(np.diff(J[:, :3], axis=0), axis=1).sum()), float(J[:, 3].max()))
     if p["type"] in TUBES: return max(np.linalg.norm(p["b"] - p["a"]), p["ra"], p["rb"])
@@ -321,6 +389,9 @@ def params(p):
     """(name, index or None, kind) for every tunable number of a part. kind: pos, size, angle."""
     if p["fit"] is False: return []
     axes = (1, 2) if on_centre_line(p) else (0, 1, 2)          # centre-line parts never move sideways
+    if p["type"] == "loft":                          # stations move up and down (and sideways), not along
+        return [("stations", (j, i), "pos") for j in range(len(p["stations"])) for i in axes if i != 1] + \
+               [("stations", (j, i), "size") for j in range(len(p["stations"])) for i in (3, 4)]
     if p["type"] == "chain":
         return [("joints", (j, i), "pos") for j in range(len(p["joints"])) for i in axes] + \
                [("joints", (j, 3), "size") for j in range(len(p["joints"]))]
@@ -337,8 +408,16 @@ def params(p):
 def label(key, i):
     """A tunable number's name for reports: center[x], ra, joints[2].z"""
     if i is None: return key
-    if isinstance(i, tuple): return f"{key}[{i[0]}].{'xyzr'[i[1]]}"
+    if isinstance(i, tuple):
+        return f"{key}[{i[0]}]." + (["x", "y", "z", "half_width", "half_height"] if key == "stations" else list("xyzr"))[i[1]]
     return f"{key}[{'xyz'[i]}]"
+
+
+def fit_scale(p):
+    """The size the fitter scales a part's steps and limits by: a loft's stations move by fractions of its
+    thickness, not of its length."""
+    if p["type"] == "loft": return float(p["stations"][:, 3:].max())
+    return scale_of(p)
 
 
 def get(p, key, i):

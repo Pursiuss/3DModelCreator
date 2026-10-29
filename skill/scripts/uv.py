@@ -5,6 +5,8 @@ unrolled along its own shape:
 - capsule (limb, neck, beak, toe): unrolled like a sleeve: across = around the tube, along = down the tube, with the
   rounded ends continuing the strip;
 - chain (a limb or tail of several segments): the same sleeve, following the bends from joint to joint;
+- loft (a torso): a sleeve slice by slice: along = down the body through the slices, across = around each slice,
+  with the cut underneath;
 - ellipsoid (body, head, flipper): a sinusoidal map, like a world map that does not stretch near the poles: along
   = from end to end along its longest axis, across = around it, shrinking towards the ends;
 - box: one flat piece per face.
@@ -48,8 +50,12 @@ class Unroller:
 
     def __init__(self, inst):
         self.p = inst; t = inst["type"]; self.kind = t
-        if t == "chain":
-            J = inst["joints"]; self.ra, self.rb = float(J[0, 3]), float(J[-1, 3])
+        if t == "loft":
+            D = PT.loft_slices(inst); self.Ys, self.D = D[:, 1], D
+            self.cl = np.r_[0, np.cumsum(np.linalg.norm(np.diff(D[:, :3], axis=0), axis=1))]
+            self.L = float(self.cl[-1]); self.ra, self.rb = float(D[0, 3:].min()), float(D[-1, 3:].min())
+        elif t == "chain":
+            J = PT.joints(inst); self.ra, self.rb = float(J[0, 3]), float(J[-1, 3])
             d = np.diff(J[:, :3], axis=0); ln = np.maximum(np.linalg.norm(d, axis=1), 1e-6)
             self.A, self.len = J[:-1, :3], ln; self.cum = np.r_[0, np.cumsum(ln)[:-1]]; self.L = float(ln.sum())
             self.axs = d / ln[:, None]; e1 = -_seam_dir(self.axs[0]); E1 = []
@@ -84,6 +90,12 @@ class Unroller:
             w = X - self.a; s = w @ self.ax; w = w - s[:, None] * self.ax
             th = np.arctan2(w @ self.e2, w @ self.e1)
             return th, s, np.zeros(len(X), int), np.linalg.norm(w, axis=1)
+        if self.kind == "loft":
+            y = X[:, 1]; xc = np.interp(y, self.Ys, self.D[:, 0]); zc = np.interp(y, self.Ys, self.D[:, 2])
+            s = np.interp(y, self.Ys, self.cl)
+            s = np.where(y < self.Ys[0], y - self.Ys[0], np.where(y > self.Ys[-1], self.L + y - self.Ys[-1], s))
+            u, v = X[:, 0] - xc, X[:, 2] - zc                             # angle 0 on top, the cut underneath
+            return np.arctan2(u, v), s, np.zeros(len(X), int), np.hypot(u, v)
         if self.kind == "chain":
             j = np.argmin([PT.sdf_one(c, X) for c in self.segs], 0); n = len(self.segs)
             w = X - self.A[j]; s = (w * self.axs[j]).sum(1)
@@ -104,7 +116,7 @@ class Unroller:
     def to_metres(self, th, along, rho):
         """Unrolled coordinates in metres from angles (th may have been unwrapped past +-pi); rho = distance from
         the axis (capsules only)."""
-        if self.kind in ("capsule", "chain"):
+        if self.kind in ("capsule", "chain", "loft"):
             s = along
             u = th * rho
             v = s.copy()

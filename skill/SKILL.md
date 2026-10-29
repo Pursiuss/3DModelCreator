@@ -43,12 +43,15 @@ Python interpreter chosen in step 1; use it for every script.
 ## 2. Look and measure
 
 1. Look at the four views and `final.png`. Decide what the animal is and list its parts as a modeller would:
-   body, head, neck, snout or beak, ears, horns, limbs and tails (a chain each, one joint at every bend), feet,
+   body (a loft, unless it really is an egg), head, neck, snout or beak, ears, horns, limbs and tails (a chain
+   each, one joint at every bend), feet,
    paws or toes, tail tufts, fins, flippers, wings, shell, antennae, eye stalks. Note which are thin.
 2. Run `PY SKILL_DIR/scripts/measure.py REFS out/work`. Open `out/work/ruler-front.png`, `ruler-side.png` and
    `ruler-top.png`: the references with a metric grid in model coordinates. Read `out/work/profiles.txt`: for
    each height (and, from the top view, each position along the body) it lists the solid stretches of the outline in
-   metres. Two stretches at one height usually mean two parts (two legs, a flipper beside the body). Its last
+   metres. Two stretches at one height usually mean two parts (two legs, a flipper beside the body). A second
+   side-view table goes along the body instead: at each y, the stretches up and down, which give a loft's stations
+   (the torso's top and bottom at that y; where a leg joins, the belly is where the leg's stretch widens). Its last
    line, and `out/work/palette.png`, list the few colours the animal is painted in, as `#rrggbb` codes.
    Its **view check** (near the top) says whether the four views agree on the animal's size and pose. The pictures
    are AI-made and may not: a top view drawn at other proportions, a back view in another pose. If it names views
@@ -69,7 +72,7 @@ length. Read x and z from the front ruler, y and z from the side ruler, and chec
 
 ```json
 {"parts": [
- {"name": "body", "type": "ellipsoid", "center": [0, 0.05, 0.45], "radii": [0.12, 0.30, 0.14]},
+ {"name": "body", "type": "loft", "stations": [[0, -0.25, 0.45, 0.08, 0.10], [0, -0.12, 0.47, 0.11, 0.15], [0, 0.08, 0.46, 0.12, 0.13], [0, 0.25, 0.47, 0.10, 0.11]], "caps": [0.05, 0.06]},
  {"name": "neck", "type": "capsule", "a": [0, -0.18, 0.50], "b": [0, -0.30, 0.62], "ra": 0.08, "rb": 0.06, "blend": 0.05},
  {"name": "head", "type": "ellipsoid", "center": [0, -0.36, 0.66], "radii": [0.07, 0.10, 0.07], "rotate": [-15, 0, 0], "blend": 0.03},
  {"name": "ear", "type": "ellipsoid", "center": [0.04, -0.33, 0.74], "radii": [0.012, 0.03, 0.05], "rotate": [0, 15, 0], "mirror": true, "blend": 0.01},
@@ -81,7 +84,13 @@ length. Read x and z from the front ruler, y and z from the side ruler, and chec
 (An example dog-like animal, not the one you are modelling.)
 
 Part types (all sizes in metres):
-- `ellipsoid`: `center`, `radii` [x, y, z], optional `rotate` [degrees about x, then y, then z]. Bodies, heads,
+- `loft`: a torso built slice by slice. `stations`: [x, y, z, half_width, half_height] from the front end to the
+  back end (y increasing); each is an upright slice across the body at that y, an ellipse `half_width` wide and
+  `half_height` tall around (x, z), and a smooth surface runs through them. `caps`: [front, back] metres the ends
+  round off past the first and last station (0: as far as the end slice is thin). For the torso of any animal
+  that is not simply an egg: the back can slope from high withers, the belly tuck up, the chest be deep and narrow,
+  the rump round off, all in one part. Not for necks or anything running steeply up or down.
+- `ellipsoid`: `center`, `radii` [x, y, z], optional `rotate` [degrees about x, then y, then z]. Round bodies, heads,
   paws, eyes, and short flat wedges such as a bird's tail.
 - `capsule`: a cone from `a` to `b`: a ball of radius `ra` at `a`, a ball of `rb` at `b`, joined smoothly. Round
   in cross-section, so for limbs, necks, toes, claws, horns, antennae, round tails; optional `aspect` (width /
@@ -177,10 +186,14 @@ Modelling rules that matter for how the result looks:
   it, narrower than the parent's cross-section where it starts, and get a generous blend: about half the smaller
   part's radius. If it is as wide as the parent there, its rounded end bulges out and prints a ring around the
   animal; then make the parent reach further instead.
-- Build the trunk from as few thick parts as the outline needs: one body ellipsoid shaped (radii, tilt) to the whole
-  torso is better than a stack. The build smooths the thick parts together as one form, which irons out small
-  waists where they meet, but a lower part that is clearly wider than the one above it still reads as a hip
-  bulge. Add a lower-body or neck part only where one ellipsoid cannot follow the outline.
+- The torso is one `loft` (an ellipsoid only when the body really is an egg, as a penguin's is). Put a station
+  wherever the outline changes: the front of the chest, behind the front legs, the withers or shoulders, mid
+  barrel, the flank in front of the hind legs, the hips, the back end of the rump; 5 to 8 stations. Read each one's
+  top and bottom from profiles.txt's side table at its y (half_height = half the gap, z = the middle) and its width
+  from the top view (from the front view if the top is skipped: the widest stretch at the torso's heights, narrower
+  towards the chest and rump). Shoulders, withers and hump belong in the loft, not in extra parts. A neck or head
+  then grows out of it as usual. Several thick parts stacked along the body are worse than one loft: the build
+  smooths them together, but where one is clearly wider than the next it still reads as a bulge or a ring.
 - Show only what the references show. A bird's upper legs are inside the body feathers: keep leg capsules short
   and mostly inside the body, and if the body stops too high, add a broad lower-body ellipsoid so the belly comes
   down to where the feet appear. Visible stilts under a body look wrong.
@@ -312,7 +325,8 @@ If it does not pass, fix the cause:
 |---|---|
 | a part missing, misplaced, too fat or too thin | edit `parts.json`, fit again (step 4), build again |
 | a crease where two parts join | raise that part's `blend` (about half the smaller radius) |
-| a ring or band around the body | a part that continues another bulges out of it: make it narrower where it starts, or let the parent reach further; `"fit": false` on it if the fitter widened it. If several stacked parts make the trunk, try fewer: one body ellipsoid shaped to the whole torso |
+| a ring or band around the body | a part that continues another bulges out of it: make it narrower where it starts, or let the parent reach further; `"fit": false` on it if the fitter widened it. If several stacked parts make the trunk, replace them with one `loft` |
+| the body looks like an egg or a barrel: no sloping back, no tucked belly, widest in the middle from every side | make the torso a `loft`, with stations read off the side table where the outline changes |
 | a free-hanging part looks glued on, or like a panel with a groove round it | make it a `paddle` with its root inside the body, `root_blend`, the rest just outside the body, `curl` so it wraps round |
 | a part drawn twice (a second flipper shape on the body), or its colour smeared onto a neighbour | in `parts-on-refs.png` the part misses its drawn shape: move or resize it to cover that shape |
 | a part textured or shaped from a view that draws it wrongly | add that view to that part's `ignore_views` (that part only) |

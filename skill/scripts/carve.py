@@ -237,6 +237,7 @@ def fair_trunk(parts, P, blk, pid, size, voxel):
     def slimmest(p):                                         # a tapering part counts by its thin end: a thigh
         if p["type"] == "capsule": return float(min(p["ra"], p["rb"]))   # narrowing to a knee is a limb
         if p["type"] == "chain": return float(p["joints"][:, 3].min())
+        if p["type"] == "loft": return PT.thinnest(p)
         return PT.thinnest(p)
     trunk = [i for i, p in enumerate(parts) if slimmest(p) >= TRUNK_THICK * big_size]
     if not trunk: return blk
