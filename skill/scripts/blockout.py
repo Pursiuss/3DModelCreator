@@ -17,7 +17,7 @@ from skimage import measure
 from scipy import ndimage
 sys.path.insert(0, os.path.dirname(__file__))
 import parts as PT
-from views import VIEWS, ViewMap, load_subject, silhouette
+from views import VIEWS, ViewMap, load_subject, silhouette, view_maps
 from carve import make_grid, sample, capped_res
 from render_preview import render
 
@@ -28,7 +28,7 @@ PALETTE = np.array([(230, 90, 70), (70, 140, 230), (90, 190, 90), (240, 190, 50)
 class Fitter:
     def __init__(self, refs, res, skip=()):
         size, _ = load_subject(refs); self.skip = tuple(skip)
-        self.maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in VIEWS}
+        self.maps = view_maps(refs, size)
         self.axes, self.voxel = make_grid(self.maps, size, capped_res(self.maps, size, res, 250_000))
         self.L = {v: sample(self.maps[v], self.axes) for v in VIEWS}
         self.shape = tuple(len(self.axes[a]) for a in "xyz")
@@ -258,9 +258,8 @@ def label_tile(parts, refs, vm, v, axes, lab, crop, height, name_px=30):
     rgba = np.array(white.convert("RGB").crop(crop).resize((Wt, height), Image.LANCZOS), float)
     rows, cols = np.mgrid[0:height, 0:Wt]
     col = c0 + (cols + 0.5) / s; row = r0 + (rows + 0.5) / s              # picture pixel under each tile pixel
-    ha, hs, va, vs = VIEWS[v]; b = vm.box
-    val = {ha: (col - (b[0] + b[2]) / 2) / vm.sc * hs,
-           va: (b[3] - row) / vm.sc if va == "z" else (row - (b[1] + b[3]) / 2) / vm.sc * vs}
+    ha, hs, va, vs = VIEWS[v]
+    val = {ha: (col - vm.c0) / vm.sc * hs, va: (row - vm.r0) / vm.sc * vs}
     idx = []
     for a in other:
         ax = axes["xyz"[a]]; step = ax[1] - ax[0]

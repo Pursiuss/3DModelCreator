@@ -14,7 +14,7 @@ import argparse, datetime, json, os, subprocess, sys, time
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS, load_subject, consistency
+from views import VIEWS, load_subject, consistency, alignment_note
 from carve import build_shape, build_shape_parts, recentre
 from texture import texture_mesh
 from glb_io import write_glb
@@ -29,6 +29,7 @@ def check_refs(refs, S):
     w = [f"{v}: silhouette from {S['notes'][v]} - check the preview for background left on"
          for v in VIEWS if S["notes"][v] != "alpha channel"]
     cw, skip = consistency(S["maps"])
+    if alignment_note(S["maps"]): w.append(alignment_note(S["maps"]))
     skip = [v for v in skip if v not in S.get("skip", ())]
     return w + cw + ([f"not skipped although they disagree: {', '.join(skip)} (see measure.py's view check)"] if skip else [])
 

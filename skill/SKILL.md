@@ -54,7 +54,9 @@ Python interpreter chosen in step 1; use it for every script.
    (the torso's top and bottom at that y; where a leg joins, the belly is where the leg's stretch widens). Its last
    line, and `out/work/palette.png`, list the few colours the animal is painted in, as `#rrggbb` codes.
    Its **view check** (near the top) says whether the four views agree on the animal's size and pose. The pictures
-   are AI-made and may not: a top view drawn at other proportions, a back view in another pose. If it names views
+   are AI-made and may not: a top view drawn at other proportions, a back view in another pose. A back view whose
+   framing is only thrown off by something drawn in it alone (a tail hanging below the paws) is lined up with the
+   front first and kept; the check says so, and the scripts use it lined up. If it names views
    to skip, pass `--skip-view` with them to every `blockout.py` and `build.py` run, so they neither pull parts out
    of place nor trim the model; model from the other views, and say so in the log. (The judges score the best two
    of the front, side and top views, so a skipped top view costs little.)
@@ -135,6 +137,18 @@ Modelling rules that matter for how the result looks:
   lower capsule (`aspect` about 1, so it does not poke out sideways). Measure both on a `--zoom` of the side view;
   take their width from the front view. Put both on the centre line, with `"fit": false`. A closed mouth drawn as
   a line on a flat face (a cartoon face) is not modelled: leave it to the texture.
+- Muzzles (dogs, cats, horses, cattle, bears: any furred snout) are not beaks. The upper jaw is the snout itself: one
+  broad capsule from inside the head to the nose, as wide as the front view draws it (`aspect` above 1), its top
+  following the drawn bridge and its underside the drawn upper lip; no `droop`. The nose is its own small ellipsoid
+  at the tip, coloured with the palette's darkest code, and the snout must end inside it (the nose is the tip):
+  a snout reaching past the nose shows its own pale end around it. A closed mouth: the lower jaw tucked right under the snout, touching it all
+  along. An open mouth: the lower jaw as drawn, touching the snout at the mouth corner and opening towards the
+  front only as far as drawn; then a mouth part between the two jaws, a capsule from the corner to just behind the
+  lips, narrower than the jaws (`aspect` about 0.7, so it sits a centimetre inside the lips on each side), coloured
+  with the palette's darkest code: without it the gap between the jaws is a hole you can see straight through. A
+  tongue on top of it if drawn (`"colour": "drawn"`). If the front view draws the nose higher or lower than the
+  side view (by more than about half the nose's height), place it from the side view and put "front" in the nose's
+  and snout's `ignore_views`, or the front picture paints its nose across the upper lip.
 - When the front and side views disagree about where a small part sits (the front view draws the beak lower than
   the side view does), place it from the side view: a part pointing at the front camera is seen end-on there,
   squashed into its own base. The build never takes a part's colours from a camera its tip points at, nor the
@@ -151,11 +165,17 @@ Modelling rules that matter for how the result looks:
   a second chain (or an ellipsoid) that starts inside the tail's last joint, with its own `"colour"`; it is built
   together with the tail. Do not exempt a tail from a view's trimming to keep it: if it breaks off, it is not a
   chain, or does not start inside the rump.
-- Feet, hands and paws: build them the way they are drawn: one capsule per toe or finger, all starting together at
-  the ankle or wrist, with at most a small flat pad where they join. No big rounded foot blob under the toes: it
-  reads as a slipper, and its large underside is seen by no picture, so it gets no real colour. Claws, nails and
-  talons as long and as thick as drawn (measure them on the rulers), at each toe tip, pointing the way drawn
-  (for example, curving down to the ground).
+- Feet and hands with separate toes or fingers (birds, lizards, frogs, hands): build them the way they are drawn:
+  one capsule per toe or finger, all starting together at the ankle or wrist, with at most a small flat pad where
+  they join. No big rounded foot blob under the toes: it reads as a slipper, and its large underside is seen by no
+  picture, so it gets no real colour. Claws, nails and talons as long and as thick as drawn (measure them on the
+  rulers), at each toe tip, pointing the way drawn (for example, curving down to the ground).
+- Furred paws (dogs, cats, bears, rabbits) are the opposite: the toes are packed together into one compact foot.
+  Build the paw as one ellipsoid as long, wide and tall as drawn (`--zoom` the front and side views), the leg
+  running down into its back half; then one small ellipsoid per drawn toe across its front edge, side by side,
+  each about a quarter of the paw's width and mostly inside it, so only a lobe shows. Claws only where the
+  drawing shows them clearly sticking out (as short chains at the toe tips); small claws tucked in the fur are left
+  to the texture, since modelled they read as pegs. Toe capsules sticking out of a paw read as sausages.
 - Give one colour to parts that are one colour: claws, nails, toes, hooves, boots, belts, a shell, a single-coloured
   limb. Set `"colour"` to the palette code from `profiles.txt` (`"#2e2932"`); such a part keeps only the drawing's
   fine detail and cannot pick up a neighbour's colour from a drawing that sits a few millimetres off. Use
@@ -289,7 +309,9 @@ What it does:
   picture whose colour is far from every palette colour (a green fringe left in the cut-out) are ignored.
 - Spots no picture colours are not guessed: each is flood-filled flat with the average colour of its part, taken
   per colour region from the area's border (white where it meets the white belly, black where it meets the black
-  back), so it stays consistent with the figure.
+  back), so it stays consistent with the figure. Only the fine strokes of the drawing (fur, feathers, scales) are
+  borrowed on top, from a patch of the same colour region that a picture sees squarely, so a filled belly does not
+  look like plastic beside drawn fur.
 - Texture: each part is unrolled along its own shape (tubes like sleeves, egg shapes like a world map) into one
   texture image, with the cuts on the back or underneath. Where a picture sees a spot squarely and away from other
   parts, the drawing is kept as drawn (eyes, faces, emblems, spots); elsewhere (slanted views, part edges,
@@ -331,6 +353,8 @@ If it does not pass, fix the cause:
 | a part drawn twice (a second flipper shape on the body), or its colour smeared onto a neighbour | in `parts-on-refs.png` the part misses its drawn shape: move or resize it to cover that shape |
 | a part textured or shaped from a view that draws it wrongly | add that view to that part's `ignore_views` (that part only) |
 | the beak or snout looks like a cone stuck on, or its colour is smeared onto the face | build it as an upper and a lower jaw measured on a `--zoom` of the side view, placed from the side view |
+| you can see through an open mouth, or the nose colour is smeared over the muzzle | a furred muzzle: add the dark mouth part between the jaws and a nose part; if the front view draws the nose elsewhere, ignore the front view for the nose and snout (see the muzzle rule) |
+| paws look like boots with sausage toes | a furred paw: one paw ellipsoid as drawn, with toe lobes mostly inside its front edge (see the paw rule) |
 | a dent in the chin or throat under the beak or snout | the head sticks out past the drawn throat (red there in the side overlay): move the head up and back, or tilt it |
 | a one-colour part (toe, claw, boot) is the wrong shade, or a neighbour's colour is on it | give it `"colour"` with the palette code; avoid `"drawn"` for parts the pictures barely see |
 | a coloured part paints over something drawn on top of it (pink leg over white feathers) | end the part where the colour changes, or take its `"colour"` off |

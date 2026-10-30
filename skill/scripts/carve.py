@@ -14,7 +14,7 @@ import numpy as np
 from scipy import ndimage, sparse
 from skimage import measure
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS, AX, ViewMap, load_subject, silhouette
+from views import VIEWS, AX, ViewMap, load_subject, silhouette, view_maps
 from glb_io import write_glb
 
 
@@ -125,7 +125,7 @@ def build_shape(refs, res=280, roundness=2.0, use_masks=False, smooth_iters=12, 
     size, _ = load_subject(refs)
     sils, notes = {}, {}
     for v in VIEWS: sils[v], notes[v] = silhouette(refs, v, use_masks)
-    maps = {v: ViewMap(v, sils[v], size) for v in VIEWS}
+    maps = view_maps(refs, size, sils)
     axes, voxel = make_grid(maps, size, res)
     hull = visual_hull(maps, axes, skip)
     occ = round_slices(hull, roundness)
@@ -400,7 +400,7 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     size, _ = load_subject(refs)
     sils, notes = {}, {}
     for v in VIEWS: sils[v], notes[v] = silhouette(refs, v)
-    maps = {v: ViewMap(v, sils[v], size) for v in VIEWS}
+    maps = view_maps(refs, size, sils)
     axes, voxel = make_grid(maps, size, res)
     grow = grow or 0.0
     hull = visual_hull(maps, axes, skip)

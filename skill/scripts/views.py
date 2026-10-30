@@ -66,15 +66,84 @@ class ViewMap:
             self.sc = (b[3] - b[1]) / real[va]                    # widths disagree, the heights do not
         self.half_h = (b[2] - b[0]) / self.sc / 2
         self.span_v = (b[3] - b[1]) / self.sc
+        self.c0 = (b[0] + b[2]) / 2                                # image column of the centre line
+        self.r0 = b[3] if va == "z" else (b[1] + b[3]) / 2          # image row of the ground (top view: the middle)
+        self.aligned = None
+
+    def align(self, sc, c0, r0):
+        """Map this view with another scale and position than its bounding box gives (see align_back)."""
+        b = self.box; self.sc, self.c0, self.r0 = sc, c0, r0
+        self.half_h = max(c0 - b[0], b[2] - c0) / sc
+        self.span_v = (r0 - b[1]) / sc if VIEWS[self.view][2] == "z" else 2 * max(r0 - b[1], b[3] - r0) / sc
 
     def project(self, P):
         """Model points (n,3), centred as carve.py builds them, -> image (col, row) floats."""
         ha, hs, va, vs = VIEWS[self.view]
         h = P[:, AX[ha]] * hs; v = P[:, AX[va]] * vs
-        b = self.box
-        col = (b[0] + b[2]) / 2 + h * self.sc
-        row = b[3] + v * self.sc if va == "z" else (b[1] + b[3]) / 2 + v * self.sc
-        return col, row
+        return self.c0 + h * self.sc, self.r0 + v * self.sc
+
+
+def _overlap(f, b, sc, c0, r0, n=(120, 240)):
+    """Overlap of the front outline with the mirrored back outline, the back mapped with (sc, c0, r0), compared on a
+    grid in metres covering the front view."""
+    X, Z = np.meshgrid(np.linspace(-1.3 * f.half_h, 1.3 * f.half_h, n[0]), np.linspace(0, 1.1 * f.span_v, n[1]))
+    def inside(sil, col, row):
+        c, r = np.floor(col).astype(int), np.floor(row).astype(int)
+        ok = (c >= 0) & (c < sil.shape[1]) & (r >= 0) & (r < sil.shape[0])
+        out = np.zeros(c.shape, bool); out[ok] = sil[r[ok], c[ok]]; return out
+    F = inside(f.sil, f.c0 + X * f.sc, f.r0 - Z * f.sc)
+    B = inside(b.sil, c0 - X * sc, r0 - Z * sc)                    # the back camera sees +x on the image left
+    return (F & B).sum() / max((F | B).sum(), 1)
+
+
+AGREE = 0.90             # front and mirrored back outlines overlapping less than this (lined up) differ enough to
+                         # shave parts when trimmed to both: another pose, or legs drawn at other widths
+
+
+def align_back(maps):
+    """Line the back view up with the front before judging it. Each view is mapped by its own bounding box, so one
+    part sticking out in the back view only (a tail hanging below the paws) shrinks and lifts the whole back view,
+    and its outline stops matching the front's although the animal is drawn the same. So the back view's scale and
+    position are searched (within 25% and 15-20%) for the best overlap with the mirrored front. If they then agree,
+    the back view is mapped that way from then on (fitting, trimming, texturing, rulers); if they still disagree, it
+    is drawn in another pose and left as it was (consistency() names it to skip). Sets maps["back"].aligned to
+    (overlap before, overlap after, scale factor)."""
+    f, b = maps["front"], maps["back"]
+    if b.aligned is not None: return
+    before = _overlap(f, b, b.sc, b.c0, b.r0)
+    b.aligned = (before, before, 1.0)
+    if before >= AGREE: return
+    W, H = b.box[2] - b.box[0], b.box[3] - b.box[1]
+    p, best = np.zeros(3), before                                  # log scale, column shift, row shift
+    step = np.array([0.04, 0.03 * W, 0.03 * H]); lim = np.array([np.log(1.25), 0.15 * W, 0.2 * H])
+    def score(q): return _overlap(f, b, b.sc * np.exp(q[0]), b.c0 + q[1], b.r0 + q[2])
+    while step[0] > 0.002:
+        moved = False
+        for k in range(3):
+            for sgn in (1, -1):
+                q = p.copy(); q[k] += sgn * step[k]
+                if abs(q[k]) > lim[k]: continue
+                sc_ = score(q)
+                if sc_ > best + 1e-4: p, best, moved = q, sc_, True; break
+        if not moved: step = step / 2
+    b.aligned = (before, best, float(np.exp(p[0])))
+    if best >= AGREE: b.align(b.sc * np.exp(p[0]), b.c0 + p[1], b.r0 + p[2])
+
+
+def view_maps(refs, size, sils=None):
+    """The four views' mappings, with the back view lined up with the front (align_back)."""
+    maps = {v: ViewMap(v, sils[v] if sils else silhouette(refs, v)[0], size) for v in VIEWS}
+    align_back(maps)
+    return maps
+
+
+def alignment_note(maps):
+    a = maps["back"].aligned
+    if a and a[1] >= AGREE and a[0] < AGREE:
+        return (f"back view lined up with the front (scaled x{a[2]:.2f} and moved; outline overlap {a[0]:.2f} -> "
+                f"{a[1]:.2f}): a part drawn only in the back view, such as a tail hanging below the paws, had thrown "
+                f"its framing off; it is used as lined up")
+    return None
 
 
 def consistency(maps):
@@ -82,7 +151,7 @@ def consistency(maps):
     in metres), or a back view drawn in another pose than the front, cut each other away when the model is trimmed
     to all of them, and pull parts to the wrong place when it is fitted to all of them. The top view is blamed when
     it disagrees with the front or the side (they agree with each other on the height, which the scale comes from);
-    the back view when it is not the mirror image of the front."""
+    the back view when, lined up with the front as well as it can be (align_back), it is not its mirror image."""
     w, skip = [], []
     pairs = [("front height", maps["front"].span_v, "side height", maps["side"].span_v, None),
              ("front width", 2 * maps["front"].half_h, "top width", 2 * maps["top"].half_h, "top"),
@@ -91,11 +160,10 @@ def consistency(maps):
         if abs(x - y) / max(x, y) > 0.08:
             w.append(f"{a} {x:.3f} m vs {b} {y:.3f} m disagree by more than 8% (pose or framing differs)")
             if blame and blame not in skip: skip.append(blame)
-    f, b = maps["front"], maps["back"]
-    fb = np.array(Image.fromarray(f.sil).crop(f.box).resize((128, 256))) > 0
-    bb = np.array(Image.fromarray(b.sil).crop(b.box).resize((128, 256)))[:, ::-1] > 0
-    iou = (fb & bb).sum() / max((fb | bb).sum(), 1)
-    if iou < 0.85:
-        w.append(f"front and mirrored back outlines overlap only {iou:.2f}: pose differs between views")
+    align_back(maps)
+    iou = maps["back"].aligned[1]
+    if iou < AGREE:
+        w.append(f"front and mirrored back outlines overlap only {iou:.2f}, even lined up as well as they can be: "
+                 f"pose differs between views")
         skip.append("back")
     return w, skip

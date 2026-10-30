@@ -15,7 +15,7 @@ import os, sys
 import numpy as np
 from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS, ViewMap, load_subject, silhouette, load_rgba
+from views import VIEWS, ViewMap, load_subject, silhouette, load_rgba, view_maps
 
 
 def nice_step(span):
@@ -24,17 +24,16 @@ def nice_step(span):
 
 
 def to_model(vm, col=None, row=None):
-    ha, hs, va, vs = VIEWS[vm.view]; b = vm.box
-    h = None if col is None else (np.asarray(col, float) - (b[0] + b[2]) / 2) / vm.sc * hs
+    ha, hs, va, vs = VIEWS[vm.view]
+    h = None if col is None else (np.asarray(col, float) - vm.c0) / vm.sc * hs
     if row is None: return h, None
-    v = (b[3] - np.asarray(row, float)) / vm.sc if va == "z" else (np.asarray(row, float) - (b[1] + b[3]) / 2) / vm.sc * vs
-    return h, v
+    return h, (np.asarray(row, float) - vm.r0) / vm.sc * vs
 
 
 def to_pixel(vm, h=None, v=None):
-    ha, hs, va, vs = VIEWS[vm.view]; b = vm.box
-    col = None if h is None else (b[0] + b[2]) / 2 + h * hs * vm.sc
-    row = None if v is None else (b[3] - v * vm.sc if va == "z" else (b[1] + b[3]) / 2 + v * vs * vm.sc)
+    ha, hs, va, vs = VIEWS[vm.view]
+    col = None if h is None else vm.c0 + h * hs * vm.sc
+    row = None if v is None else vm.r0 + v * vs * vm.sc
     return col, row
 
 
@@ -142,13 +141,14 @@ def main():
     size, _ = load_subject(refs)
     if len(sys.argv) > 3 and sys.argv[3] == "--zoom":
         v = sys.argv[4]; box = [float(x) for x in sys.argv[5:9]]
-        vm = ViewMap(v, silhouette(refs, v)[0], size); path = os.path.join(work, f"zoom-{v}.png")
+        vm = view_maps(refs, size)[v]; path = os.path.join(work, f"zoom-{v}.png")
         zoom(refs, vm, box, path); print("wrote", path); return
     out = [f"subject (m): width {size['width']} (x), length {size['length']} (y), height {size['height']} (z)",
            "Each line lists the solid stretches of the outline across that level (separate stretches = separate parts,",
            "e.g. two legs). Model coordinates in metres; nose towards -y; front view right = +x.", ""]
+    maps = view_maps(refs, size)
     for v in ("front", "side", "top", "back"):
-        sil, how = silhouette(refs, v); vm = ViewMap(v, sil, size)
+        how = silhouette(refs, v)[1]; vm = maps[v]
         ruler(refs, vm, os.path.join(work, f"ruler-{v}.png"))
         if v != "back":
             out.append(f"{v} view ({how}), top to bottom:" if v != "top" else f"top view ({how}), nose end (-y) to tail end:")
@@ -158,11 +158,10 @@ def main():
                 out.append("side view, nose end (-y) to tail end, stretches top to bottom (a loft's stations: the torso's "
                            "top and bottom):")
                 out += column_lines(vm); out.append("")
-    from views import consistency
-    maps = {v: ViewMap(v, silhouette(refs, v)[0], size) for v in ("front", "side", "back", "top")}
-    cw, skip = consistency(maps)
+    from views import consistency, alignment_note
+    cw, skip = consistency(maps); note = alignment_note(maps)
     out[3:3] = (["view check: the four views agree" if not cw else "view check: the views DISAGREE:"] +
-                [f"  {x}" for x in cw] +
+                ([f"  {note}"] if note else []) + [f"  {x}" for x in cw] +
                 ([f"  -> use --skip-view {' '.join(skip)} with blockout.py and build.py, and model the parts those views "
                   f"draw differently from the other views"] if skip else []) + [""])
     codes = palette_sheet(refs, os.path.join(work, "palette.png"))

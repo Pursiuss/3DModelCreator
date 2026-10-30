@@ -139,7 +139,9 @@ def end_on(parts, pid_face, cen, cand, k, d):
     squashed into its own base. Projected back, that blob paints the part's colours in a ring onto the face around
     it, and paints the part itself with colours it does not have. So that camera colours neither the part nor its
     footprint: whatever, as the camera sees it, lies within two and a half times the part's thickness of it (the
-    views often disagree by about that much on where a small part sits), close behind it."""
+    views often disagree by about that much on where a small part sits), around and behind it: no nearer the camera
+    than halfway along it. What stands further forward (a dog's snout above its lower jaw, with the nose at its
+    tip) is drawn as it is, and that camera still colours it."""
     import parts as PT
     for i, p in enumerate(parts):
         if p["type"] not in PT.LONG: continue
@@ -156,7 +158,8 @@ def end_on(parts, pid_face, cen, cand, k, d):
             a2, b2 = flat(A[None])[0], flat(B[None])[0]; q = flat(cen) - a2; e = b2 - a2
             t = np.clip(q @ e / max(e @ e, 1e-12), 0, 1)
             dist = np.linalg.norm(q - np.outer(t, e), axis=1)
-            behind = np.abs((cen - A) @ d) < L + 3 * r
+            depth = (cen - A) @ d                                     # towards the camera from the root
+            behind = (depth < 0.5 * L + r) & (depth > -(L + 3 * r))
             cand[(dist < 2.5 * r) & behind, k] = False
 
 
@@ -425,6 +428,31 @@ def sample_views(refs, maps, names, cache, P, Wt):
     return out
 
 
+def borrowed_detail(detail, gw, region, yy, xx, size, strength=0.8):
+    """Fine texture for spots no picture sees. Their colour stays the flat fill (the region's own average); only
+    the drawing's fine strokes (fur, feathers, scales) are borrowed, so a filled belly does not look like plastic
+    beside drawn fur. Per colour region: the largest square of texture that a picture sees squarely and wholly in
+    that region is tiled, mirrored at its edges so the tiles meet without seams. Returns per-texel detail (0 where
+    a region has no such square)."""
+    out = np.zeros((len(yy), 3), np.float32)
+    det = np.zeros((size, size, 3), np.float32); det[yy, xx] = detail
+    for c in np.unique(region):
+        good = np.zeros((size, size), bool); sel = (region == c) & (gw > 0.8); good[yy[sel], xx[sel]] = True
+        if good.sum() < 256: continue
+        ii = np.pad(good.astype(np.int32).cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+        for B in (64, 48, 32, 24, 16):                      # the largest square wholly seen
+            full = ii[B:, B:] - ii[:-B, B:] - ii[B:, :-B] + ii[:-B, :-B] == B * B
+            if full.any(): break
+        else: continue
+        r, q = np.argwhere(full)[0]
+        patch = det[r:r + B, q:q + B]
+        tile = np.concatenate([np.concatenate([patch, patch[:, ::-1]], 1),
+                               np.concatenate([patch[::-1], patch[::-1, ::-1]], 1)], 0)
+        m = region == c
+        out[m] = strength * tile[yy[m] % (2 * B), xx[m] % (2 * B)]
+    return out
+
+
 def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, facing, edge, features=()):
     """Paint the model into a proper UV texture (see uv.py). Where a picture sees the spot squarely, away from other
     parts and from a handover between pictures, the drawing is kept as drawn. Everywhere else (slanted views, part
@@ -436,7 +464,8 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
        belly painted behind a flipper, beak red smeared onto the face) loses, and every border becomes a smooth
        curve. Each spot is painted in its region's flat colour: the artist's broad shading is gone.
     3. Detail: the drawing's fine texture (feather strokes, scales), only where it belongs to the same colour
-       region and the picture sees the spot squarely, added on top, so the regions are not flat plastic.
+       region and the picture sees the spot squarely, added on top, so the regions are not flat plastic. Where no
+       picture sees the spot, the fine texture is borrowed from elsewhere in the same region (borrowed_detail).
     4. Stickers: the strongest small features found in the drawings (eyes, nostrils) are copied as drawn from the
        one picture that shows them best, where that picture sees them, so the plan does not smooth them away."""
     import uv as UV
@@ -505,7 +534,7 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
     same_region = np.argmin(((feat(raw_t)[:, None] - pal_f[None]) ** 2).sum(2), 1) == np.argmax(pt, 1)
     face_t = (facing[t] * Wt[:, :K]).sum(1)
     gw = np.clip((face_t - 0.35) / 0.35, 0, 1) * same_region * (1 - Wt[:, K])
-    planned = plan + gw[:, None] * detail
+    planned = plan + gw[:, None] * detail + Wt[:, K, None] * borrowed_detail(detail, gw, np.argmax(pt, 1), yy, xx, size)
     # trust in the drawing: a picture that sees the spot squarely, away from other parts and away from a handover
     # between pictures, is right as drawn (eyes, faces, emblems, spots). Elsewhere the plan takes over.
     tri_trust = np.clip((np.where(seen, facing[np.arange(len(F)), np.maximum(best, 0)], 0) - 0.45) / 0.3, 0, 1)
