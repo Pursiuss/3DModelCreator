@@ -321,11 +321,16 @@ What it does:
 
 It writes `out/untextured.glb`, `out/textured.glb`, `out/preview-untextured.png`, `out/preview-textured.png`
 (rendered pixel by pixel from the texture, as a model viewer shows it), `out/report.json` and a section of
-`out/run-log.md`.
+`out/run-log.md`. For troubleshooting the shape it also writes `out/parts-coloured.glb` and
+`out/preview-parts.png`: the same mesh with every part in its own flat colour (the body grey, the key under the
+preview), each triangle coloured by the part it lies nearest to. They are not scored, and `textured.glb` keeps
+its real texture.
 
 ## 6. Review like a person would
 
-Open the two previews next to the references. The model passes when:
+Open the two previews next to the references, and `preview-parts.png` to see which part made which bit of the
+surface: the texture can hide a shape fault that the part colours show at once (a part swallowed by its
+neighbour, a part spreading over where another is drawn, a joint in the wrong place). The model passes when:
 - it is complete and recognisable: every part in the references is there, attached, on the correct side;
 - centre-line parts are straight: the beak or snout points straight ahead, the tail straight back;
 - the surface is smooth where the animal is smooth: no ridges, steps, rings at part joins, flat slabs, spikes or
@@ -346,6 +351,7 @@ If it does not pass, fix the cause:
 | What you see | Fix |
 |---|---|
 | a part missing, misplaced, too fat or too thin | edit `parts.json`, fit again (step 4), build again |
+| in `preview-parts.png` a part hardly shows (swallowed by the body or a neighbour), or spreads over where another part is drawn | the swallowed part is too small or too deep inside, or the other too big: resize or move them so each covers its own drawn place |
 | a crease where two parts join | raise that part's `blend` (about half the smaller radius) |
 | a ring or band around the body | a part that continues another bulges out of it: make it narrower where it starts, or let the parent reach further; `"fit": false` on it if the fitter widened it. If several stacked parts make the trunk, replace them with one `loft` |
 | the body looks like an egg or a barrel: no sloping back, no tucked belly, widest in the middle from every side | make the torso a `loft`, with stations read off the side table where the outline changes |
@@ -392,6 +398,6 @@ Confirm `out/untextured.glb`, `out/textured.glb` and `out/run-log.md` exist befo
 ## Budget
 
 Measuring, each fit and each build take a minute or two and few tokens. Look at the rulers and any zooms once,
-then at the overlay, `parts-on-refs.png`, `parts-on-refs-detail.png`, the parts preview and the two build
+then at the overlay, `parts-on-refs.png`, `parts-on-refs-detail.png`, the parts preview and the three build
 previews; do not read `.glb` files into context. Expect 15 to 30 minutes in all, well inside the 2-hour,
 2.5-million-token limit.

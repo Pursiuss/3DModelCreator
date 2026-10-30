@@ -19,6 +19,7 @@ from carve import build_shape, build_shape_parts, recentre
 from texture import texture_mesh
 from glb_io import write_glb
 from render_preview import preview
+from part_colours import write_part_model
 import parts as PT
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -92,13 +93,15 @@ def main():
     atlas.save(os.path.join(a.out, "texture-atlas.png"))
     preview(S["V"], S["F"], None, None, os.path.join(a.out, "preview-untextured.png"), N=S.get("N"))
     preview(V2, F2, UV, atlas, os.path.join(a.out, "preview-textured.png"), N=N2)
+    key = (write_part_model(os.path.join(a.out, "parts-coloured.glb"), os.path.join(a.out, "preview-parts.png"),
+                            S["V"], S["F"], S.get("N"), parts, shift, write_glb) if a.parts else None)
     s_shape = self_score(untex, a.refs, S["maps"], a.out, False)
     s_tex = self_score(tex, a.refs, S["maps"], a.out, True)
     ext = S["V"].max(0) - S["V"].min(0)
     report = {"params": vars(a), "method": method, "voxel_mm": round(S["voxel"] * 1000, 2), "triangles": len(S["F"]),
               "extent_m": {"width": round(ext[0], 3), "length": round(ext[1], 3), "height": round(ext[2], 3)},
               "subject_m": S["size"], "silhouettes": S["notes"], "warnings": warnings,
-              "texture_views": tstats, "self_check": {"untextured_shape": s_shape["shape_score"],
+              "texture_views": tstats, "part_colours": key, "self_check": {"untextured_shape": s_shape["shape_score"],
               "textured_shape": s_tex["shape_score"], "gross_errors": s_shape.get("gross_errors", []),
               "colour_score": s_tex.get("colour_score"), "views": s_tex["views"]}, "seconds": round(time.time() - t0, 1)}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)

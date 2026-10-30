@@ -20,9 +20,9 @@ def vertex_normals(V, F):
     return n / np.maximum(l, 1e-12)
 
 
-def read_glb(path, with_normals=False):
+def read_glb(path, with_normals=False, with_colours=False):
     """Reader for the files write_glb makes (one primitive, no node transforms): V z-up, F, uv or None, PIL image or None
-    (and the z-up vertex normals, if with_normals)."""
+    (and the z-up vertex normals, if with_normals; and the vertex colours, if with_colours)."""
     from PIL import Image
     b = open(path, "rb").read()
     n = struct.unpack_from("<I", b, 12)[0]; js = json.loads(b[20:20 + n]); blob = b[20 + n + 8:]
@@ -42,14 +42,18 @@ def read_glb(path, with_normals=False):
         img = Image.open(io.BytesIO(blob[bv["byteOffset"]:bv["byteOffset"] + bv["byteLength"]])).convert("RGB")
     if with_normals:
         Ng = acc(p["attributes"]["NORMAL"]).astype(float)
-        return V, F, uv, img, np.c_[Ng[:, 0], -Ng[:, 2], Ng[:, 1]]
-    return V, F, uv, img
+        out = (V, F, uv, img, np.c_[Ng[:, 0], -Ng[:, 2], Ng[:, 1]])
+    else:
+        out = (V, F, uv, img)
+    if with_colours:                                                 # sRGB 0-255, or None
+        out += ((acc(p["attributes"]["COLOR_0"]) ** (1 / 2.2) * 255 if "COLOR_0" in p["attributes"] else None),)
+    return out
 
 
-def write_glb(path, V, F, uv=None, texture=None, colour=(0.8, 0.8, 0.8, 1.0), normals=None):
+def write_glb(path, V, F, uv=None, texture=None, colour=(0.8, 0.8, 0.8, 1.0), normals=None, vertex_colours=None):
     """V: (n,3) z-up metres, F: (m,3) triangle indices, uv: (n,2) or None, texture: PIL image or None,
     normals: (n,3) z-up vertex normals or None (computed). Pass normals when vertices are split along texture
-    seams, so the seams don't show up as creases in the shading."""
+    seams, so the seams don't show up as creases in the shading. vertex_colours: (n,3) linear RGB 0-1, or None."""
     V = np.asarray(V, float); F = np.asarray(F, np.uint32)
     Vg = np.c_[V[:, 0], V[:, 2], -V[:, 1]].astype(np.float32)
     if normals is not None:
@@ -75,6 +79,8 @@ def write_glb(path, V, F, uv=None, texture=None, colour=(0.8, 0.8, 0.8, 1.0), no
     mat = {"pbrMetallicRoughness": {"baseColorFactor": list(colour), "metallicFactor": 0.0, "roughnessFactor": 0.9},
            "doubleSided": True}
     gltf = {"asset": {"version": "2.0", "generator": "penguin-challenge skill"}}
+    if vertex_colours is not None:
+        attrs["COLOR_0"] = add_acc(np.asarray(vertex_colours, np.float32), 5126, "VEC3", 34962)
     if uv is not None and texture is not None:
         attrs["TEXCOORD_0"] = add_acc(np.asarray(uv, np.float32), 5126, "VEC2", 34962)
         png = io.BytesIO(); texture.convert("RGB").save(png, "PNG")

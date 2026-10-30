@@ -376,6 +376,13 @@ def bounds(p):
 
 # ---- parameter vectors for fitting ---------------------------------------------------------------------------------
 
+def volume(p):
+    """Rough volume (all mirrored copies), from a 16-cube grid over the part's box."""
+    lo, hi = bounds(p); g = [np.linspace(lo[k], hi[k], 16) for k in range(3)]
+    G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+    return float((sdf_part(p, G) < 0).mean() * np.prod(hi - lo))
+
+
 def scale_of(p):
     if p["type"] == "loft":
         S = p["stations"]; return max(float(np.linalg.norm(np.diff(S[:, :3], axis=0), axis=1).sum()), float(S[:, 3:].max()))

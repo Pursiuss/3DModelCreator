@@ -288,11 +288,7 @@ def fine_parts(parts, voxel):
     import parts as PT
     fine = {i for i, p in enumerate(parts)
             if p.get("fine") or (p["type"] == "chain" and p["joints"][:, 3].min() < FINE_VOXELS * voxel)}
-    def volume(p):
-        lo, hi = PT.bounds(p); g = [np.linspace(lo[k], hi[k], 16) for k in range(3)]
-        G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
-        return float((PT.sdf_part(p, G) < 0).mean() * np.prod(hi - lo))
-    fine.discard(int(np.argmax([volume(p) for p in parts])))
+    fine.discard(int(np.argmax([PT.volume(p) for p in parts])))
     changed = bool(fine)
     while changed:
         changed = False

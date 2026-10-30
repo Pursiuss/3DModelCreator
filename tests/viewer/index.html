@@ -77,7 +77,9 @@ function applyLook() {
     if (!o.isMesh) return;
     if (!maps.has(o)) maps.set(o, o.material.map);
     o.material.map = textured ? maps.get(o) : null;
-    o.material.color.set(textured && maps.get(o) ? 0xffffff : 0xcfd3da);
+    const vc = !!o.geometry.attributes.color;                  // parts-coloured.glb: one colour per part
+    o.material.vertexColors = textured && vc;
+    o.material.color.set(textured && (maps.get(o) || vc) ? 0xffffff : 0xcfd3da);
     o.material.wireframe = wire; o.material.side = THREE.DoubleSide; o.material.needsUpdate = true;
   });
 }
