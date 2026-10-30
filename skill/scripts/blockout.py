@@ -208,6 +208,23 @@ def part_checks(parts, f, build_voxel):
             outside = float((s & ~f.L[v]).sum() / n)
             if outside > 0.2:
                 out.append(f"  {name}: {outside:.0%} of it lies outside the {v} outline: too big, or in the wrong place")
+    # roots that bulge out: a limb, neck or tail whose root end sits just under the body's surface
+    # shows the back of its root ball (the side facing away from where it grows) as a lump at the shoulder, hip or
+    # chest, with a crease round it
+    body = int(np.argmax([PT.volume(p) for p in parts]))
+    for i, p in enumerate(parts):
+        if i == body or p["type"] not in PT.LONG: continue
+        one = dict(p, mirror=False); A, B, ra, _ = PT.ends(one); u = (B - A) / max(np.linalg.norm(B - A), 1e-9)
+        if PT.sdf_part(parts[body], A[None])[0] >= 0: continue          # not rooted in the body
+        others = [q for j, q in enumerate(parts) if j != i]
+        S = PT.surface_points(one); S = S[(np.linalg.norm(S - A, axis=1) < 1.2 * ra) & ((S - A) @ u <= 0)]
+        if not len(S): continue
+        out_by = float(PT.sdf(others, S, smooth=False).max())
+        if out_by > max(0.35 * ra, 2 * build_voxel):
+            out.append(f"  {p['name']}: the back of its root end bulges {out_by * 100:.1f} cm out of the body, a "
+                       f"lump at the shoulder, hip or chest: start it deeper inside (its root at least "
+                       f"its root radius in from the surface) and join it with root_blend; where the drawing really "
+                       f"is that wide there, widen the body there instead")
     # floating groups: parts not joined, through a chain of touching parts, to the biggest part. The build keeps
     # only the main piece of the mesh, so a group that floats free (a tail and its tuft hanging behind the rump) is
     # dropped
@@ -394,6 +411,16 @@ def main():
         log(f"  {p0['name']}: " + ("; ".join(moved) if moved else "unchanged"))
     _, build_voxel = make_grid(f.maps, load_subject(a.refs)[0], 280)
     log("part checks:"); [log(s) for s in part_checks(parts, f, build_voxel)]
+    # a part pushed near the fitter's size limit is usually filling the outline where another part belongs (a round
+    # skull swelling into where the ears are drawn), and refitting the fitted file grows it again every round
+    for p0, p1 in zip(start, parts):
+        grown = [PT.label(k, i) for k, i, kind in PT.params(p0)
+                 if kind == "size" and PT.get(p1, k, i) >= 1.2 * PT.get(p0, k, i) > 0]
+        if grown:
+            log(f"  {p0['name']}: {', '.join(grown)} grew by 20% or more (the fitter allows 25%). Check in "
+                f"parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck "
+                f"under it): if so, put the size back, add or enlarge that other part and give this one "
+                f"\"fit\": false; if it really is that big, write it that big")
     out = os.path.join(a.work, "parts.fitted.json"); PT.save(parts, out)
     overlay(f, parts, os.path.join(a.work, "blockout-overlay.png"))
     parts_preview(parts, f, os.path.join(a.work, "blockout-parts.png"))

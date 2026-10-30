@@ -222,6 +222,18 @@ def keep_main_pieces(V, F, min_share=0.02):
 
 TRUNK_THICK = 0.06       # a part at least this thick (share of the animal's largest size) belongs to the trunk
 TRUNK_SIGMA = 0.035      # smoothing scale of the trunk (share of the animal's largest size)
+FAIR_OUT = 0.15          # the fairing moves the trunk's surface outward by at most this share of its smoothing scale
+
+
+def mostly_inside(parts, i, share=0.6):
+    """Is most of part i's own volume inside the other parts?"""
+    import parts as PT
+    lo, hi = PT.bounds(parts[i]); g = [np.linspace(lo[k], hi[k], 20) for k in range(3)]
+    G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+    own = PT.sdf_part(parts[i], G) < 0
+    others = [q for j, q in enumerate(parts) if j != i]
+    if not own.any() or not others: return False
+    return float((PT.sdf(others, G[own], smooth=False) < 0).mean()) > share
 
 
 def fair_trunk(parts, P, blk, pid, size, voxel):
@@ -247,6 +259,9 @@ def fair_trunk(parts, P, blk, pid, size, voxel):
     # Blurring a distance field moves a curved surface inwards by sigma^2/2 times its curvature (a head of radius R by
     # sigma^2/R); add that back, measured on a coarser blur so that it follows the overall form, not the dips.
     smooth = ndimage.gaussian_filter(d, sigma) - 0.5 * sigma ** 2 * ndimage.gaussian_laplace(d, 2 * sigma)
+    # Filling a dip moves the surface outward a little; never let the fairing push it out further than that, or the
+    # widest line of a flank swells into a ridge with a slit under it
+    smooth = np.maximum(smooth, d - FAIR_OUT * sigma * voxel)
     w = ndimage.gaussian_filter(np.isin(pid, trunk).astype(np.float32), 1.5)   # soft edge where thin parts take over
     return blk + w * (smooth - d)
 
@@ -287,7 +302,7 @@ def fine_parts(parts, voxel):
     on the coarse grid would be left floating once the thin part is taken out. Never the biggest part."""
     import parts as PT
     fine = {i for i, p in enumerate(parts)
-            if p.get("fine") or (p["type"] == "chain" and p["joints"][:, 3].min() < FINE_VOXELS * voxel)}
+            if p.get("fine") or p.get("strands") or (p["type"] == "chain" and p["joints"][:, 3].min() < FINE_VOXELS * voxel)}
     fine.discard(int(np.argmax([PT.volume(p) for p in parts])))
     changed = bool(fine)
     while changed:
@@ -429,11 +444,13 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     # Trimming shaves parts, it never deletes them: a part that would lose most of its volume is placed off its
     # drawing (an antler tine a few centimetres from where one view draws it), and the animal looks wrong without
     # it. Such a part is kept as blocked out, and reported, so the agent can move it onto the drawing.
+    # A part written mostly inside others (toe lobes sunk into a paw, a nose pad set into the muzzle) only shows its
+    # tip, so losing that tip to trimming is ordinary trimming, not a part placed off its drawing.
     protected = []
     for i, p in enumerate(parts):
         mine = (pid == i) & (blk < 0)
         n = int(mine.sum())
-        if n and (field[mine] < 0).sum() < 0.5 * n:
+        if n and (field[mine] < 0).sum() < 0.5 * n and not mostly_inside(parts, i):
             protected.append(i)
     if protected:
         keep = ndimage.binary_dilation(np.isin(pid, protected), iterations=1)

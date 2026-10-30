@@ -149,6 +149,27 @@ Modelling rules that matter for how the result looks:
   tongue on top of it if drawn (`"colour": "drawn"`). If the front view draws the nose higher or lower than the
   side view (by more than about half the nose's height), place it from the side view and put "front" in the nose's
   and snout's `ignore_views`, or the front picture paints its nose across the upper lip.
+- Long faces (cattle, horses, deer, sheep, goats, camels): there is no step between forehead and nose, and the
+  head tapers from the skull to the muzzle. Build skull and snout as one `capsule` "head": `a` at the poll (between
+  the ear or horn roots, inside the top of the neck), `b` just behind the nose, `ra` and `rb` half the head's
+  drawn depth there, so its top runs along the drawn forehead line and its underside along the cheek; `aspect`
+  = the front view's head width at the eyes / the side view's depth there (about 1.1-1.2, never so wide that it
+  reaches where the ears are drawn). A round skull ellipsoid with a snout capsule on it gives a dished, dog-like
+  face with a dip where they meet, and the fitter widens the round skull into the space the ears are drawn in.
+  Under it, a lower jaw capsule from the jaw angle to the chin, as wide as the front view draws the chin (`aspect`
+  1.3-1.6): it must not taper to a point. The nose pad is an ellipsoid on the front of the head's tip, as wide as
+  drawn and standing 1-2 cm proud of it, in the drawn nose colour (`"drawn"` for a pink or pale nose). Give the
+  head, jaw and nose `"fit": false`.
+- Ears are paddles, mirrored, with `root_blend`, sized and turned as drawn (`--zoom` the front and side views):
+  - Ears that stick out (cattle, horses, deer, cats, foxes): leaf-shaped, narrow at the root and widest
+    two-thirds out, so `ra` small at the root and `rb` the drawn half-width, with `b` that far in from the tip;
+    the flat side faces the camera that sees the ear's full shape (`normal` mostly [0, 1, 0] when the front view
+    shows it broad).
+  - Hanging ears (most dogs, lop rabbits): the root high on the side of the skull, `b` low beside the cheek where
+    the front view draws the ear's bottom (the rounded tip reaches `rb` below `b`), the flat side facing outward
+    (`normal` mostly [1, 0, 0], tilted up a little as the ear leans out), lying against the head with a little
+    `curl`. Turned towards the front it stands off the head like a horn from above.
+  - Size the head without them: if the head ends up covering where the ears are drawn, it is too wide.
 - When the front and side views disagree about where a small part sits (the front view draws the beak lower than
   the side view does), place it from the side view: a part pointing at the front camera is seen end-on there,
   squashed into its own base. The build never takes a part's colours from a camera its tip points at, nor the
@@ -163,13 +184,22 @@ Modelling rules that matter for how the result looks:
   be as thin as drawn (down to a third of that minimum).
 - Tails: one chain from inside the rump to the tip, as thick as drawn all the way. A tuft or switch at the end is
   a second chain (or an ellipsoid) that starts inside the tail's last joint, with its own `"colour"`; it is built
-  together with the tail. Do not exempt a tail from a view's trimming to keep it: if it breaks off, it is not a
+  together with the tail. Give a hairy tuft `"strands"` (6-10) so it ends in a ragged brush, and put "top" in its
+  `ignore_views` when it hangs under the tail: from above it is hidden under the tail, and the top view would trim
+  it to the tail's width, a flat blade. Do not exempt a tail from a view's trimming to keep it: if it breaks off, it is not a
   chain, or does not start inside the rump.
 - Feet and hands with separate toes or fingers (birds, lizards, frogs, hands): build them the way they are drawn:
   one capsule per toe or finger, all starting together at the ankle or wrist, with at most a small flat pad where
   they join. No big rounded foot blob under the toes: it reads as a slipper, and its large underside is seen by no
   picture, so it gets no real colour. Claws, nails and talons as long and as thick as drawn (measure them on the
   rulers), at each toe tip, pointing the way drawn (for example, curving down to the ground).
+- Hooves are wedges, not balls: in the side view the front wall slopes from the coronet down to the toe, the sole is
+  flat on the ground and the heel is lower than the coronet. Build each claw as a `paddle` with `normal` [1, 0, 0]
+  (flat sides facing sideways): `a` at the heel's centre, `b` near the toe on the ground (the rounded tip reaches
+  `rb` beyond it), `ra` half the heel's height, `rb` small, `thick` half the claw's width from the front view,
+  with the hoof's `"colour"`. Cloven hooves (cattle, deer, sheep, goats, pigs, giraffes): two such claws per foot,
+  side by side either side of the leg's centre with a small cleft between them; horses: one, as wide as the hoof.
+  Start them inside the leg chain's last joint; trimming to the side view flattens the sole.
 - Furred paws (dogs, cats, bears, rabbits) are the opposite: the toes are packed together into one compact foot.
   Build the paw as one ellipsoid as long, wide and tall as drawn (`--zoom` the front and side views), the leg
   running down into its back half; then one small ellipsoid per drawn toe across its front edge, side by side,
@@ -205,7 +235,9 @@ Modelling rules that matter for how the result looks:
 - A part that continues another (neck out of a body, head out of a neck, a fuller lower belly) must start inside
   it, narrower than the parent's cross-section where it starts, and get a generous blend: about half the smaller
   part's radius. If it is as wide as the parent there, its rounded end bulges out and prints a ring around the
-  animal; then make the parent reach further instead.
+  animal; then make the parent reach further instead. A neck joining a four-legged body needs more: a blend about
+  as big as its root radius, and its root as wide as the front view draws the neck where it meets the shoulders
+  (`aspect` about 0.9-1.1; a neck much narrower than tall sits on the chest as an oval patch with a groove round it).
 - The torso is one `loft` (an ellipsoid only when the body really is an egg, as a penguin's is). Put a station
   wherever the outline changes: the front of the chest, behind the front legs, the withers or shoulders, mid
   barrel, the flank in front of the hind legs, the hips, the back end of the rump; 5 to 8 stations. Read each one's
@@ -226,6 +258,17 @@ Modelling rules that matter for how the result looks:
   upper leg's lower end through the knee or hock and the fetlock down to the hoof or paw (an ellipsoid with its
   own `"colour"`, starting inside the chain's last joint). Read the widths off the back and front views (`profiles.txt` lists the front; a `--zoom` of the
   back view shows where the thighs end).
+  Give the lower-leg chain a joint at every bend and bulge the side view draws: for a front leg the elbow
+  (inside the body or upper leg), mid-forearm, knee, mid-cannon, fetlock and the top of the hoof; for a hind leg
+  the stifle (inside the thigh), hock, mid-cannon, fetlock and the top of the hoof. The hock is the hind leg's
+  backmost point, so its joint sits behind the ones above and below it, and the pastern slopes forward from the
+  fetlock to the hoof. Read each joint's radius from the widths in `profiles.txt`'s side table at its height
+  (half the leg's stretch): the knee, hock and fetlock come out a little thicker than the cannon between them.
+  Three or four evenly spaced joints make a straight, smooth stick.
+  Start every upper leg deep: its root (`a`, or a chain's first joint) at least its root radius in from the body's
+  surface, towards the middle of the body rather than just under its side. A root just under the surface shows the
+  back of its rounded end as a lump at the shoulder or hip, with a crease round it; the fit report names such
+  roots ("bulges ... out of the body"). The same goes for the neck and the tail.
 - Chest, brisket, dewlap: no separate ball on the chest. If the front view shows a chest or brisket in front of
   the shoulders, make it no wider than the front view draws it (usually about half the body's width) and give
   it, the neck and the body generous blends (from 0.2 up to half the neck's radius); otherwise let
@@ -352,6 +395,8 @@ If it does not pass, fix the cause:
 |---|---|
 | a part missing, misplaced, too fat or too thin | edit `parts.json`, fit again (step 4), build again |
 | in `preview-parts.png` a part hardly shows (swallowed by the body or a neighbour), or spreads over where another part is drawn | the swallowed part is too small or too deep inside, or the other too big: resize or move them so each covers its own drawn place |
+| a lump at the shoulder, hip, chest or tail root, or the fit report says a root "bulges out of the body" | start that part deeper inside the body (its root at least its root radius in) and give it `root_blend`; if the drawing really is wider there, widen the loft's stations instead |
+| the neck sits on the chest as an oval patch, or a ring or groove runs round its base | widen the neck's root to the drawn width and raise its blend to about its root radius |
 | a crease where two parts join | raise that part's `blend` (about half the smaller radius) |
 | a ring or band around the body | a part that continues another bulges out of it: make it narrower where it starts, or let the parent reach further; `"fit": false` on it if the fitter widened it. If several stacked parts make the trunk, replace them with one `loft` |
 | the body looks like an egg or a barrel: no sloping back, no tucked belly, widest in the middle from every side | make the torso a `loft`, with stations read off the side table where the outline changes |
@@ -360,6 +405,10 @@ If it does not pass, fix the cause:
 | a part textured or shaped from a view that draws it wrongly | add that view to that part's `ignore_views` (that part only) |
 | the beak or snout looks like a cone stuck on, or its colour is smeared onto the face | build it as an upper and a lower jaw measured on a `--zoom` of the side view, placed from the side view |
 | you can see through an open mouth, or the nose colour is smeared over the muzzle | a furred muzzle: add the dark mouth part between the jaws and a nose part; if the front view draws the nose elsewhere, ignore the front view for the nose and snout (see the muzzle rule) |
+| a cow's, horse's or deer's face looks dished, pointed or dog-like, or the head is wider than drawn | build the head as one long tapered capsule with a broad lower jaw and a nose pad (see the long-face rule) |
+| ears too small, hidden in the head, or sticking out like horns from above | resize and turn them as in the ear rule; if the fit report says the head grew by 20% or more, put it back and give it `"fit": false` |
+| legs look like straight sticks: no knees, hocks or fetlocks | a joint at every drawn bend and bulge, radii read off the side table (see the four-legged rule) |
+| hooves look like round knobs | build them as wedge-shaped claws (see the hoof rule) |
 | paws look like boots with sausage toes | a furred paw: one paw ellipsoid as drawn, with toe lobes mostly inside its front edge (see the paw rule) |
 | a dent in the chin or throat under the beak or snout | the head sticks out past the drawn throat (red there in the side overlay): move the head up and back, or tilt it |
 | a one-colour part (toe, claw, boot) is the wrong shade, or a neighbour's colour is on it | give it `"colour"` with the palette code; avoid `"drawn"` for parts the pictures barely see |
@@ -370,6 +419,7 @@ If it does not pass, fix the cause:
 | warning: two views disagree on a size, or front and mirrored back differ | use `--skip-view` with the views measure.py's view check names, for the fit and the build |
 | the model is shorter or smaller than the drawings, or parts are cut off | a view that disagrees was used for trimming: see the row above |
 | warning: a loose piece came off and was dropped, or fit report: parts "not joined to the body" | a part (tail, tuft, ear, horn) hangs on only where trimming cuts it: start it inside the part it grows from; make a thin tail, strand or leg a chain, with its tuft or hoof starting inside its last joint |
+| fit report: a part "grew by 20% or more" | it is filling in for another part (ears beside the head, a neck too thin under it): fix that part, put this one's size back and give it `"fit": false`. Refitting the fitted file lets it grow 25% again every round |
 | warning: parts "kept untrimmed" | trimming would have removed most of them, so they are off their drawn place: move them onto the drawing (`parts-on-refs.png`, a `--zoom`) and build again |
 | the blockout cannot be made to work after 3 rounds | fallback: `build.py REFS out --hull-only` (outline carving only; boxier, can invent stubs between legs), and say so in the log |
 

@@ -17,6 +17,8 @@ the root (put it inside the part it grows from) to the tip, joined by round cone
 fitting moves a joint together with both segments that share it. "aspect" (default 1) flattens every segment's
 cross-section as for a capsule. A chain thinner than about three build voxels somewhere (a tail strand, a leg's
 pastern) is built on its own finer grid and joined on, so it cannot break off; "fine": true forces that.
+"strands": n (chains) ends the chain in a tuft of n thin strands fanning out from its last segment (a tail switch,
+the brush of a bushy tail, the tip of a mane); such a chain is always built on the finer grid.
 loft: a torso built slice by slice, the way a modeller lofts one from blueprints: "stations" =
 [x, y, z, half_width, half_height] from the front end to the back end (y increasing); each station is an upright
 slice across the animal at that y, an ellipse half_width wide (x) and half_height tall (z) around (x, z), and a
@@ -69,7 +71,8 @@ def load(path):
         q = {"name": p.get("name", t), "type": t, "mirror": bool(p.get("mirror", False)),
              "blend": float(p.get("blend", 0.0)), "fit": p.get("fit", True),
              "root_blend": float(p.get("root_blend", 0.0)), "colour": p.get("colour"),
-             "ignore": [str(v) for v in p.get("ignore_views", [])], "fine": bool(p.get("fine", False))}
+             "ignore": [str(v) for v in p.get("ignore_views", [])], "fine": bool(p.get("fine", False)),
+             "strands": int(p.get("strands", 0)) if t == "chain" else 0}
         bad = [v for v in q["ignore"] if v not in VIEW_NAMES]
         if bad: raise SystemExit(f"part {q['name']}: ignore_views {bad} (use {', '.join(VIEW_NAMES)})")
         for k in TYPES[t]:
@@ -97,6 +100,7 @@ def save(parts, path):
         if p["fit"] is not True: r["fit"] = p["fit"]
         if p.get("ignore"): r["ignore_views"] = p["ignore"]
         if p.get("fine"): r["fine"] = True
+        if p.get("strands"): r["strands"] = int(p["strands"])
         rows.append(r)
     text = json.dumps({"parts": rows}, indent=1)
     text = re.sub(r"\[\s+([-\d.e,\s]+?)\s+\]", lambda m: "[" + ", ".join(m.group(1).split()).replace(",,", ",") + "]", text)
@@ -140,6 +144,25 @@ def segments(p):
     J = joints(p)
     return [{"type": "capsule", "a": J[k, :3], "b": J[k + 1, :3], "ra": J[k, 3], "rb": J[k + 1, 3],
              "aspect": p.get("aspect", 1.0), "droop": 0.0} for k in range(len(J) - 1)]
+
+
+def strands(p):
+    """A chain's tuft: with "strands": n, its last segment ends in n thin strands that fan out a little and reach a
+    quarter of that segment past the last joint, so the end of a tail or a mane is a ragged brush rather than a
+    smooth spindle. Spread over the last joint's cross-section in a sunflower pattern (always the same)."""
+    n = int(p.get("strands", 0) or 0)
+    if p["type"] != "chain" or n < 2: return []
+    J = p["joints"]; base, tip = J[-2, :3], J[-1, :3]; L = max(float(np.linalg.norm(tip - base)), 1e-6)
+    u = (tip - base) / L; e1 = np.cross(u, [0, 0, 1.0])
+    if np.linalg.norm(e1) < 1e-6: e1 = np.cross(u, [1.0, 0, 0])
+    e1 /= np.linalg.norm(e1); e2 = np.cross(u, e1)
+    spread = float(J[-1, 3]); asp = float(p.get("aspect", 1.0)); out = []
+    for k in range(n):
+        th = 2.39996 * k; rad = spread * np.sqrt((k + 0.5) / n)
+        off = e1 * np.cos(th) * rad * asp + e2 * np.sin(th) * rad
+        out.append({"type": "capsule", "a": base + 0.3 * off, "b": tip + 0.25 * L * u + 1.3 * off,
+                    "ra": 0.45 * float(max(J[-2, 3], J[-1, 3])), "rb": max(0.12 * spread, 1e-3), "aspect": 1.0, "droop": 0.0})
+    return out
 
 
 def ends(p):
@@ -193,7 +216,7 @@ def sdf_one(p, P):
     t = p["type"]
     if t == "loft": return sdf_loft(p, P)
     if t == "chain":                                # round cones sharing a ball at every joint: smooth over the
-        return np.min([sdf_one(c, P) for c in segments(p)], 0)    # outside of a bend, creased inside it (a knee)
+        return np.min([sdf_one(c, P) for c in segments(p) + strands(p)], 0)   # creased inside a bend (a knee)
     if t == "paddle":                               # a round cone's outline in a plane, given a rounded thickness
         u, w, n = paddle_frame(p); L = float(np.linalg.norm(p["b"] - p["a"]))
         q = P - p["a"]; s = q @ u; x = q @ w; z = q @ n
@@ -360,6 +383,7 @@ def bounds(p):
     for q in instances(p):
         if q["type"] == "chain":
             J = q["joints"]; r = float(J[:, 3].max()); lo, hi = J[:, :3].min(0) - r, J[:, :3].max(0) + r
+            for c in strands(q): lo = np.minimum(lo, c["b"] - c["rb"]); hi = np.maximum(hi, c["b"] + c["rb"])
         elif q["type"] == "loft":
             S = q["stations"]; r = float(S[:, 3:].max()) + float(np.max(q.get("caps", [0, 0])))
             lo, hi = S[:, :3].min(0) - r, S[:, :3].max(0) + r
@@ -375,6 +399,13 @@ def bounds(p):
 
 
 # ---- parameter vectors for fitting ---------------------------------------------------------------------------------
+
+def surface_points(p, n=32):
+    """Points on (within half a cell of) the part's own surface, from an n-cube grid over its box."""
+    lo, hi = bounds(p); g = [np.linspace(lo[k], hi[k], n) for k in range(3)]
+    G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+    return G[np.abs(sdf_part(p, G)) < 0.5 * float(np.max(hi - lo)) / (n - 1)]
+
 
 def volume(p):
     """Rough volume (all mirrored copies), from a 16-cube grid over the part's box."""
