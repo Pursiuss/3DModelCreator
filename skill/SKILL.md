@@ -193,6 +193,15 @@ Modelling rules that matter for how the result looks:
   they join. No big rounded foot blob under the toes: it reads as a slipper, and its large underside is seen by no
   picture, so it gets no real colour. Claws, nails and talons as long and as thick as drawn (measure them on the
   rulers), at each toe tip, pointing the way drawn (for example, curving down to the ground).
+- Long fur (retrievers, setters, collies, long-haired cats, manes): the outline the drawings show is the fur, not
+  the body under it, so size the body, neck and limbs to the fur's outer edge, and add the fur that hangs off them
+  as its own parts, measured on `--zoom` close-ups of the side and front views: feathering behind the front legs
+  and trousers on the back of the thighs as `paddle`s with `normal` [1, 0, 0] (flat sides facing sideways,
+  `thick` 1.5-3 cm), from inside the leg out to the drawn fringe; a chest ruff as a small ellipsoid under the
+  throat; a mane as a chain along the top of the neck with `aspect` below 1 (taller than wide). Compare the
+  build's outline with the drawing: wherever the drawing is wider than the model in the side view behind a leg,
+  under the chest or along the neck, fur is missing there. A fatter tail or leg is not the fix if its other
+  views are narrower: trimming then cuts it into flat facets.
 - Hooves are wedges, not balls: in the side view the front wall slopes from the coronet down to the toe, the sole is
   flat on the ground and the heel is lower than the coronet. Build each claw as a `paddle` with `normal` [1, 0, 0]
   (flat sides facing sideways): `a` at the heel's centre, `b` near the toe on the ground (the rounded tip reaches
@@ -408,6 +417,7 @@ If it does not pass, fix the cause:
 | a cow's, horse's or deer's face looks dished, pointed or dog-like, or the head is wider than drawn | build the head as one long tapered capsule with a broad lower jaw and a nose pad (see the long-face rule) |
 | ears too small, hidden in the head, or sticking out like horns from above | resize and turn them as in the ear rule; if the fit report says the head grew by 20% or more, put it back and give it `"fit": false` |
 | legs look like straight sticks: no knees, hocks or fetlocks | a joint at every drawn bend and bulge, radii read off the side table (see the four-legged rule) |
+| long-haired animal looks shaved: smooth legs, no feathering, no ruff, slimmer than drawn behind the legs | add the fur parts (see the long-fur rule) |
 | hooves look like round knobs | build them as wedge-shaped claws (see the hoof rule) |
 | paws look like boots with sausage toes | a furred paw: one paw ellipsoid as drawn, with toe lobes mostly inside its front edge (see the paw rule) |
 | a dent in the chin or throat under the beak or snout | the head sticks out past the drawn throat (red there in the side overlay): move the head up and back, or tilt it |
