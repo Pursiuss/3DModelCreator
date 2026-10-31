@@ -14,13 +14,9 @@ import os, shutil, sys
 
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_FILES = ["front.png", "side.png", "back.png", "top.png", "final.png", "subject.json"]
-ANIMALS = {"penguin": os.path.join(KIT, "penguin"),
-           "cow": os.path.join(KIT, "tests", "animals", "cow"),
-           "giraffe": os.path.join(KIT, "tests", "animals", "giraffe"),
-           "dog": os.path.join(KIT, "tests", "animals", "dog"),
-           "stag": os.path.join(KIT, "tests", "animals", "stag"),
-           "sheep": os.path.join(KIT, "tests", "animals", "sheep"),
-           "miku": os.path.join(KIT, "tests", "animals", "miku")}         # a character sheet with no top view (local only)
+REFS = os.path.join(KIT, "references")
+ANIMALS = {name: os.path.join(REFS, name)                       # miku: a character sheet with no top view (local only)
+           for name in ("penguin", "cow", "giraffe", "dog", "stag", "sheep", "miku")}
 
 
 def main():

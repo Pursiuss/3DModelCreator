@@ -9,17 +9,18 @@ outlines, and texturing from the drawings.
 | Path | What |
 |---|---|
 | `skill/` | the skill itself: `SKILL.md` (the agent's instructions), `requirements.txt` and `scripts/` |
-| `kit-README.md`, `score_glb.py`, `penguin/` | the organizers' practice kit: rules, scorer and the penguin references |
+| `kit-README.md`, `score_glb.py` | the organizers' practice kit: rules and scorer (their penguin references are in `references/penguin/`) |
+| `references/` | the reference subjects (penguin, cow, dog, giraffe, stag, sheep), each with its four views, `final.png` and `subject.json`; `sheets/` holds the original turnaround sheets they were cut from |
+| `tests/` | `make_test_workspace.py` (sets up `../penguin-skill-test` for a test run), `make_refs_from_sheet.py`, the model viewer, and the results: `test-00` (the first penguin build) to `test-10`, one folder per test with a folder per animal; `quick-tests/`; `inspection/` (before/after sheets for each fix) |
+| `OLD/` | superseded material kept for reference (see `OLD/README.md`) |
 | `organizer-questions.md` | open questions for the organizers |
-| `out/` | the latest penguin build |
-| `tests/` | test animals, test scripts, results and inspection renders |
 
 To try the skill on the penguin:
 ```
 python -m venv .venv
 .venv/Scripts/python -m pip install -r skill/requirements.txt
 ```
-then follow `skill/SKILL.md` with `penguin` as the references folder.
+then follow `skill/SKILL.md` with `references/penguin` as the references folder.
 
 ## Viewing the models
 
