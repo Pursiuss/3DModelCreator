@@ -225,6 +225,34 @@ def part_checks(parts, f, build_voxel):
                        f"lump at the shoulder, hip or chest: start it deeper inside (its root at least "
                        f"its root radius in from the surface) and join it with root_blend; where the drawing really "
                        f"is that wide there, widen the body there instead")
+    # limb segments that do not meet: a lower leg (or any long part) that carries on from another long part should
+    # start at that part's tip end. Where the upper part runs on past the lower one's start, or stops short of it,
+    # the two sit side by side and the leg gets a lump, a kink or a bulge sticking out at the hip or shoulder
+    round_long = ("capsule", "chain")                  # (paddles are flat: fur, hooves, fins lying side by side)
+    for i, p in enumerate(parts):
+        if i == body or p["type"] not in round_long: continue
+        one = dict(p, mirror=False); A, B, ra, _ = PT.ends(one)
+        if PT.sdf_part(parts[body], A[None])[0] < 0: continue           # grows straight out of the body
+        holders = [j for j, q in enumerate(parts) if j not in (i, body) and PT.sdf_part(q, A[None])[0] < 0]
+        if len(holders) > 1: continue                  # rooted in several parts (a jaw in the head, a tongue in a mouth)
+        u = (p["joints"][1, :3] - A) if p["type"] == "chain" else (B - A); u = u / max(np.linalg.norm(u), 1e-9)
+        for j, q in enumerate(parts):
+            if j in (i, body) or q["type"] not in round_long or bool(q.get("mirror")) != bool(p.get("mirror")): continue
+            qo = dict(q, mirror=False); qa, qb, qra, qrb = PT.ends(qo)
+            w = (qb - q["joints"][-2, :3]) if q["type"] == "chain" else (qb - qa); w = w / max(np.linalg.norm(w), 1e-9)
+            t = (A - qa) @ (qb - qa) / max((qb - qa) @ (qb - qa), 1e-12)
+            into_q = float(PT.sdf_part(qo, A[None])[0])
+            if into_q > ra or u @ w < 0.7 or t < 0.5: continue        # not carrying on from q's lower end
+            if any(PT.sdf_part(k, qb[None])[0] < 0 for m, k in enumerate(parts) if m not in (i, j)):
+                continue                                   # q ends inside something else (a neck in the head)
+            sticks_out = float(PT.sdf_part(one, qb[None])[0]) + qrb      # how far q's tip pokes out of p
+            gap = float(np.linalg.norm(A - qb))
+            if (sticks_out > max(0.5 * qrb, 2 * build_voxel) and gap > max(ra, qrb)) or into_q > 2 * build_voxel:
+                out.append(f"  {p['name']}: starts {gap * 100:.0f} cm from the end of {q['name']}, which "
+                           f"{'stops short of it' if into_q > 2 * build_voxel else f'runs on past it and sticks {sticks_out * 100:.0f} cm out of it'}"
+                           f": the leg gets a lump or a kink there (a bulge at the hip or shoulder where an upper leg "
+                           f"sticks out sideways). Make them meet: put {q['name']}'s tip end (b) on {p['name']}'s "
+                           f"first joint, with its tip radius about that joint's, whenever you move either of them")
     # floating groups: parts not joined, through a chain of touching parts, to the biggest part. The build keeps
     # only the main piece of the mesh, so a group that floats free (a tail and its tuft hanging behind the rump) is
     # dropped

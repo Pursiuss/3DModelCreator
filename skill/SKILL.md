@@ -58,8 +58,11 @@ Python interpreter chosen in step 1; use it for every script.
    framing is only thrown off by something drawn in it alone (a tail hanging below the paws) is lined up with the
    front first and kept; the check says so, and the scripts use it lined up. If it names views
    to skip, pass `--skip-view` with them to every `blockout.py` and `build.py` run, so they neither pull parts out
-   of place nor trim the model; model from the other views, and say so in the log. (The judges score the best two
-   of the front, side and top views, so a skipped top view costs little.)
+   of place nor trim the model; model from the other views, and say so in the log. A skipped top view is still
+   scored: the shape score takes the best two of the front, side and top views, but a gross error in any of them
+   (the top included) fails the run. A top view drawn at other proportions (much longer than the side view) usually
+   gives a gross error that no model true to the front and side views can avoid; say so in the log and in the final
+   summary, and do not distort the model to chase it.
 3. For small parts (beak, snout, mouth, toes, claws, eyes, ears, antler tines), make a close-up with a fine grid:
    `PY SKILL_DIR/scripts/measure.py REFS out/work --zoom side Y0 Z0 Y1 Z1` (front or back: X0 Z0 X1 Z1; top:
    X0 Y0 X1 Y1), which writes `out/work/zoom-side.png` (rename it before the next zoom of that view). The grid is
@@ -144,9 +147,13 @@ Modelling rules that matter for how the result looks:
   a snout reaching past the nose shows its own pale end around it. A closed mouth: the lower jaw tucked right under the snout, touching it all
   along. An open mouth: the lower jaw as drawn, touching the snout at the mouth corner and opening towards the
   front only as far as drawn; then a mouth part between the two jaws, a capsule from the corner to just behind the
-  lips, narrower than the jaws (`aspect` about 0.7, so it sits a centimetre inside the lips on each side), coloured
-  with the palette's darkest code: without it the gap between the jaws is a hole you can see straight through. A
-  tongue on top of it if drawn (`"colour": "drawn"`). If the front view draws the nose higher or lower than the
+  lips, a centimetre narrower than the jaws on each side, coloured with the palette's darkest code: without it the
+  gap between the jaws is a hole you can see straight through. A wide open grin (most dogs drawn panting) is as wide
+  as the front view draws it between the mouth corners: give the lower jaw the drawn chin's width (`aspect` about
+  1.5-2; a narrow jaw tapering to a point leaves a round "O" of a mouth from the front), the snout an `aspect` of
+  about 1.6 so its underside covers the mouth part, and the mouth part `aspect` about 2. A mouth part wider than
+  the jaws at its height sticks out of the lips as a dark flange. A tongue on top of it if drawn (`"colour":
+  "drawn"`), as wide as drawn (`aspect` about 2.5), reaching out over the lower lip as far as the side view draws it. If the front view draws the nose higher or lower than the
   side view (by more than about half the nose's height), place it from the side view and put "front" in the nose's
   and snout's `ignore_views`, or the front picture paints its nose across the upper lip.
 - Long faces (cattle, horses, deer, sheep, goats, camels): there is no step between forehead and nose, and the
@@ -193,6 +200,11 @@ Modelling rules that matter for how the result looks:
   they join. No big rounded foot blob under the toes: it reads as a slipper, and its large underside is seen by no
   picture, so it gets no real colour. Claws, nails and talons as long and as thick as drawn (measure them on the
   rulers), at each toe tip, pointing the way drawn (for example, curving down to the ground).
+  Webbed feet (penguins, ducks, geese, frogs) are the exception: where the drawing shows skin joining the toes,
+  add one flat `paddle` per foot under them, `normal` [0, 0, 1], `a` at the ankle (`ra` about the ankle's
+  half-width), `b` a little short of the toe tips (`rb` about half the spread between the outer toes there),
+  `thick` about half the toes' thickness, with the toes' `"colour"`. The toes then stand on it as ridges; without
+  it the foot reads as three bare sticks.
 - Long fur (retrievers, setters, collies, long-haired cats, manes): the outline the drawings show is the fur, not
   the body under it, so size the body, neck and limbs to the fur's outer edge, and add the fur that hangs off them
   as its own parts, measured on `--zoom` close-ups of the side and front views: feathering behind the front legs
@@ -210,11 +222,14 @@ Modelling rules that matter for how the result looks:
   side by side either side of the leg's centre with a small cleft between them; horses: one, as wide as the hoof.
   Start them inside the leg chain's last joint; trimming to the side view flattens the sole.
 - Furred paws (dogs, cats, bears, rabbits) are the opposite: the toes are packed together into one compact foot.
-  Build the paw as one ellipsoid as long, wide and tall as drawn (`--zoom` the front and side views), the leg
-  running down into its back half; then one small ellipsoid per drawn toe across its front edge, side by side,
-  each about a quarter of the paw's width and mostly inside it, so only a lobe shows. Claws only where the
-  drawing shows them clearly sticking out (as short chains at the toe tips); small claws tucked in the fur are left
-  to the texture, since modelled they read as pegs. Toe capsules sticking out of a paw read as sausages.
+  Build the paw as one ellipsoid as long, wide and tall as drawn (`--zoom` the front and side views; its width is
+  the span of the toes in the front view, not the fur above them), the leg running down into its back half; then
+  one small ellipsoid per drawn toe across its front edge in an arc (the middle two furthest forward), each about
+  a quarter of the paw's width, with its front third standing out of the paw's front edge, so the toes show from
+  the front as lobes with grooves between them. Toes buried in a paw wider than they are show only as bumps on its
+  sides, and the paw reads as a boot. Where the drawing shows dark claw tips at the front of the toes (most dogs
+  do), add each as a short chain from inside its toe's front, a few millimetres out and down to the ground, with
+  the claw colour; claws reaching forward read as pegs. Toe capsules sticking out of a paw read as sausages.
 - Give one colour to parts that are one colour: claws, nails, toes, hooves, boots, belts, a shell, a single-coloured
   limb. Set `"colour"` to the palette code from `profiles.txt` (`"#2e2932"`); such a part keeps only the drawing's
   fine detail and cannot pick up a neighbour's colour from a drawing that sits a few millimetres off. Use
@@ -274,6 +289,10 @@ Modelling rules that matter for how the result looks:
   fetlock to the hoof. Read each joint's radius from the widths in `profiles.txt`'s side table at its height
   (half the leg's stretch): the knee, hock and fetlock come out a little thicker than the cannon between them.
   Three or four evenly spaced joints make a straight, smooth stick.
+  The two pieces must meet: the upper leg's tip end (`b`) on the lower-leg chain's first joint, its `rb` about
+  that joint's radius. Whenever you move one (pinning a lower leg to measured joints, say), move the other with it.
+  An upper leg that runs on past the lower leg's start, or stops short of it, sits beside the leg as a lump and
+  sticks out sideways at the hip or shoulder; the fit report names such legs ("starts ... from the end of").
   Start every upper leg deep: its root (`a`, or a chain's first joint) at least its root radius in from the body's
   surface, towards the middle of the body rather than just under its side. A root just under the surface shows the
   back of its rounded end as a lump at the shoulder or hip, with a crease round it; the fit report names such
@@ -413,13 +432,16 @@ If it does not pass, fix the cause:
 | a part drawn twice (a second flipper shape on the body), or its colour smeared onto a neighbour | in `parts-on-refs.png` the part misses its drawn shape: move or resize it to cover that shape |
 | a part textured or shaped from a view that draws it wrongly | add that view to that part's `ignore_views` (that part only) |
 | the beak or snout looks like a cone stuck on, or its colour is smeared onto the face | build it as an upper and a lower jaw measured on a `--zoom` of the side view, placed from the side view |
+| an open mouth looks like a round "O" from the front, or a dark flange sticks out of the lips | widen the lower jaw and snout to the drawn mouth width and keep the mouth part just inside them (see the muzzle rule) |
 | you can see through an open mouth, or the nose colour is smeared over the muzzle | a furred muzzle: add the dark mouth part between the jaws and a nose part; if the front view draws the nose elsewhere, ignore the front view for the nose and snout (see the muzzle rule) |
 | a cow's, horse's or deer's face looks dished, pointed or dog-like, or the head is wider than drawn | build the head as one long tapered capsule with a broad lower jaw and a nose pad (see the long-face rule) |
 | ears too small, hidden in the head, or sticking out like horns from above | resize and turn them as in the ear rule; if the fit report says the head grew by 20% or more, put it back and give it `"fit": false` |
 | legs look like straight sticks: no knees, hocks or fetlocks | a joint at every drawn bend and bulge, radii read off the side table (see the four-legged rule) |
+| a leg has a lump or kink partway down, or the rump or shoulders look fat with a lobe sticking out sideways; fit report: a lower leg "starts ... from the end of" an upper leg | the two pieces do not meet: put the upper leg's `b` on the lower chain's first joint, `rb` about that joint's radius |
+| a webbed foot (penguin, duck, frog) looks like bare separate toes | add the web paddle under the toes (see the feet rule) |
 | long-haired animal looks shaved: smooth legs, no feathering, no ruff, slimmer than drawn behind the legs | add the fur parts (see the long-fur rule) |
 | hooves look like round knobs | build them as wedge-shaped claws (see the hoof rule) |
-| paws look like boots with sausage toes | a furred paw: one paw ellipsoid as drawn, with toe lobes mostly inside its front edge (see the paw rule) |
+| paws look like boots with sausage toes, or toes show only as bumps on the paw's sides | a furred paw: one paw ellipsoid as wide as the drawn toes, with toe lobes in an arc standing out of its front edge, and short claws where drawn (see the paw rule) |
 | a dent in the chin or throat under the beak or snout | the head sticks out past the drawn throat (red there in the side overlay): move the head up and back, or tilt it |
 | a one-colour part (toe, claw, boot) is the wrong shade, or a neighbour's colour is on it | give it `"colour"` with the palette code; avoid `"drawn"` for parts the pictures barely see |
 | a coloured part paints over something drawn on top of it (pink leg over white feathers) | end the part where the colour changes, or take its `"colour"` off |

@@ -20,3 +20,22 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r skill/requirements.txt
 ```
 then follow `skill/SKILL.md` with `penguin` as the references folder.
+
+## Viewing the models
+
+Each run writes three models to its output folder: `untextured.glb`, `textured.glb`, and `parts-coloured.glb`
+(each body part in its own flat colour, for spotting shape problems; `preview-parts.png` is its key).
+
+**Local viewer (recommended).** From the kit folder:
+```
+.venv/Scripts/python tests/viewer/serve.py
+```
+then open http://localhost:8765. The drop-down lists every `.glb` in this folder and in the test workspace next to
+it (`../penguin-skill-test`), newest first; press **Reload** after a new run. Drag to turn, scroll to zoom,
+right-drag to pan; the buttons switch the texture (or the part colours) on and off, show the wireframe, spin the
+model and jump to the front, side, back, top and 3/4 views. Use `--port` for another port. The page loads three.js
+from a CDN, so it needs an internet connection; nothing is uploaded, and the server only answers on this computer.
+
+**Without the viewer.** A `.glb` also opens in Blender (File > Import > glTF 2.0), or by dragging it onto an online glTF viewer such as https://gltf-viewer.donmccurdy.com (the file
+stays in the browser). Each run's `preview-textured.png`, `preview-untextured.png` and `preview-parts.png` show the
+model from five angles without opening it.
