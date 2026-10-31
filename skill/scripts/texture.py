@@ -115,17 +115,23 @@ def paddle_shadow(parts, pid_face, cen, n, cand, size, rel=0.02):
     """A paddle (flipper, wing, fin) is drawn standing a little off the body, with what lies between them (its inner
     face, the flank under it) drawn in the gap. The model's paddle never sits exactly where it is drawn, so those
     gap colours land on the body next to it, or on the paddle's edge: white slivers on a black flank. So the body
-    within about 2% of the animal's size of a paddle, and the paddle's own inner face (the side towards the body),
-    take no colour from any picture; they are flood-filled from the colour regions around them. Not around the
-    paddle's root: the shoulder it grows out of is drawn as it is."""
+    within about 2% of the animal's size of a paddle takes no colour from the pictures that look along the paddle
+    (front, back and top for a flipper), which draw that gap; the picture facing the paddle (the side) draws its
+    edge there as it is, so it still paints that strip, or the flipper's white trailing edge turns into a flat
+    blob. The paddle's own inner face (the side towards the body) takes no colour from any picture. What no picture
+    paints is flood-filled from the colour regions around it. Not around the paddle's root: the shoulder it grows
+    out of is drawn as it is."""
     import parts as PT
     reach = rel * max(size["width"], size["length"], size["height"])
     for i, p in enumerate(parts):
         if p["type"] != "paddle": continue
-        d = PT.sdf_part(p, cen)
-        root = np.min([np.linalg.norm(cen - inst["a"], axis=1) for inst in PT.instances(p)], 0)
-        away = root > float(p["ra"]) + 2 * reach          # around the root the body is drawn as it is (shoulder)
-        cand[(pid_face != i) & (d < reach) & away] = False
+        for inst in PT.instances(p):
+            d = PT.sdf_part(dict(inst, mirror=False), cen)
+            away = np.linalg.norm(cen - inst["a"], axis=1) > float(p["ra"]) + 2 * reach   # (shoulder drawn as is)
+            strip = (pid_face != i) & (d < reach) & away
+            fn = PT.paddle_frame(inst)[2]
+            for k, (_, dv, _, _) in enumerate(CAMS.values()):
+                if abs(fn @ np.array(dv, float)) < 0.5: cand[strip, k] = False
         mine = np.nonzero(pid_face == i)[0]
         for inst in PT.instances(p):
             fn = PT.paddle_frame(inst)[2]

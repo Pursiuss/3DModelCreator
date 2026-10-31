@@ -120,7 +120,8 @@ Part types (all sizes in metres):
   the build automatically spreads the join out instead of adding a bulge); `"fit": false` stops the fitter from
   changing it; `"root_blend"` (capsules, paddles, chains): a larger blend used only near the root, so the part flows
   out of the body there and stays a separate shape everywhere else; `"colour"`: the part is one colour, either a
-  `#rrggbb` code from the palette or `"drawn"` (see the colour rule below); `"ignore_views": ["back"]` (any of
+  `#rrggbb` code from the palette or `"drawn"` (see the colour rule below); `"fur": true` on long fur lying along a
+  limb or the body (see the long-fur rule); `"ignore_views": ["back"]` (any of
   front, back, side, top) tells every script to ignore that reference view for this part, for a view that draws
   the part wrongly (see the last rule below).
 
@@ -152,8 +153,11 @@ Modelling rules that matter for how the result looks:
   as the front view draws it between the mouth corners: give the lower jaw the drawn chin's width (`aspect` about
   1.5-2; a narrow jaw tapering to a point leaves a round "O" of a mouth from the front), the snout an `aspect` of
   about 1.6 so its underside covers the mouth part, and the mouth part `aspect` about 2. A mouth part wider than
-  the jaws at its height sticks out of the lips as a dark flange. A tongue on top of it if drawn (`"colour":
-  "drawn"`), as wide as drawn (`aspect` about 2.5), reaching out over the lower lip as far as the side view draws it. If the front view draws the nose higher or lower than the
+  the jaws at its height sticks out of the lips as a dark flange. A tongue if drawn: a flat capsule resting on the lower jaw
+  inside the mouth, as wide as drawn (`aspect` about 2.5), its tip at the lower lip where the side view draws it.
+  The front view often draws it hanging lower, over the chin; do not follow that: past the side outline it is
+  trimmed away, or, with the side view ignored, juts out of the chin on a stalk. Give it a pink `"colour"` (the
+  palette's, or a pink close to the drawn one such as `#d98a8f`): `"drawn"` takes the jaw's colour around it. If the front view draws the nose higher or lower than the
   side view (by more than about half the nose's height), place it from the side view and put "front" in the nose's
   and snout's `ignore_views`, or the front picture paints its nose across the upper lip.
 - Long faces (cattle, horses, deer, sheep, goats, camels): there is no step between forehead and nose, and the
@@ -209,7 +213,7 @@ Modelling rules that matter for how the result looks:
   the body under it, so size the body, neck and limbs to the fur's outer edge, and add the fur that hangs off them
   as its own parts, measured on `--zoom` close-ups of the side and front views: feathering behind the front legs
   and trousers on the back of the thighs as `paddle`s with `normal` [1, 0, 0] (flat sides facing sideways,
-  `thick` 1.5-3 cm), from inside the leg out to the drawn fringe; a chest ruff as a small ellipsoid under the
+  `thick` 1.5-3 cm, `"fur": true`), from inside the leg out to the drawn fringe; a chest ruff as a small ellipsoid under the
   throat; a mane as a chain along the top of the neck with `aspect` below 1 (taller than wide). Compare the
   build's outline with the drawing: wherever the drawing is wider than the model in the side view behind a leg,
   under the chest or along the neck, fur is missing there. A fatter tail or leg is not the fix if its other
@@ -309,6 +313,11 @@ Modelling rules that matter for how the result looks:
 - Antlers, horns and branching parts: the main beam as a chain (a joint wherever it bends) and one capsule or
   chain per tine, each starting inside the beam, measured on `--zoom` close-ups of the front and side views. Thin
   branches that sit a little off their drawn place are kept by the build, but they paint and score better on it.
+  Where a branch passes outside a view's outline, trimming cuts it there, and whatever is beyond the cut is
+  dropped: lay each beam and tine over its drawn shape in every view it keeps. A top view often draws antlers
+  swept back over the shoulders while the side view draws them rising above the head; when the two disagree by
+  more than the beam's thickness, put "top" in the antler parts' `ignore_views`, model them from the front and
+  side, and say in the log that the top view's gross error comes from the drawing.
 - Order: biggest first. Parts listed later blend into the ones before them.
 - Check each part against every view it appears in. If one view clearly draws a part differently from the others
   (feet or toes pointing the other way, a limb in another pose), add that view to the part's `ignore_views` and say
@@ -321,7 +330,9 @@ Modelling rules that matter for how the result looks:
 ```
 PY SKILL_DIR/scripts/blockout.py REFS out/work/parts.json out/work [--skip-view VIEW ...]
 ```
-It nudges every part (within limits around what you wrote) to match the outlines and writes
+It nudges every part (within limits around what you wrote: a chain's joints keep their order, move at most a
+quarter of a segment, stay on their side of the centre line and above the ground, so legs written in the right
+place do not need `"fit": false`) to match the outlines and writes
 `out/work/parts.fitted.json`, `fit-report.txt`, `blockout-overlay.png`, `blockout-parts.png`,
 `parts-on-refs.png` and `parts-on-refs-detail.png`.
 
@@ -441,6 +452,7 @@ If it does not pass, fix the cause:
 | a webbed foot (penguin, duck, frog) looks like bare separate toes | add the web paddle under the toes (see the feet rule) |
 | long-haired animal looks shaved: smooth legs, no feathering, no ruff, slimmer than drawn behind the legs | add the fur parts (see the long-fur rule) |
 | hooves look like round knobs | build them as wedge-shaped claws (see the hoof rule) |
+| hooves, toes or claws come out as small dark tips, or the fit report says one "lies outside the ... outline" | it is off its drawn shape and trimming cuts it down: move it onto the drawing in `parts-on-refs-detail.png` (the report judges small parts exactly, point by point) |
 | paws look like boots with sausage toes, or toes show only as bumps on the paw's sides | a furred paw: one paw ellipsoid as wide as the drawn toes, with toe lobes in an arc standing out of its front edge, and short claws where drawn (see the paw rule) |
 | a dent in the chin or throat under the beak or snout | the head sticks out past the drawn throat (red there in the side overlay): move the head up and back, or tilt it |
 | a one-colour part (toe, claw, boot) is the wrong shade, or a neighbour's colour is on it | give it `"colour"` with the palette code; avoid `"drawn"` for parts the pictures barely see |

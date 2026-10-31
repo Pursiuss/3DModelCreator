@@ -71,12 +71,29 @@ class Fitter:
                           for k, i, kind in PT.params(p)})
         # Limits around what was written, so a part keeps its role (a beak must not swell to fill the head):
         # position within 25% of the part's size, size between 0.8x and 1.25x, rotation within 25 degrees.
+        # A chain's joint moves at most a quarter of its shorter segment, so the joints keep their order (a long leg
+        # chain could otherwise swap its knee and fetlock); a part off the centre line stays on its own side, no
+        # nearer the middle than its own radius (legs drifted onto the centre line and crossed); nothing sinks
+        # below the ground.
         limits = []
         for p in parts:
             s = PT.fit_scale(p); lim = {}
             for k, i, kind in PT.params(p):
                 v0 = PT.get(p, k, i)
-                if kind == "pos": lim[(k, i)] = (v0 - 0.25 * s - 2 * self.voxel, v0 + 0.25 * s + 2 * self.voxel)
+                if kind == "pos":
+                    reach = 0.25 * s; r = None
+                    if k == "joints":
+                        J = p["joints"][:, :3]; j = i[0]
+                        seg = [np.linalg.norm(J[j] - J[n]) for n in (j - 1, j + 1) if 0 <= n < len(J)]
+                        reach = min(reach, 0.25 * min(seg)); r = float(p["joints"][j, 3])
+                    elif k in ("a", "b"): r = float(p["ra" if k == "a" else "rb"])
+                    lo, hi = v0 - reach - 2 * self.voxel, v0 + reach + 2 * self.voxel
+                    axis = i[1] if isinstance(i, tuple) else i
+                    if axis == 0 and r is not None and v0 != 0:            # x: stay on this side of the middle
+                        keep = min(abs(v0), r)
+                        lo, hi = (max(lo, keep), hi) if v0 > 0 else (lo, min(hi, -keep))
+                    if axis == 2 and r is not None: lo = max(lo, min(v0, r))   # z: not below the ground
+                    lim[(k, i)] = (lo, hi)
                 elif kind == "size": lim[(k, i)] = (0.8 * v0, max(1.25 * v0, v0 + 0.5 * self.voxel))
                 else: lim[(k, i)] = (v0 - 25, v0 + 25)
             limits.append(lim)
@@ -186,7 +203,7 @@ def part_checks(parts, f, build_voxel):
                        f"({1.5 * build_voxel * 1000:.1f} mm), so it melts into a blob or a dent; make it a chain "
                        f"(built on a finer grid), or drop it and let the texture show it")
         bigger = [j for j in range(len(parts)) if j != i and PT.scale_of(parts[j]) > 1.5 * PT.scale_of(p)]
-        if bigger and 2 * f.voxel <= thin < 0.3 * longest:            # (too thin to judge on this grid)
+        if bigger and 2 * f.voxel <= thin < 0.3 * longest and not p.get("fur"):   # (fur lies along the leg)
             others = np.min([D[j] for j in bigger], 0)
             shell = np.nonzero(np.abs(D[i]) < f.voxel)[0]
             if len(shell) >= 40:
@@ -201,11 +218,26 @@ def part_checks(parts, f, build_voxel):
                                f"hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes "
                                f"in; lying along the body it reads as a stuck-on patch with a groove round it")
         pr = f.projections(D[i])
+        # a small part (a hoof, a claw, a nose pad) is only a few cells of the fitting grid, too coarse to tell
+        # whether it sits on its drawn shape; trimming at build resolution then cuts it down. So it is judged
+        # exactly: points inside it, projected into each picture
+        S = None
+        if longest < 6 * f.voxel:
+            lo, hi = PT.bounds(p); S = lo + np.random.default_rng(1).random((40000, 3)) * (hi - lo)
+            S = S[PT.sdf_part(p, S) < 0][:3000]
+            if len(S) < 50: S = None
         for v in ("front", "side", "top"):
             if v in p.get("ignore", []) or v in f.skip: continue
-            s = pr[v]; n = s.sum()
-            if n < 15: continue
-            outside = float((s & ~f.L[v]).sum() / n)
+            if S is not None:
+                c, r = f.maps[v].project(S); sil = f.maps[v].sil
+                ci, ri = np.floor(c).astype(int), np.floor(r).astype(int)
+                ok = (ci >= 0) & (ci < sil.shape[1]) & (ri >= 0) & (ri < sil.shape[0])
+                ins = np.zeros(len(S), bool); ins[ok] = sil[ri[ok], ci[ok]]
+                outside = float(1 - ins.mean())
+            else:
+                s = pr[v]; n = s.sum()
+                if n < 15: continue
+                outside = float((s & ~f.L[v]).sum() / n)
             if outside > 0.2:
                 out.append(f"  {name}: {outside:.0%} of it lies outside the {v} outline: too big, or in the wrong place")
     # roots that bulge out: a limb, neck or tail whose root end sits just under the body's surface
@@ -213,7 +245,7 @@ def part_checks(parts, f, build_voxel):
     # chest, with a crease round it
     body = int(np.argmax([PT.volume(p) for p in parts]))
     for i, p in enumerate(parts):
-        if i == body or p["type"] not in PT.LONG: continue
+        if i == body or p["type"] not in PT.LONG or p.get("fur"): continue
         one = dict(p, mirror=False); A, B, ra, _ = PT.ends(one); u = (B - A) / max(np.linalg.norm(B - A), 1e-9)
         if PT.sdf_part(parts[body], A[None])[0] >= 0: continue          # not rooted in the body
         others = [q for j, q in enumerate(parts) if j != i]
@@ -225,6 +257,21 @@ def part_checks(parts, f, build_voxel):
                        f"lump at the shoulder, hip or chest: start it deeper inside (its root at least "
                        f"its root radius in from the surface) and join it with root_blend; where the drawing really "
                        f"is that wide there, widen the body there instead")
+    # buried parts: a part almost wholly inside others never shows (a tail swallowed by the rump, a nose pad inside the
+    # tip of the head, a ruff inside the chest). Upper legs, necks and roots are meant to be mostly inside (up to about
+    # 90%), so only nearly complete burial counts
+    rng = np.random.default_rng(0)
+    for i, p in enumerate(parts):
+        if i == body: continue
+        lo, hi = PT.bounds(p); S = lo + rng.random((60000, 3)) * (hi - lo)
+        S = S[PT.sdf_part(p, S) < 0][:4000]
+        if len(S) < 50: continue
+        buried = float((PT.sdf([q for j, q in enumerate(parts) if j != i], S, smooth=False) < 0).mean())
+        if buried >= 0.97:
+            out.append(f"  {p['name']}: {buried:.0%} of it is inside other parts, so it changes nothing. If the parts "
+                       f"around it already make its drawn shape (a rump that bulges where the tail lies on it, a head "
+                       f"whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move "
+                       f"it out until it stands as proud of them as the drawing shows")
     # limb segments that do not meet: a lower leg (or any long part) that carries on from another long part should
     # start at that part's tip end. Where the upper part runs on past the lower one's start, or stops short of it,
     # the two sit side by side and the leg gets a lump, a kink or a bulge sticking out at the hip or shoulder

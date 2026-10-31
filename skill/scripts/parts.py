@@ -19,6 +19,8 @@ cross-section as for a capsule. A chain thinner than about three build voxels so
 pastern) is built on its own finer grid and joined on, so it cannot break off; "fine": true forces that.
 "strands": n (chains) ends the chain in a tuft of n thin strands fanning out from its last segment (a tail switch,
 the brush of a bushy tail, the tip of a mane); such a chain is always built on the finer grid.
+"fur": true (any part) marks long fur lying along a limb or the body (feathering, trousers, a mane): the fit report
+does not warn that it lies against a bigger part or bulges at its root.
 loft: a torso built slice by slice, the way a modeller lofts one from blueprints: "stations" =
 [x, y, z, half_width, half_height] from the front end to the back end (y increasing); each station is an upright
 slice across the animal at that y, an ellipse half_width wide (x) and half_height tall (z) around (x, z), and a
@@ -72,7 +74,7 @@ def load(path):
              "blend": float(p.get("blend", 0.0)), "fit": p.get("fit", True),
              "root_blend": float(p.get("root_blend", 0.0)), "colour": p.get("colour"),
              "ignore": [str(v) for v in p.get("ignore_views", [])], "fine": bool(p.get("fine", False)),
-             "strands": int(p.get("strands", 0)) if t == "chain" else 0}
+             "strands": int(p.get("strands", 0)) if t == "chain" else 0, "fur": bool(p.get("fur", False))}
         bad = [v for v in q["ignore"] if v not in VIEW_NAMES]
         if bad: raise SystemExit(f"part {q['name']}: ignore_views {bad} (use {', '.join(VIEW_NAMES)})")
         for k in TYPES[t]:
@@ -101,6 +103,7 @@ def save(parts, path):
         if p.get("ignore"): r["ignore_views"] = p["ignore"]
         if p.get("fine"): r["fine"] = True
         if p.get("strands"): r["strands"] = int(p["strands"])
+        if p.get("fur"): r["fur"] = True
         rows.append(r)
     text = json.dumps({"parts": rows}, indent=1)
     text = re.sub(r"\[\s+([-\d.e,\s]+?)\s+\]", lambda m: "[" + ", ".join(m.group(1).split()).replace(",,", ",") + "]", text)

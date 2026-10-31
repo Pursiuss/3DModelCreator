@@ -220,7 +220,24 @@ def keep_main_pieces(V, F, min_share=0.02):
     return V[used], remap[F[keep]], int((counts >= min_share * counts.max()).sum()), int(len(counts))
 
 
-TRUNK_THICK = 0.06       # a part at least this thick (share of the animal's largest size) belongs to the trunk
+def keep_attached(V, F, field, origin, voxel, reach):
+    """In a box of fine parts, keep the pieces that reach the body (within `reach` of its surface, where they are
+    joined on) and drop the rest: an antler tip or a tine end that trimming cut off its chain floats in the air.
+    Returns (V, F, share of the triangles dropped)."""
+    from scipy.sparse.csgraph import connected_components
+    n = len(V); e = np.r_[F[:, [0, 1]], F[:, [1, 2]]]
+    _, lab = connected_components(sparse.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n)), directed=False)
+    dist = ndimage.map_coordinates(field, ((V - origin) / voxel).T, order=1, mode="nearest")
+    near = np.zeros(lab.max() + 1, bool); np.logical_or.at(near, lab, dist < reach)
+    fl = lab[F[:, 0]]; counts = np.bincount(fl, minlength=len(near))
+    near[np.argmax(counts)] = True                     # never drop the main piece
+    keep = near[fl]
+    if keep.all(): return V, F, 0.0
+    used = np.unique(F[keep]); remap = -np.ones(n, np.int64); remap[used] = np.arange(len(used))
+    return V[used], remap[F[keep]], float(counts[~near].max() / counts.max())
+
+
+TRUNK_THICK = 0.06      # a part at least this thick (share of the animal's largest size) belongs to the trunk
 TRUNK_SIGMA = 0.035      # smoothing scale of the trunk (share of the animal's largest size)
 FAIR_OUT = 0.15          # the fairing moves the trunk's surface outward by at most this share of its smoothing scale
 
@@ -304,19 +321,23 @@ def fine_parts(parts, voxel):
     fine = {i for i, p in enumerate(parts)
             if p.get("fine") or p.get("strands") or (p["type"] == "chain" and p["joints"][:, 3].min() < FINE_VOXELS * voxel)}
     fine.discard(int(np.argmax([PT.volume(p) for p in parts])))
+    touches = {}                                     # which parts each part touches
+    for i, p in enumerate(parts):
+        lo, hi = PT.bounds(p); g = [np.linspace(lo[k], hi[k], 20) for k in range(3)]
+        G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
+        cell = float((hi - lo).max()) / 19
+        S = G[np.abs(PT.sdf_part(p, G)) < max(cell, voxel)]              # points on its surface
+        touches[i] = {j for j in range(len(parts)) if j != i and len(S) and float(PT.sdf_part(parts[j], S).min()) < voxel}
+    # a group of parts that touch only each other and fine parts (the two claws of a cloven hoof under a thin leg)
+    # hangs from the fine parts alone and goes with them; one touching anything else coarse (the body) stays
     changed = bool(fine)
     while changed:
-        changed = False
-        for i, p in enumerate(parts):
-            if i in fine: continue
-            lo, hi = PT.bounds(p); g = [np.linspace(lo[k], hi[k], 20) for k in range(3)]
-            G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3)
-            cell = float((hi - lo).max()) / 19
-            S = G[np.abs(PT.sdf_part(p, G)) < max(cell, voxel)]          # points on its surface
-            if not len(S): continue
-            def touch(js): return bool(js) and float(np.min([PT.sdf_part(parts[j], S) for j in js])) < voxel
-            if touch(sorted(fine)) and not touch([j for j in range(len(parts)) if j != i and j not in fine]):
-                fine.add(i); changed = True
+        cand = {i for i in range(len(parts)) if i not in fine and touches[i] & fine}
+        while True:
+            drop = {i for i in cand if touches[i] - fine - cand}
+            if not drop: break
+            cand -= drop
+        changed = bool(cand); fine |= cand
     return sorted(fine)
 
 
@@ -386,6 +407,8 @@ def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore
         V, F = V[used], remap[F]
         V, F, _, _ = keep_main_pieces(V, F)
         dropped = max(dropped, keep_main_pieces.biggest_dropped)
+        V, F, cut_off = keep_attached(V, F, field, origin, voxel, kb + 2 * voxel)
+        dropped = max(dropped, cut_off)
         meshes.append((V, F, field_normals(d, V, o, vf)))
         # the coarse grids that texturing reads: where the fine shape is, and which views ignore it there
         sl = tuple(slice(np.searchsorted(axes[a], lo[q]), np.searchsorted(axes[a], hi[q])) for q, a in enumerate("xyz"))
