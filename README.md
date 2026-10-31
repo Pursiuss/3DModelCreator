@@ -26,7 +26,8 @@ then follow `skill/SKILL.md` with `penguin` as the references folder.
 Each run writes three models to its output folder: `untextured.glb`, `textured.glb`, and `parts-coloured.glb`
 (each body part in its own flat colour, for spotting shape problems; `preview-parts.png` is its key).
 
-**Local viewer (recommended).** From the kit folder:
+**Local viewer (recommended).** Double-click `view-models.bat` in the kit folder: it starts the viewer and opens
+http://localhost:8765 in the browser; close its window to stop it. Or, from the kit folder:
 ```
 .venv/Scripts/python tests/viewer/serve.py
 ```
