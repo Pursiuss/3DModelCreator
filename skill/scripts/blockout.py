@@ -243,13 +243,15 @@ def part_checks(parts, f, build_voxel):
             t = (A - qa) @ (qb - qa) / max((qb - qa) @ (qb - qa), 1e-12)
             into_q = float(PT.sdf_part(qo, A[None])[0])
             if into_q > ra or u @ w < 0.7 or t < 0.5: continue        # not carrying on from q's lower end
+            if (B - qb) @ w < 0.5 * np.linalg.norm(B - A): continue   # ends level with q: side by side (a jaw)
             if any(PT.sdf_part(k, qb[None])[0] < 0 for m, k in enumerate(parts) if m not in (i, j)):
                 continue                                   # q ends inside something else (a neck in the head)
             sticks_out = float(PT.sdf_part(one, qb[None])[0]) + qrb      # how far q's tip pokes out of p
             gap = float(np.linalg.norm(A - qb))
-            if (sticks_out > max(0.5 * qrb, 2 * build_voxel) and gap > max(ra, qrb)) or into_q > 2 * build_voxel:
+            short = into_q > 2 * build_voxel and t > 0.85             # starts beyond q's end, not alongside it (a jaw)
+            if (sticks_out > max(0.5 * qrb, 2 * build_voxel) and gap > max(ra, qrb)) or short:
                 out.append(f"  {p['name']}: starts {gap * 100:.0f} cm from the end of {q['name']}, which "
-                           f"{'stops short of it' if into_q > 2 * build_voxel else f'runs on past it and sticks {sticks_out * 100:.0f} cm out of it'}"
+                           f"{'stops short of it' if short else f'runs on past it and sticks {sticks_out * 100:.0f} cm out of it'}"
                            f": the leg gets a lump or a kink there (a bulge at the hip or shoulder where an upper leg "
                            f"sticks out sideways). Make them meet: put {q['name']}'s tip end (b) on {p['name']}'s "
                            f"first joint, with its tip radius about that joint's, whenever you move either of them")
