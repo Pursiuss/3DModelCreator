@@ -3,3 +3,8 @@
 .venv-skill/
 __pycache__/
 *.pyc
+
+# Miku: a copyrighted character, for local testing only - never commit her pictures or any model built from them
+**/miku/
+**/*miku*
+**/*Miku*

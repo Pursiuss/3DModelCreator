@@ -142,6 +142,7 @@ def main():
     if len(sys.argv) > 3 and sys.argv[3] == "--zoom":
         v = sys.argv[4]; box = [float(x) for x in sys.argv[5:9]]
         vm = view_maps(refs, size)[v]; path = os.path.join(work, f"zoom-{v}.png")
+        if vm.missing: sys.exit(f"there is no {v} picture to zoom into")
         zoom(refs, vm, box, path); print("wrote", path); return
     out = [f"subject (m): width {size['width']} (x), length {size['length']} (y), height {size['height']} (z)",
            "Each line lists the solid stretches of the outline across that level (separate stretches = separate parts,",
@@ -149,6 +150,8 @@ def main():
     maps = view_maps(refs, size)
     for v in ("front", "side", "top", "back"):
         how = silhouette(refs, v)[1]; vm = maps[v]
+        if vm.missing:
+            out += [f"{v} view: no picture; skipped (model from the other views)", ""]; continue
         ruler(refs, vm, os.path.join(work, f"ruler-{v}.png"))
         if v != "back":
             out.append(f"{v} view ({how}), top to bottom:" if v != "top" else f"top view ({how}), nose end (-y) to tail end:")

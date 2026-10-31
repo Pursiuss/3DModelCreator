@@ -14,7 +14,7 @@ import argparse, datetime, json, os, subprocess, sys, time
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from views import VIEWS, load_subject, consistency, alignment_note
+from views import VIEWS, load_subject, consistency, alignment_note, missing_views
 from carve import build_shape, build_shape_parts, recentre
 from texture import texture_mesh
 from glb_io import write_glb
@@ -28,7 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 def check_refs(refs, S):
     """Warnings about inputs that tend to break carving."""
     w = [f"{v}: silhouette from {S['notes'][v]} - check the preview for background left on"
-         for v in VIEWS if S["notes"][v] != "alpha channel"]
+         for v in VIEWS if S["notes"][v] not in ("alpha channel", "no picture (skipped)")]
     cw, skip = consistency(S["maps"])
     if alignment_note(S["maps"]): w.append(alignment_note(S["maps"]))
     skip = [v for v in skip if v not in S.get("skip", ())]
@@ -37,7 +37,9 @@ def check_refs(refs, S):
 
 def self_score(model, refs, maps, out_dir, textured):
     md = os.path.join(out_dir, "selfcheck"); os.makedirs(md, exist_ok=True)
-    for v, vm in maps.items(): Image.fromarray((vm.sil * 255).astype(np.uint8)).save(os.path.join(md, f"{v}-mask.png"))
+    for v, vm in maps.items():
+        if vm.missing: continue                                     # no picture: not scored
+        Image.fromarray((vm.sil * 255).astype(np.uint8)).save(os.path.join(md, f"{v}-mask.png"))
     size, _ = load_subject(refs)                                    # the scorer reads only the three sizes
     json.dump({k: size[k] for k in ("height", "length", "width")}, open(os.path.join(md, "subject.json"), "w"))
     for f in ("front.png", "side.png", "back.png", "top.png"):     # pictures: for the colour score
@@ -59,6 +61,7 @@ def main():
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); t0 = time.time()
     if a.quick and a.res == 280: a.res = 180
     if not a.parts and not a.hull_only: ap.error("give --parts PARTS.json (normal) or --hull-only (fallback)")
+    a.skip_view = list(dict.fromkeys(a.skip_view + missing_views(a.refs)))     # a view with no picture is skipped
 
     if a.parts:
         parts = PT.load(a.parts)

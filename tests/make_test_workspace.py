@@ -17,7 +17,10 @@ INPUT_FILES = ["front.png", "side.png", "back.png", "top.png", "final.png", "sub
 ANIMALS = {"penguin": os.path.join(KIT, "penguin"),
            "cow": os.path.join(KIT, "tests", "animals", "cow"),
            "giraffe": os.path.join(KIT, "tests", "animals", "giraffe"),
-           "dog": os.path.join(KIT, "tests", "animals", "dog")}
+           "dog": os.path.join(KIT, "tests", "animals", "dog"),
+           "stag": os.path.join(KIT, "tests", "animals", "stag"),
+           "sheep": os.path.join(KIT, "tests", "animals", "sheep"),
+           "miku": os.path.join(KIT, "tests", "animals", "miku")}         # a character sheet with no top view (local only)
 
 
 def main():
@@ -34,7 +37,8 @@ def main():
     for name, src in ANIMALS.items():
         if not os.path.isdir(src): print("skipped", name, "(folder missing)"); continue
         d = os.path.join(ws, "refs", name); shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
-        for f in INPUT_FILES: shutil.copy(os.path.join(src, f), d)
+        for f in INPUT_FILES:                                       # (a view may be missing: miku has no top)
+            if os.path.exists(os.path.join(src, f)): shutil.copy(os.path.join(src, f), d)
     print("workspace ready:", ws)
 
 

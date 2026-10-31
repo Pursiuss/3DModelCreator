@@ -186,6 +186,7 @@ def best_two(values):
 def load_refs(refs_dir):
     refs = {}
     for view in VIEWMAP:
+        if not os.path.exists(os.path.join(refs_dir, f"{view}-mask.png")): continue   # (skill copy: a view with
         m = np.array(Image.open(os.path.join(refs_dir, f"{view}-mask.png")).convert("L")) > 127
         ys, xs = np.nonzero(m); box = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
         pic = os.path.join(refs_dir, f"{view}.png"); rgb = None
@@ -202,8 +203,9 @@ def score(V, T, UV, tex, refs, size, textured=False):
         res["views"][view] = {"iou": round(float(i / max(u, 1)), 3), "reference_missed": round(float((m & ~s).sum() / max(m.sum(), 1)), 3),
                               "model_outside": round(float((s & ~m).sum() / max(s.sum(), 1)), 3), "scored": view in SCORED}
         r = TOLERANCE * max(size.values()) * pixel_scale(view, box, size); res["views"][view]["off_target"] = round(off_target(s, m, r), 4)
-    res["shape_score"] = round(best_two([res["views"][v]["iou"] for v in SCORED]), 3)
-    res["gross_errors"] = [v for v in SCORED if res["views"][v]["off_target"] > GROSS_LIMIT]
+    scored = [v for v in SCORED if v in refs]                 # no picture is not scored; the kit's scorer needs all)
+    res["shape_score"] = round(best_two([res["views"][v]["iou"] for v in scored]), 3)
+    res["gross_errors"] = [v for v in scored if res["views"][v]["off_target"] > GROSS_LIMIT]
     if textured:
         if tex is None or not np.isfinite(UV).any():
             res["colour_score"] = None; res["note"] = "no base-colour texture with UV coordinates found in the model"
@@ -212,7 +214,7 @@ def score(V, T, UV, tex, refs, size, textured=False):
                 if rgb is None: continue
                 rend = render_colour(V, T, UV, tex, view, box, size, m.shape); s = sil[view]
                 res["views"][view]["colour"] = round(colour_view(rend, s, rgb, m), 3)
-            res["colour_score"] = round(best_two([res["views"][v]["colour"] for v in SCORED if "colour" in res["views"][v]]), 3)
+            res["colour_score"] = round(best_two([res["views"][v]["colour"] for v in scored if "colour" in res["views"][v]]), 3)
     return res
 
 

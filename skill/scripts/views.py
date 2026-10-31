@@ -19,6 +19,23 @@ def load_subject(refs):
     return s.get("size", s), s
 
 
+def missing_views(refs):
+    """Views with no picture (a turnaround sheet drawn without a top view, say). Every script treats them as skipped:
+    they neither fit, trim nor paint the model, and the self-check does not score them."""
+    return [v for v in VIEWS if not os.path.exists(os.path.join(refs, f"{v}.png"))]
+
+
+def stand_in(refs, view, px=400, margin=20):
+    """For a view with no picture: a plain box as big as subject.json says, so the view's mapping can still be
+    made (and the model's grid sized). Nothing is fitted, trimmed or painted from it."""
+    size, _ = load_subject(refs)
+    ha, _, va, _ = VIEWS[view]
+    real = {"x": size["width"], "y": size["length"], "z": size["height"]}
+    sc = px / max(real[ha], real[va]); w, h = int(round(real[ha] * sc)), int(round(real[va] * sc))
+    sil = np.zeros((h + 2 * margin, w + 2 * margin), bool); sil[margin:margin + h, margin:margin + w] = True
+    return sil
+
+
 def load_rgba(refs, view):
     return Image.open(os.path.join(refs, f"{view}.png")).convert("RGBA")
 
@@ -41,6 +58,8 @@ def segment_without_alpha(rgb):
 
 def silhouette(refs, view, use_masks=False):
     """Boolean mask (True = animal) and a note on how it was obtained."""
+    if view in missing_views(refs):
+        return stand_in(refs, view), "no picture (skipped)"
     if use_masks:
         return np.array(Image.open(os.path.join(refs, f"{view}-mask.png")).convert("L")) > 127, "mask file"
     im = Image.open(os.path.join(refs, f"{view}.png"))
@@ -69,6 +88,7 @@ class ViewMap:
         self.c0 = (b[0] + b[2]) / 2                                # image column of the centre line
         self.r0 = b[3] if va == "z" else (b[1] + b[3]) / 2          # image row of the ground (top view: the middle)
         self.aligned = None
+        self.missing = False                                       # no picture: a stand-in box (missing_views)
 
     def align(self, sc, c0, r0):
         """Map this view with another scale and position than its bounding box gives (see align_back)."""
@@ -110,6 +130,7 @@ def align_back(maps):
     (overlap before, overlap after, scale factor)."""
     f, b = maps["front"], maps["back"]
     if b.aligned is not None: return
+    if f.missing or b.missing: b.aligned = (1.0, 1.0, 1.0); return
     before = _overlap(f, b, b.sc, b.c0, b.r0)
     b.aligned = (before, before, 1.0)
     if before >= AGREE: return
@@ -133,6 +154,7 @@ def align_back(maps):
 def view_maps(refs, size, sils=None):
     """The four views' mappings, with the back view lined up with the front (align_back)."""
     maps = {v: ViewMap(v, sils[v] if sils else silhouette(refs, v)[0], size) for v in VIEWS}
+    for v in missing_views(refs): maps[v].missing = True
     align_back(maps)
     return maps
 
@@ -153,16 +175,20 @@ def consistency(maps):
     it disagrees with the front or the side (they agree with each other on the height, which the scale comes from);
     the back view when, lined up with the front as well as it can be (align_back), it is not its mirror image."""
     w, skip = [], []
+    gone = [v for v, m in maps.items() if m.missing]
+    for v in gone: w.append(f"no {v} picture: the {v} view is skipped (not fitted, trimmed, painted or scored)")
+    skip += gone
     pairs = [("front height", maps["front"].span_v, "side height", maps["side"].span_v, None),
              ("front width", 2 * maps["front"].half_h, "top width", 2 * maps["top"].half_h, "top"),
              ("side length", 2 * maps["side"].half_h, "top length", maps["top"].span_v, "top")]
+    pairs = [q for q in pairs if not any(g in q[0] or g in q[2] for g in gone)]
     for a, x, b, y, blame in pairs:
         if abs(x - y) / max(x, y) > 0.08:
             w.append(f"{a} {x:.3f} m vs {b} {y:.3f} m disagree by more than 8% (pose or framing differs)")
             if blame and blame not in skip: skip.append(blame)
     align_back(maps)
     iou = maps["back"].aligned[1]
-    if iou < AGREE:
+    if iou < AGREE and "back" not in gone:
         w.append(f"front and mirrored back outlines overlap only {iou:.2f}, even lined up as well as they can be: "
                  f"pose differs between views")
         skip.append("back")

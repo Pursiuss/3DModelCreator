@@ -17,7 +17,7 @@ from skimage import measure
 from scipy import ndimage
 sys.path.insert(0, os.path.dirname(__file__))
 import parts as PT
-from views import VIEWS, ViewMap, load_subject, silhouette, view_maps
+from views import VIEWS, ViewMap, load_subject, silhouette, view_maps, missing_views
 from carve import make_grid, sample, capped_res
 from render_preview import render
 
@@ -296,7 +296,9 @@ def label_tile(parts, refs, vm, v, axes, lab, crop, height, name_px=30):
     """The reference picture, dimmed, cropped to `crop` (pixel box) and scaled to `height`, with the edges of the
     part labels `lab` (on the grid `axes`) drawn on it in each part's colour, and each part named."""
     axis, _ = CAMERA[v]; other = [a for a in range(3) if a != axis]
-    im = Image.open(os.path.join(refs, f"{v}.png")).convert("RGBA")
+    pic = os.path.join(refs, f"{v}.png")                  # (no picture for this view: a blank page)
+    im = (Image.open(pic).convert("RGBA") if os.path.exists(pic)
+          else Image.new("RGBA", (vm.sil.shape[1], vm.sil.shape[0]), (255, 255, 255, 0)))
     white = Image.new("RGBA", im.size, (255, 255, 255, 255)); white.alpha_composite(im)
     c0, r0, c1, r1 = crop
     s = height / (r1 - r0); Wt = max(1, int(round((c1 - c0) * s)))
@@ -422,6 +424,7 @@ def main():
     ap.add_argument("--skip-view", nargs="*", default=[], choices=list(VIEWS),
                     help="views that disagree with the others (measure.py's view check): not fitted to")
     a = ap.parse_args(); os.makedirs(a.work, exist_ok=True)
+    a.skip_view = list(dict.fromkeys(a.skip_view + missing_views(a.refs)))     # a view with no picture is skipped
     parts = PT.load(a.parts); start = copy.deepcopy(parts)
     f = Fitter(a.refs, a.res, a.skip_view); f.set_ignores(parts)
     lines = []

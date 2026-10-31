@@ -172,6 +172,7 @@ def dedupe_features(refs, maps, cand, facing, cen, names, vis_face, size, F):
     blobs = []                                                   # (camera index, 3-D position, faces, score)
     for k, cam in enumerate(names):
         view = CAMS[cam][0]
+        if maps[view].missing: continue                          # no picture for this view
         rgb = solid_rgb(refs, view); c, r = maps[view].project(cen)
         ok = vis_face[:, k] & (facing[:, k] > 0.1)
         for br, bc, rad, strength in find_features(rgb, maps[view].sil):
@@ -222,6 +223,7 @@ def solid_rgb(refs, view, stray=70.0):
 def build_atlas(refs, maps, height=1024, pad=10):
     tiles, place, x0 = [], {}, 0
     for view in ("front", "back", "side", "top"):
+        if maps[view].missing: continue                     # no picture for this view
         rgb_all = solid_rgb(refs, view); sil = maps[view].sil
         b = maps[view].box
         c0, r0 = max(b[0] - pad, 0), max(b[1] - pad, 0); c1, r1 = min(b[2] + pad, sil.shape[1]), min(b[3] + pad, sil.shape[0])
@@ -393,6 +395,7 @@ def palette(refs, k=12, merge=28.0, min_share=0.002, seed=0):
     Lightness counts half as much as hue, so a shaded and a lit patch of the same feathers count as one colour."""
     rng = np.random.default_rng(seed); X = []
     for v in ("front", "side", "back"):
+        if not os.path.exists(os.path.join(refs, f"{v}.png")): continue          # no picture for this view
         a = np.array(load_rgba(refs, v)); m = a[..., 3] >= 250
         px = a[..., :3][m].astype(float)
         if len(px): X.append(px[rng.choice(len(px), min(len(px), 30000), replace=False)])
@@ -599,7 +602,8 @@ def texture_mesh(refs, S, tol=3, debug=None):
     names = list(CAMS); m = len(F)
     facing = np.zeros((m, len(names))); cand = np.zeros((m, len(names)), bool); col = np.zeros((m, len(names), 3))
     edge = np.zeros((m, len(names))); vis_face = np.zeros((m, len(names)), bool)
-    imgs = {v: np.asarray(Image.fromarray(solid_rgb(refs, v)).filter(ImageFilter.BoxBlur(2)), float) for v in maps}
+    imgs = {v: np.asarray(Image.fromarray(solid_rgb(refs, v)).filter(ImageFilter.BoxBlur(2)), float)
+            for v in maps if not maps[v].missing}                   # (a view with no picture paints nothing)
     cen = tri.mean(1)
     parts = S.get("parts")
     if parts:
@@ -608,6 +612,7 @@ def texture_mesh(refs, S, tol=3, debug=None):
         margin = max(3.0, 0.025 * max(S["size"][k] for k in ("width", "length", "height")) / voxel)   # in voxels
     for k, cam in enumerate(names):
         view, d, axis, high = CAMS[cam]
+        if maps[view].missing: continue                              # no picture: this camera sees nothing
         occ_v = occ
         if view in S.get("ignored_space", {}):                       # a part that ignores this view (the picture
             occ_v = occ & ~S["ignored_space"][view]                  # leaves it out or draws it wrongly) does not

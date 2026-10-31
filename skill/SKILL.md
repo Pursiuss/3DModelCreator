@@ -13,7 +13,7 @@ You get one folder path, `REFS`, holding:
 
 | File | What |
 |---|---|
-| `front.png`, `side.png`, `back.png`, `top.png` | orthographic reference views of the animal, usually with a transparent background |
+| `front.png`, `side.png`, `back.png`, `top.png` | orthographic reference views of the animal, usually with a transparent background. A view may be missing (a turnaround sheet with no top view): the scripts then skip it everywhere on their own (not fitted, trimmed, painted or scored); model from the others and say so in the log |
 | `final.png` | the finished look, in a scene: what the expert reviewers compare the texture with (the scoring script compares it with the four views instead) |
 | `subject.json` | real size in metres: `{"height": .., "length": .., "width": ..}` |
 
