@@ -118,9 +118,10 @@ def paddle_shadow(parts, pid_face, cen, n, cand, size, rel=0.02):
     within about 2% of the animal's size of a paddle takes no colour from the pictures that look along the paddle
     (front, back and top for a flipper), which draw that gap; the picture facing the paddle (the side) draws its
     edge there as it is, so it still paints that strip, or the flipper's white trailing edge turns into a flat
-    blob. The paddle's own inner face (the side towards the body) takes no colour from any picture. What no picture
-    paints is flood-filled from the colour regions around it. Not around the paddle's root: the shoulder it grows
-    out of is drawn as it is."""
+    blob. The paddle's own inner face (the side towards the body) takes no colour from any picture; only for a
+    paddle that faces sideways (a flipper): one that faces forward or back (an ear) has no face towards the body,
+    and the back picture draws its back as it is. What no picture paints is flood-filled from the colour regions
+    around it. Not around the paddle's root: the shoulder it grows out of is drawn as it is."""
     import parts as PT
     reach = rel * max(size["width"], size["length"], size["height"])
     for i, p in enumerate(parts):
@@ -135,7 +136,8 @@ def paddle_shadow(parts, pid_face, cen, n, cand, size, rel=0.02):
         mine = np.nonzero(pid_face == i)[0]
         for inst in PT.instances(p):
             fn = PT.paddle_frame(inst)[2]
-            out = fn if fn[0] * inst["a"][0] >= 0 else -fn                # face normal pointing away from the body
+            if abs(fn[0]) < 0.5: continue                                 # faces forward or back: no inner face
+            out = fn if fn[0] * inst["a"][0] >= 0 else -fn               # face normal pointing away from the body
             side = (cen[mine, 0] * inst["a"][0]) > 0                      # this instance's side of the animal
             cand[mine[side & ((n[mine] @ out) < -0.3)]] = False
 
@@ -147,8 +149,11 @@ def end_on(parts, pid_face, cen, cand, k, d):
     footprint: whatever, as the camera sees it, lies within two and a half times the part's thickness of it (the
     views often disagree by about that much on where a small part sits), around and behind it: no nearer the camera
     than halfway along it. What stands further forward (a dog's snout above its lower jaw, with the nose at its
-    tip) is drawn as it is, and that camera still colours it."""
+    tip) is drawn as it is, and that camera still colours it. So is a flat part that faces the camera squarely (a
+    stag's ears beside its head seen face-on): the picture draws it at full size, the clearest thing in it."""
     import parts as PT
+    face_on = np.array([p["type"] == "paddle" and max(abs(PT.paddle_frame(q)[2] @ d) for q in PT.instances(p)) > 0.7
+                        for p in parts])
     for i, p in enumerate(parts):
         if p["type"] not in PT.LONG: continue
         for inst in PT.instances(p):
@@ -166,7 +171,7 @@ def end_on(parts, pid_face, cen, cand, k, d):
             dist = np.linalg.norm(q - np.outer(t, e), axis=1)
             depth = (cen - A) @ d                                     # towards the camera from the root
             behind = (depth < 0.5 * L + r) & (depth > -(L + 3 * r))
-            cand[(dist < 2.5 * r) & behind, k] = False
+            cand[(dist < 2.5 * r) & behind & ~face_on[pid_face], k] = False
 
 
 def dedupe_features(refs, maps, cand, facing, cen, names, vis_face, size, F):
