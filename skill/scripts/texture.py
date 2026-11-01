@@ -442,17 +442,21 @@ def sample_views(refs, maps, names, cache, P, Wt):
     return out
 
 
-def borrowed_detail(detail, gw, region, yy, xx, size, strength=0.8):
+def borrowed_detail(detail, gw, region, part, yy, xx, size, strength=0.8):
     """Fine texture for spots no picture sees. Their colour stays the flat fill (the region's own average); only
     the drawing's fine strokes (fur, feathers, scales) are borrowed, so a filled belly does not look like plastic
-    beside drawn fur. Per colour region: the largest square of texture that a picture sees squarely and wholly in
-    that region is tiled, mirrored at its edges so the tiles meet without seams. Returns per-texel detail (0 where
-    a region has no such square)."""
+    beside drawn fur. Per part and colour region: the largest square of texture that a picture sees squarely and
+    wholly in that region of that part is tiled, mirrored at its edges so the tiles meet without seams. Only from
+    the same part: one palette region may hold a stag's cream throat and its antlers, and antler grain tiled
+    across a throat reads as stripes. A part with no such square of its own stays plain. Returns per-texel
+    detail (0 where there is none)."""
     out = np.zeros((len(yy), 3), np.float32)
     det = np.zeros((size, size, 3), np.float32); det[yy, xx] = detail
-    for c in np.unique(region):
-        good = np.zeros((size, size), bool); sel = (region == c) & (gw > 0.8); good[yy[sel], xx[sel]] = True
-        if good.sum() < 256: continue
+    patches = {}
+    for i, c in set(zip(part.tolist(), region.tolist())):
+        sel = (part == i) & (region == c) & (gw > 0.8)
+        if sel.sum() < 256: continue
+        good = np.zeros((size, size), bool); good[yy[sel], xx[sel]] = True
         ii = np.pad(good.astype(np.int32).cumsum(0).cumsum(1), ((1, 0), (1, 0)))
         for B in (64, 48, 32, 24, 16):                      # the largest square wholly seen
             full = ii[B:, B:] - ii[:-B, B:] - ii[B:, :-B] + ii[:-B, :-B] == B * B
@@ -460,11 +464,29 @@ def borrowed_detail(detail, gw, region, yy, xx, size, strength=0.8):
         else: continue
         r, q = np.argwhere(full)[0]
         patch = det[r:r + B, q:q + B]
-        tile = np.concatenate([np.concatenate([patch, patch[:, ::-1]], 1),
-                               np.concatenate([patch[::-1], patch[::-1, ::-1]], 1)], 0)
-        m = region == c
-        out[m] = strength * tile[yy[m] % (2 * B), xx[m] % (2 * B)]
+        patches[(i, c)] = np.concatenate([np.concatenate([patch, patch[:, ::-1]], 1),
+                                          np.concatenate([patch[::-1], patch[::-1, ::-1]], 1)], 0)
+    for (i, c), tile in patches.items():
+        B2 = len(tile); m = (part == i) & (region == c)
+        out[m] = strength * tile[yy[m] % B2, xx[m] % B2]
     return out
+
+
+def part_region_colours(pal, d2, raw_v, fill_w, vpart, A, deg, min_n=30):
+    """The colour each palette region has on each part: the median of the drawings' colours there, from vertices a
+    picture paints (not filled), wherever the part shows enough of that region; else the palette colour itself.
+    Per vertex (vertices x regions x RGB), softened across part borders so neighbouring parts do not meet in a
+    step (a slightly creamier neck than chest)."""
+    vlab = np.argmin(d2, 1); src = fill_w < 0.5
+    out = np.repeat(pal[None].astype(np.float32), len(vlab), 0)
+    for i in np.unique(vpart):
+        on = vpart == i
+        for g in range(len(pal)):
+            s = src & on & (vlab == g)
+            if s.sum() >= min_n: out[on, g] = np.median(raw_v[s], 0)
+    flat = out.reshape(len(vlab), -1)
+    for _ in range(6): flat = 0.5 * flat + 0.5 * (A @ flat) / deg[:, None]
+    return flat.reshape(out.shape)
 
 
 def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, facing, edge, features=()):
@@ -476,7 +498,9 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
        area meets another's) or, where no picture sees it, from its part's own colour. The votes are smoothed over
        the surface within each part, so a colour patch thinner than about 2% of the animal (a sliver of white
        belly painted behind a flipper, beak red smeared onto the face) loses, and every border becomes a smooth
-       curve. Each spot is painted in its region's flat colour: the artist's broad shading is gone.
+       curve. Each spot is painted in its region's flat colour: the artist's broad shading is gone. That colour is
+       the region's colour on that part, as the pictures show it there (part_region_colours): one palette colour
+       may cover the cream of a stag's throat and the grey of its antlers, whose average is on neither.
     3. Detail: the drawing's fine texture (feather strokes, scales), only where it belongs to the same colour
        region and the picture sees the spot squarely, added on top, so the regions are not flat plastic. Where no
        picture sees the spot, the fine texture is borrowed from elsewhere in the same region (borrowed_detail).
@@ -536,7 +560,9 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
     vote /= np.maximum(vote.sum(1, keepdims=True), 1e-12)
     pt = (vote[F[t]] * w[..., None]).sum(1)
     pt = pt ** 6; pt /= np.maximum(pt.sum(1, keepdims=True), 1e-12)   # crisp but anti-aliased borders
-    plan = pt @ pal
+    pcol = part_region_colours(pal, d2, raw_v, Wv[:, K], vpart, A, deg)
+    plan = np.zeros((len(t), 3))
+    for g in range(len(pal)): plan += pt[:, g, None] * (pcol[F[t], g] * w[..., None]).sum(1)
 
     # 3. detail: the drawing's fine texture within the same colour region, faded out where the picture grazes
     tex_raw = np.zeros((size, size, 3), np.float32); filled = np.zeros((size, size), bool)
@@ -548,7 +574,8 @@ def bake_uv(refs, S, F, V, N, best, cand, seen, fcol, names, pid_face, cen, faci
     same_region = np.argmin(((feat(raw_t)[:, None] - pal_f[None]) ** 2).sum(2), 1) == np.argmax(pt, 1)
     face_t = (facing[t] * Wt[:, :K]).sum(1)
     gw = np.clip((face_t - 0.35) / 0.35, 0, 1) * same_region * (1 - Wt[:, K])
-    planned = plan + gw[:, None] * detail + Wt[:, K, None] * borrowed_detail(detail, gw, np.argmax(pt, 1), yy, xx, size)
+    borrowed = borrowed_detail(detail, gw, np.argmax(pt, 1), pid_face[t], yy, xx, size)
+    planned = plan + gw[:, None] * detail + Wt[:, K, None] * borrowed
     # trust in the drawing: a picture that sees the spot squarely, away from other parts and away from a handover
     # between pictures, is right as drawn (eyes, faces, emblems, spots). Elsewhere the plan takes over.
     tri_trust = np.clip((np.where(seen, facing[np.arange(len(F)), np.maximum(best, 0)], 0) - 0.45) / 0.3, 0, 1)
