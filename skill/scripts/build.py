@@ -8,7 +8,8 @@ With --parts (normal use): the shape is the fitted blockout, trimmed where it st
 --grow (metres, default 0) enlarges the blockout before trimming: closer outlines, but flat cut surfaces.
 Writes OUT_DIR/report.json (numbers for the agent) and appends a "pipeline run" section to OUT_DIR/run-log.md.
 The self-check scores the models with the bundled copy of score_glb.py against masks made from the references' own
-transparency (the staff make their own masks for the judged run, so expect small differences).
+transparency (the staff make their own masks for the judged run, so expect small differences). A scored view that is
+near or over the scorer's gross-error limit gets a map of where, selfcheck/off-target-<view>.png, and a warning.
 """
 import argparse, datetime, json, os, subprocess, sys, time
 import numpy as np
@@ -47,6 +48,37 @@ def self_score(model, refs, maps, out_dir, textured):
         if os.path.exists(src): open(os.path.join(md, f), "wb").write(open(src, "rb").read())
     cmd = [sys.executable, os.path.join(HERE, "score_glb.py"), model, md] + (["--textured"] if textured else [])
     return json.loads(subprocess.run(cmd, capture_output=True, text=True, check=True).stdout)
+
+
+GROSS_WARN = 0.01     # a scored view this far off (half the scorer's 2% gross-error limit) gets a map
+
+
+def off_target_maps(model, out_dir, result):
+    """For each scored view whose share off by more than the scorer's tolerance is GROSS_WARN or more: a picture
+    of where (selfcheck/off-target-<view>.png, over the reference picture: red = model beyond the drawing, blue =
+    drawing the model misses, each by more than the tolerance), worked out with the scorer's own functions.
+    Returns warnings that name the views and the maps."""
+    import score_glb as G
+    md = os.path.join(out_dir, "selfcheck")
+    V, T, _, _ = G.load_glb(model); refs, size = G.load_refs(md)
+    out = []
+    for view in G.SCORED:
+        if view not in refs: continue
+        share = result["views"][view]["off_target"]
+        path = os.path.join(md, f"off-target-{view}.png")
+        if share < GROSS_WARN:
+            if os.path.exists(path): os.remove(path)                 # (a map from an earlier build)
+            continue
+        m, box, rgb = refs[view]; s = G.raster(V, T, view, box, size, m.shape)
+        r = max(1, int(round(G.TOLERANCE * max(size.values()) * G.pixel_scale(view, box, size))))
+        over, miss = s & ~G.dilate(m, r), m & ~G.dilate(s, r)
+        img = (255 - 0.35 * (255 - (rgb if rgb is not None else np.full(m.shape + (3,), 200)))).astype(np.uint8)
+        img[s & ~m] = (255, 190, 190); img[over] = (220, 30, 30); img[miss] = (30, 80, 230)
+        Image.fromarray(img).save(path)
+        limit = "over the 2% gross-error limit" if share > G.GROSS_LIMIT else "close to the 2% gross-error limit"
+        out.append(f"{view}: {100 * share:.1f}% of the picture is off by more than the tolerance ({limit}); "
+                   f"see selfcheck/off-target-{view}.png (red = model beyond the drawing, blue = drawing missed)")
+    return out
 
 
 def main():
@@ -100,7 +132,8 @@ def main():
                             S["V"], S["F"], S.get("N"), parts, shift, write_glb) if a.parts else None)
     s_shape = self_score(untex, a.refs, S["maps"], a.out, False)
     s_tex = self_score(tex, a.refs, S["maps"], a.out, True)
-    ext = S["V"].max(0) - S["V"].min(0)
+    warnings += off_target_maps(untex, a.out, s_shape)
+    ext =S["V"].max(0) - S["V"].min(0)
     report = {"params": vars(a), "method": method, "voxel_mm": round(S["voxel"] * 1000, 2), "triangles": len(S["F"]),
               "extent_m": {"width": round(ext[0], 3), "length": round(ext[1], 3), "height": round(ext[2], 3)},
               "subject_m": S["size"], "silhouettes": S["notes"], "warnings": warnings,

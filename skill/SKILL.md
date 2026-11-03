@@ -60,9 +60,11 @@ Python interpreter chosen in step 1; use it for every script.
    to skip, pass `--skip-view` with them to every `blockout.py` and `build.py` run, so they neither pull parts out
    of place nor trim the model; model from the other views, and say so in the log. A skipped top view is still
    scored: the shape score takes the best two of the front, side and top views, but a gross error in any of them
-   (the top included) fails the run. A top view drawn at other proportions (much longer than the side view) usually
-   gives a gross error that no model true to the front and side views can avoid; say so in the log and in the final
-   summary, and do not distort the model to chase it.
+   (the top included) fails the run. So does a view one part ignores (`ignore_views`): a part drawn elsewhere in
+   one view still has to land within that view's gross-error limit (step 6, "a gross error in a view that draws a
+   part differently"). Only a top view drawn at other proportions for the whole animal (much longer than the side
+   view) can give a gross error that no model true to the front and side views avoids; then say so in the log and
+   in the final summary, and do not distort the body to chase it.
 3. For small parts (beak, snout, mouth, toes, claws, eyes, ears, antler tines), make a close-up with a fine grid:
    `PY SKILL_DIR/scripts/measure.py REFS out/work --zoom side Y0 Z0 Y1 Z1` (front or back: X0 Z0 X1 Z1; top:
    X0 Y0 X1 Y1), which writes `out/work/zoom-side.png` (rename it before the next zoom of that view). The grid is
@@ -316,8 +318,10 @@ Modelling rules that matter for how the result looks:
   Where a branch passes outside a view's outline, trimming cuts it there, and whatever is beyond the cut is
   dropped: lay each beam and tine over its drawn shape in every view it keeps. A top view often draws antlers
   swept back over the shoulders while the side view draws them rising above the head; when the two disagree by
-  more than the beam's thickness, put "top" in the antler parts' `ignore_views`, model them from the front and
-  side, and say in the log that the top view's gross error comes from the drawing.
+  more than the beam's thickness, put "top" in the antler parts' `ignore_views` (so the top outline does not trim
+  them), model them from the front and side, then lean them towards the top drawing until the top view is clear
+  of a gross error (step 6): tips swept a little further back, tines the top view does not show moved in over the
+  head. A stag's side view is mostly body, so a few centimetres of antler beyond its drawing cost it little.
 - Order: biggest first. Parts listed later blend into the ones before them.
 - Check each part against every view it appears in. If one view clearly draws a part differently from the others
   (feet or toes pointing the other way, a limb in another pose), add that view to the part's `ignore_views` and say
@@ -363,8 +367,9 @@ and run the fit again. Aim for the front and side overlaps at 0.90 or more with 
 not add parts that are not in the references just to cover an area.
 
 The shape and colour scores use the best two of front, side and top. Get front and side right first. The top view
-only needs to stay clear of gross errors: do not move parts away from the front and side drawings to fit a top
-view that draws them differently (flippers swept back, feet splayed, a wider head).
+only needs to stay clear of gross errors: do not move parts away from the front and side drawings to raise the top
+view's overlap. Moving a part a little away from them is right only where the top view would otherwise have a gross
+error (step 6).
 
 ## 5. Build (about 1 minute)
 
@@ -433,6 +438,7 @@ If it does not pass, fix the cause:
 | What you see | Fix |
 |---|---|
 | a part missing, misplaced, too fat or too thin | edit `parts.json`, fit again (step 4), build again |
+| a gross error (or a warning that a view is close to one) in a view that draws a part differently from the others, often one the part ignores (antlers swept back in the top view) | open `selfcheck/off-target-<view>.png`: red is model beyond that drawing, blue is drawing the model misses, each by more than the tolerance. Move the parts there partway towards that view's drawing (tips further back, a tine the view does not show moved in or shortened), with `"fit": false` so the fitter does not pull them back, and build again. Stop when every scored view's `off_target` in `report.json` is under 0.02, ideally under 0.015 in each: the shape score may drop a little, a gross error fails. Change the parts only where the map is coloured |
 | in `preview-parts.png` a part hardly shows (swallowed by the body or a neighbour), or spreads over where another part is drawn | the swallowed part is too small or too deep inside, or the other too big: resize or move them so each covers its own drawn place |
 | a lump at the shoulder, hip, chest or tail root, or the fit report says a root "bulges out of the body" | start that part deeper inside the body (its root at least its root radius in) and give it `root_blend`; if the drawing really is wider there, widen the loft's stations instead |
 | the neck sits on the chest as an oval patch, or a ring or groove runs round its base | widen the neck's root to the drawn width and raise its blend to about its root radius |
