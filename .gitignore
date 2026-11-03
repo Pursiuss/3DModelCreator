@@ -8,3 +8,7 @@ __pycache__/
 **/miku/
 **/*miku*
 **/*Miku*
+
+# Auto-score builds and masks (large, rebuilt by tests/score_all.py); each run's results.json and table.md are kept
+tests/auto-scores/*/*/
+tests/auto-scores/masks/

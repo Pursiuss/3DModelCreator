@@ -11,7 +11,7 @@ outlines, and texturing from the drawings.
 | `skill/` | the skill itself: `SKILL.md` (the agent's instructions), `requirements.txt` and `scripts/` |
 | `kit-README.md`, `score_glb.py` | the organizers' practice kit: rules and scorer (their penguin references are in `references/penguin/`) |
 | `references/` | the reference subjects (penguin, cow, dog, giraffe, stag, sheep), each with its four views, `final.png` and `subject.json`; `sheets/` holds the original turnaround sheets they were cut from |
-| `tests/` | `make_test_workspace.py` (sets up `../penguin-skill-test` for a test run), `make_refs_from_sheet.py`, the model viewer, and the results: `test-00` (the first penguin build) to `test-10`, one folder per test with a folder per animal; `quick-tests/`; `inspection/` (before/after sheets for each fix) |
+| `tests/` | `make_test_workspace.py` (sets up `../penguin-skill-test` for a test run), `score_all.py` (scores every animal with the current skill, see below), `make_refs_from_sheet.py`, the model viewer, and the results: `test-00` (the first penguin build) onwards, one folder per test with a folder per animal; `quick-tests/`; `auto-scores/` (one folder per `score_all.py` run); `inspection/` (before/after sheets for each fix) |
 | `OLD/` | superseded material kept for reference (see `OLD/README.md`) |
 | `organizer-questions.md` | open questions for the organizers |
 
@@ -21,6 +21,21 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r skill/requirements.txt
 ```
 then follow `skill/SKILL.md` with `references/penguin` as the references folder.
+
+## Scoring all the animals
+
+After a change to the skill, check that no animal got worse:
+```
+.venv/Scripts/python tests/score_all.py
+```
+It rebuilds every animal in `references/` from the blockout its latest saved test ended with (so only the skill's
+code changes between runs, not the agent's work), scores both models with the kit's own `score_glb.py` (run as it
+is), and prints one table: shape, the IoU per view, gross errors, colour, pass or not, and the change since the last
+run. Each run is saved in `tests/auto-scores/<date_time>/` (`table.md`, `results.json`). A full run takes about
+15 minutes; `--quick` is faster but coarser, `--animals cow dog` scores only some, `--jobs` sets how many build at
+once. The penguin is scored against the kit's own masks; the others against masks made from their pictures'
+transparency (the staff make their own for the judged run). Miku is left out: she has no top view, which the kit's
+scorer needs.
 
 ## Viewing the models
 
