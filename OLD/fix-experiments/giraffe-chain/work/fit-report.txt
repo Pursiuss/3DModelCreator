@@ -1,0 +1,24 @@
+outline overlap per view (before -> after): front 0.91 -> 0.91, back 0.00 -> 0.00 (skipped), side 0.89 -> 0.89, top 0.00 -> 0.00 (skipped)
+  body: unchanged
+  withers: unchanged
+  neck: unchanged
+  cranium: unchanged
+  upper jaw: unchanged
+  lower jaw: unchanged
+  eye: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  ear: unchanged
+  hind thigh: unchanged
+  front leg R: unchanged
+  hind leg R: unchanged
+  front leg L: unchanged
+  hind leg L: unchanged
+  front hoof R: unchanged
+  front hoof L: unchanged
+  hind hoof R: unchanged
+  hind hoof L: unchanged
+  tail: unchanged
+  tail tuft: unchanged
+part checks:
+  tail tuft: 37% of it lies outside the front outline: too big, or in the wrong place

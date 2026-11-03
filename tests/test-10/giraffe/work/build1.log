@@ -1,0 +1,130 @@
+{
+ "params": {
+  "refs": "refs/giraffe",
+  "out": "out",
+  "parts": "out/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "round-3 blockout, legs pinned to measured joints; top and back skipped per view check",
+  "skip_view": [
+   "top",
+   "back"
+  ]
+ },
+ "method": "blockout (27 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 1 of 5 mesh pieces; built on a finer grid and joined on: mane, front leg A, front leg B, hind leg C, hind leg D, tail, tail tuft",
+ "voxel_mm": 17.86,
+ "triangles": 275239,
+ "extent_m": {
+  "width": 0.911,
+  "length": 3.198,
+  "height": 4.96
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 3.221,
+  "width": 0.908
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front width 0.908 m vs top width 0.718 m disagree by more than 8% (pose or framing differs)",
+  "side length 3.221 m vs top length 3.896 m disagree by more than 8% (pose or framing differs)",
+  "front and mirrored back outlines overlap only 0.76, even lined up as well as they can be: pose differs between views",
+  "a loose piece (0.8% of the model) came off and was dropped: a part (often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the part it grows from, and build a thin tail, strand or leg as a chain (thin chains are built on a finer grid, with whatever hangs from them)",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): hoof C inner, hoof D inner"
+ ],
+ "texture_views": {
+  "front": 0.129,
+  "back": 0.149,
+  "side": 0.269,
+  "side_mirror": 0.277,
+  "top": 0.022,
+  "unseen_filled": 0.154,
+  "duplicate_features_removed": 4,
+  "uv_islands": 30,
+  "texel_mm": 3.32,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "lower jaw": "#f38400",
+  "nose": "#a1caf1",
+  "ossicone": "#be0032",
+  "ossicone knob": "#c2b280",
+  "ear": "#008856",
+  "mane": "#e68fac",
+  "front shoulder A": "#0067a5",
+  "front shoulder B": "#f99379",
+  "hind thigh C": "#604e97",
+  "hind thigh D": "#f6a600",
+  "front leg A": "#b3446c",
+  "front leg B": "#dcd300",
+  "hind leg C": "#882d17",
+  "hind leg D": "#8db600",
+  "hoof A outer": "#654522",
+  "hoof A inner": "#e25822",
+  "hoof B outer": "#2b3d26",
+  "hoof B inner": "#222222",
+  "hoof C outer": "#f8de72",
+  "hoof C inner": "#bda2c3",
+  "hoof D outer": "#f8bb72",
+  "hoof D inner": "#cbe1f7",
+  "tail": "#db728e",
+  "tail tuft": "#ddd4b9"
+ },
+ "self_check": {
+  "untextured_shape": 0.909,
+  "textured_shape": 0.909,
+  "gross_errors": [
+   "top"
+  ],
+  "colour_score": 0.888,
+  "views": {
+   "front": {
+    "iou": 0.907,
+    "reference_missed": 0.057,
+    "model_outside": 0.04,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.862
+   },
+   "back": {
+    "iou": 0.737,
+    "reference_missed": 0.132,
+    "model_outside": 0.17,
+    "scored": false,
+    "off_target": 0.0061,
+    "colour": 0.839
+   },
+   "side": {
+    "iou": 0.91,
+    "reference_missed": 0.053,
+    "model_outside": 0.041,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.914
+   },
+   "top": {
+    "iou": 0.632,
+    "reference_missed": 0.131,
+    "model_outside": 0.302,
+    "scored": true,
+    "off_target": 0.0556,
+    "colour": 0.857
+   }
+  }
+ },
+ "seconds": 323.1
+}

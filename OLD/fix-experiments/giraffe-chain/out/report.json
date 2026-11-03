@@ -1,0 +1,99 @@
+{
+ "params": {
+  "refs": "tests/animals/giraffe",
+  "out": "tests/work/giraffe-chain/out",
+  "parts": "tests/work/giraffe-chain/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "chains + fine grid",
+  "skip_view": [
+   "top",
+   "back"
+  ]
+ },
+ "method": "blockout (21 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 1 of 1 mesh pieces",
+ "voxel_mm": 17.86,
+ "triangles": 187912,
+ "extent_m": {
+  "width": 0.936,
+  "length": 3.16,
+  "height": 4.982
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 3.221,
+  "width": 0.908
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front width 0.908 m vs top width 0.718 m disagree by more than 8% (pose or framing differs)",
+  "side length 3.221 m vs top length 3.896 m disagree by more than 8% (pose or framing differs)",
+  "front and mirrored back outlines overlap only 0.82: pose differs between views"
+ ],
+ "texture_views": {
+  "front": 0.126,
+  "back": 0.11,
+  "side": 0.269,
+  "side_mirror": 0.267,
+  "top": 0.043,
+  "unseen_filled": 0.186,
+  "duplicate_features_removed": 3,
+  "uv_islands": 26,
+  "texel_mm": 3.01,
+  "palette_colours": 5
+ },
+ "self_check": {
+  "untextured_shape": 0.883,
+  "textured_shape": 0.883,
+  "gross_errors": [
+   "top"
+  ],
+  "colour_score": 0.889,
+  "views": {
+   "front": {
+    "iou": 0.889,
+    "reference_missed": 0.062,
+    "model_outside": 0.055,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.855
+   },
+   "back": {
+    "iou": 0.707,
+    "reference_missed": 0.151,
+    "model_outside": 0.192,
+    "scored": false,
+    "off_target": 0.0034,
+    "colour": 0.859
+   },
+   "side": {
+    "iou": 0.876,
+    "reference_missed": 0.089,
+    "model_outside": 0.042,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.915
+   },
+   "top": {
+    "iou": 0.649,
+    "reference_missed": 0.133,
+    "model_outside": 0.279,
+    "scored": true,
+    "off_target": 0.0461,
+    "colour": 0.863
+   }
+  }
+ },
+ "seconds": 122.9
+}

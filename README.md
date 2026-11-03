@@ -11,7 +11,7 @@ outlines, and texturing from the drawings.
 | `skill/` | the skill itself: `SKILL.md` (the agent's instructions), `requirements.txt` and `scripts/` |
 | `kit-README.md`, `score_glb.py` | the organizers' practice kit: rules and scorer (their penguin references are in `references/penguin/`) |
 | `references/` | the reference subjects (penguin, cow, dog, giraffe, stag, sheep), each with its four views, `final.png` and `subject.json`; `sheets/` holds the original turnaround sheets they were cut from |
-| `tests/` | `make_test_workspace.py` (sets up `../penguin-skill-test` for a test run), `score_all.py` (scores every animal with the current skill, see below), `make_refs_from_sheet.py`, the model viewer, and the results: `test-00` (the first penguin build) onwards, one folder per test with a folder per animal; `quick-tests/`; `auto-scores/` (one folder per `score_all.py` run); `inspection/` (before/after sheets for each fix) |
+| `tests/` | `make_test_workspace.py` (sets up `../penguin-skill-test` for a test run), `score_all.py` (scores every animal with the current skill, see below), `make_refs_from_sheet.py`, the model viewer, and the results: `test-00` (the first penguin build) onwards, one folder per test with a folder per animal; `quick-tests/`; `auto-scores/` (one folder per `score_all.py` run); `inspection/` (before/after sheets for each fix). From `test-09` on, GitHub keeps each test's reports, logs, previews and blockouts but not its `.glb` models or texture atlas (they stay on the computer that ran the test) |
 | `OLD/` | superseded material kept for reference (see `OLD/README.md`) |
 | `organizer-questions.md` | open questions for the organizers |
 

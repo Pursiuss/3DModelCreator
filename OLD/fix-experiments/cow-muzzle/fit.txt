@@ -1,0 +1,36 @@
+outline overlap per view (before -> after): front 0.85 -> 0.85, back 0.00 -> 0.00 (skipped), side 0.92 -> 0.92, top 0.89 -> 0.89
+  body: unchanged
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose: unchanged
+  ear: unchanged
+  horn: unchanged
+  front upper leg R: unchanged
+  front upper leg L: unchanged
+  hind thigh R: unchanged
+  hind thigh L: unchanged
+  front lower leg R: unchanged
+  front lower leg L: unchanged
+  hind lower leg R: unchanged
+  hind lower leg L: unchanged
+  front hoof R: unchanged
+  front hoof L: unchanged
+  hind hoof R: unchanged
+  hind hoof L: unchanged
+  udder: unchanged
+  teat front: unchanged
+  teat back: unchanged
+  tail: unchanged
+  tail switch: unchanged
+part checks:
+  ear: 43% of it lies outside the top outline: too big, or in the wrong place
+  front upper leg R: lies against a bigger part along 80% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  front upper leg L: lies against a bigger part along 80% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  hind thigh R: lies against a bigger part along 80% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  hind thigh R: 40% of it lies outside the top outline: too big, or in the wrong place
+  hind thigh L: lies against a bigger part along 90% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  front lower leg R: 21% of it lies outside the side outline: too big, or in the wrong place
+  hind lower leg R: 93% of it lies outside the top outline: too big, or in the wrong place
+  hind hoof R: 64% of it lies outside the top outline: too big, or in the wrong place
+wrote tests/work/cow-muzzle/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in tests/work/cow-muzzle/work

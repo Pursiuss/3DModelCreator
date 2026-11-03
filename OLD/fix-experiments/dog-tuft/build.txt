@@ -1,0 +1,124 @@
+{
+ "params": {
+  "refs": "tests/animals/dog",
+  "out": "tests/work/dog-tuft/out",
+  "parts": "tests/work/dog-tuft/parts.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "bushy tail strands",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "method": "blockout (24 parts from parts.json) grown 0.0 mm, trimmed to the outlines (3.78 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: tail",
+ "voxel_mm": 3.78,
+ "triangles": 297718,
+ "extent_m": {
+  "width": 0.303,
+  "length": 1.059,
+  "height": 0.797
+ },
+ "subject_m": {
+  "height": 0.8,
+  "width": 0.291,
+  "length": 1.058,
+  "scale_by": "height"
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.88, even lined up as well as they can be: pose differs between views",
+  "views ignored for parts they disagree with (one view would have cut deep into a part the others draw whole): thigh: top; hind lower leg: top; hind paw: top; hind toe 4: top",
+  "a loose piece (0.8% of the model) came off and was dropped: a part (often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the part it grows from, and build a thin tail, strand or leg as a chain (thin chains are built on a finer grid, with whatever hangs from them)",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): front toe 2, front toe 3, hind toe 2, hind toe 3, hind toe 4"
+ ],
+ "texture_views": {
+  "front": 0.064,
+  "back": 0.069,
+  "side": 0.241,
+  "side_mirror": 0.239,
+  "top": 0.119,
+  "unseen_filled": 0.268,
+  "duplicate_features_removed": 7,
+  "uv_islands": 39,
+  "texel_mm": 0.99,
+  "palette_colours": 4
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "upper jaw": "#f38400",
+  "nose": "#a1caf1",
+  "lower jaw": "#be0032",
+  "mouth": "#c2b280",
+  "tongue": "#008856",
+  "ear": "#e68fac",
+  "front upper leg": "#0067a5",
+  "front lower leg": "#f99379",
+  "front paw": "#604e97",
+  "front toe 1": "#f6a600",
+  "front toe 2": "#b3446c",
+  "front toe 3": "#dcd300",
+  "front toe 4": "#882d17",
+  "thigh": "#8db600",
+  "hind lower leg": "#654522",
+  "hind paw": "#e25822",
+  "hind toe 1": "#2b3d26",
+  "hind toe 2": "#222222",
+  "hind toe 3": "#f8de72",
+  "hind toe 4": "#bda2c3",
+  "tail": "#f8bb72"
+ },
+ "self_check": {
+  "untextured_shape": 0.916,
+  "textured_shape": 0.916,
+  "gross_errors": [],
+  "colour_score": 0.911,
+  "views": {
+   "front": {
+    "iou": 0.922,
+    "reference_missed": 0.049,
+    "model_outside": 0.032,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.866
+   },
+   "back": {
+    "iou": 0.774,
+    "reference_missed": 0.077,
+    "model_outside": 0.172,
+    "scored": false,
+    "off_target": 0.0305,
+    "colour": 0.835
+   },
+   "side": {
+    "iou": 0.91,
+    "reference_missed": 0.062,
+    "model_outside": 0.033,
+    "scored": true,
+    "off_target": 0.0059,
+    "colour": 0.921
+   },
+   "top": {
+    "iou": 0.888,
+    "reference_missed": 0.017,
+    "model_outside": 0.098,
+    "scored": true,
+    "off_target": 0.0034,
+    "colour": 0.9
+   }
+  }
+ },
+ "seconds": 225.1
+}

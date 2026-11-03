@@ -1,0 +1,36 @@
+start: mean outline overlap 0.921
+sweep 1: overlap 0.921 (1 changes)
+sweep 2: overlap 0.921 (1 changes)
+sweep 3: overlap 0.922 (1 changes)
+sweep 4: overlap 0.922 (0 changes)
+outline overlap per view (before -> after): front 0.92 -> 0.92, back 0.00 -> 0.00 (skipped), side 0.93 -> 0.92, top 0.00 -> 0.00 (skipped)
+  body: stations[3].z +2.424->+2.377; stations[3].half_height +0.517->+0.489
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  ear: unchanged
+  mane: joints[2].r +0.035->+0.040
+  front shoulder A: unchanged
+  front shoulder B: unchanged
+  hind thigh C: unchanged
+  hind thigh D: unchanged
+  front leg A: unchanged
+  front leg B: unchanged
+  hind leg C: unchanged
+  hind leg D: unchanged
+  hoof A outer: unchanged
+  hoof A inner: unchanged
+  hoof B outer: unchanged
+  hoof B inner: unchanged
+  hoof C outer: unchanged
+  hoof C inner: unchanged
+  hoof D outer: unchanged
+  hoof D inner: unchanged
+  tail: unchanged
+  tail tuft: unchanged
+part checks:
+  no problems found
+wrote out/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/work

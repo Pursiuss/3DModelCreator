@@ -1,0 +1,336 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    0.005,
+    0.33
+   ],
+   "radii": [
+    0.104,
+    0.098,
+    0.305
+   ],
+   "rotate": [
+    8.0,
+    0.0,
+    0.0
+   ],
+   "fit": false
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.0352,
+    0.6335
+   ],
+   "radii": [
+    0.0568,
+    0.069,
+    0.0548
+   ],
+   "rotate": [
+    -12.8,
+    0.0,
+    0.0
+   ],
+   "blend": 0.04
+  },
+  {
+   "name": "upper beak",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.09,
+    0.651
+   ],
+   "b": [
+    0.0,
+    -0.153,
+    0.64
+   ],
+   "ra": 0.01,
+   "rb": 0.003,
+   "aspect": 1.1,
+   "droop": 0.004,
+   "blend": 0.006,
+   "fit": false
+  },
+  {
+   "name": "lower beak",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.09,
+    0.637
+   ],
+   "b": [
+    0.0,
+    -0.14,
+    0.636
+   ],
+   "ra": 0.007,
+   "rb": 0.003,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.005,
+   "fit": false
+  },
+  {
+   "name": "flipper",
+   "type": "paddle",
+   "a": [
+    0.085,
+    -0.005,
+    0.47
+   ],
+   "b": [
+    0.12,
+    0.032,
+    0.2
+   ],
+   "ra": 0.036,
+   "rb": 0.016,
+   "thick": 0.009,
+   "normal": [
+    1.0,
+    0.0,
+    0.1
+   ],
+   "bend": 0.0,
+   "curl": 0.006,
+   "mirror": true,
+   "blend": 0.005,
+   "root_blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "tail",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    0.1102,
+    0.07
+   ],
+   "radii": [
+    0.0327,
+    0.04,
+    0.01
+   ],
+   "rotate": [
+    -45.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.015,
+   "fit": false
+  },
+  {
+   "name": "leg",
+   "type": "capsule",
+   "a": [
+    0.045,
+    0.0,
+    0.13
+   ],
+   "b": [
+    0.052,
+    0.005,
+    0.03
+   ],
+   "ra": 0.018,
+   "rb": 0.016,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.01,
+   "root_blend": 0.02,
+   "fit": false
+  },
+  {
+   "name": "outer toe",
+   "type": "capsule",
+   "a": [
+    0.057,
+    0.008,
+    0.025
+   ],
+   "b": [
+    0.098,
+    -0.06,
+    0.018
+   ],
+   "ra": 0.012,
+   "rb": 0.008,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "colour": "drawn",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "middle toe",
+   "type": "capsule",
+   "a": [
+    0.055,
+    0.008,
+    0.025
+   ],
+   "b": [
+    0.066,
+    -0.072,
+    0.016
+   ],
+   "ra": 0.012,
+   "rb": 0.008,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "colour": "drawn",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "inner toe",
+   "type": "capsule",
+   "a": [
+    0.053,
+    0.008,
+    0.025
+   ],
+   "b": [
+    0.033,
+    -0.06,
+    0.016
+   ],
+   "ra": 0.012,
+   "rb": 0.008,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "colour": "drawn",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "web",
+   "type": "paddle",
+   "a": [
+    0.055,
+    0.004,
+    0.019
+   ],
+   "b": [
+    0.0655,
+    -0.048,
+    0.015
+   ],
+   "ra": 0.014,
+   "rb": 0.03,
+   "thick": 0.0055,
+   "normal": [
+    0,
+    0,
+    1
+   ],
+   "bend": 0,
+   "curl": 0,
+   "mirror": true,
+   "blend": 0.004,
+   "colour": "drawn",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "outer claw",
+   "type": "capsule",
+   "a": [
+    0.098,
+    -0.062,
+    0.02
+   ],
+   "b": [
+    0.108,
+    -0.0845,
+    0.012
+   ],
+   "ra": 0.006,
+   "rb": 0.003,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "middle claw",
+   "type": "capsule",
+   "a": [
+    0.0645,
+    -0.072,
+    0.017
+   ],
+   "b": [
+    0.068,
+    -0.1,
+    0.008
+   ],
+   "ra": 0.006,
+   "rb": 0.003,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "inner claw",
+   "type": "capsule",
+   "a": [
+    0.0304,
+    -0.062,
+    0.017
+   ],
+   "b": [
+    0.029,
+    -0.09,
+    0.008
+   ],
+   "ra": 0.006,
+   "rb": 0.003,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  }
+ ]
+}

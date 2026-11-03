@@ -12,3 +12,12 @@ __pycache__/
 # Auto-score builds and masks (large, rebuilt by tests/score_all.py); each run's results.json and table.md are kept
 tests/auto-scores/*/*/
 tests/auto-scores/masks/
+
+# Saved test results are kept light on GitHub: reports, logs, previews and blockouts, not the models or atlases
+# (test-00 and test-05 were committed with theirs before this rule)
+tests/test-*/**/*.glb
+tests/test-*/**/texture-atlas.png
+tests/quick-tests/**/*.glb
+tests/quick-tests/**/texture-atlas.png
+OLD/fix-experiments/**/*.glb
+OLD/fix-experiments/**/texture-atlas.png

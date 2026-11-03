@@ -1,0 +1,34 @@
+start: mean outline overlap 0.911
+sweep 1: overlap 0.911 (2 changes)
+sweep 2: overlap 0.913 (4 changes)
+sweep 3: overlap 0.913 (1 changes)
+sweep 4: overlap 0.913 (4 changes)
+sweep 5: overlap 0.914 (3 changes)
+sweep 6: overlap 0.914 (0 changes)
+outline overlap per view (before -> after): front 0.86 -> 0.86, back 0.00 -> 0.00 (skipped), side 0.91 -> 0.91, top 0.96 -> 0.96
+  body: stations[1].z +2.562->+2.483; stations[3].z +2.470->+2.456; stations[6].z +2.300->+2.292; stations[0].half_height +0.327->+0.293; stations[3].half_height +0.516->+0.533; stations[5].half_width +0.369->+0.402; stations[6].half_width +0.350->+0.382
+  neck: joints[0].y -0.010->-0.061; joints[0].z +2.700->+2.731; joints[2].z +3.494->+3.409; joints[3].r +0.200->+0.218; joints[4].r +0.155->+0.141
+  head: unchanged
+  lower jaw: unchanged
+  front upper leg: unchanged
+  hind upper leg: unchanged
+  front lower leg R: unchanged
+  front lower leg L: unchanged
+  hind lower leg R: unchanged
+  hind lower leg L: unchanged
+  front hoof R outer: unchanged
+  front hoof R inner: unchanged
+  front hoof L outer: unchanged
+  front hoof L inner: unchanged
+  hind hoof R outer: unchanged
+  hind hoof R inner: unchanged
+  hind hoof L outer: unchanged
+  hind hoof L inner: unchanged
+  tail: unchanged
+  tail tuft: unchanged
+  ear: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  eye: unchanged
+part checks:
+  hind hoof L inner: 24% of it lies outside the front outline: too big, or in the wrong place

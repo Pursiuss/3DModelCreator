@@ -1,0 +1,107 @@
+{
+ "params": {
+  "refs": "refs/penguin",
+  "out": "out/penguin",
+  "parts": "out/penguin/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "penguin round 3 blockout, full build",
+  "skip_view": []
+ },
+ "method": "blockout (13 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (2.49 mm voxels), smoothed; kept 1 of 1 mesh pieces",
+ "voxel_mm": 2.49,
+ "triangles": 178624,
+ "extent_m": {
+  "width": 0.246,
+  "length": 0.284,
+  "height": 0.678
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "views ignored for parts they disagree with (one view would have cut deep into a part the others draw whole): outer toe: top; outer claw: top"
+ ],
+ "texture_views": {
+  "front": 0.203,
+  "back": 0.218,
+  "side": 0.204,
+  "side_mirror": 0.204,
+  "top": 0.025,
+  "unseen_filled": 0.146,
+  "duplicate_features_removed": 6,
+  "uv_islands": 21,
+  "texel_mm": 0.51,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "head": "#f3c300",
+  "upper beak": "#875692",
+  "lower beak": "#f38400",
+  "flipper": "#a1caf1",
+  "tail": "#be0032",
+  "leg": "#c2b280",
+  "outer toe": "#008856",
+  "middle toe": "#e68fac",
+  "inner toe": "#0067a5",
+  "outer claw": "#f99379",
+  "middle claw": "#604e97",
+  "inner claw": "#f6a600"
+ },
+ "self_check": {
+  "untextured_shape": 0.903,
+  "textured_shape": 0.903,
+  "gross_errors": [],
+  "colour_score": 0.873,
+  "views": {
+   "front": {
+    "iou": 0.903,
+    "reference_missed": 0.068,
+    "model_outside": 0.034,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.826
+   },
+   "back": {
+    "iou": 0.905,
+    "reference_missed": 0.071,
+    "model_outside": 0.028,
+    "scored": false,
+    "off_target": 0.0,
+    "colour": 0.881
+   },
+   "side": {
+    "iou": 0.904,
+    "reference_missed": 0.062,
+    "model_outside": 0.038,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.919
+   },
+   "top": {
+    "iou": 0.842,
+    "reference_missed": 0.132,
+    "model_outside": 0.034,
+    "scored": true,
+    "off_target": 0.0026,
+    "colour": 0.768
+   }
+  }
+ },
+ "seconds": 106.0
+}

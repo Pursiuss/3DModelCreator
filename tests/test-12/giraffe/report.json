@@ -1,0 +1,120 @@
+{
+ "params": {
+  "refs": "refs/giraffe",
+  "out": "out",
+  "parts": "out/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "final: round-3 blockout, ossicones as chains, ears on fine grid",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "method": "blockout (24 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: tail, tail tuft, ear, ossicone, ossicone knob",
+ "voxel_mm": 17.86,
+ "triangles": 178101,
+ "extent_m": {
+  "width": 0.969,
+  "length": 2.638,
+  "height": 4.991
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 2.668,
+  "width": 0.965
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.78, even lined up as well as they can be: pose differs between views"
+ ],
+ "texture_views": {
+  "front": 0.085,
+  "back": 0.223,
+  "side": 0.209,
+  "side_mirror": 0.207,
+  "top": 0.045,
+  "unseen_filled": 0.231,
+  "duplicate_features_removed": 3,
+  "uv_islands": 30,
+  "texel_mm": 3.11,
+  "palette_colours": 4
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "lower jaw": "#f38400",
+  "front upper leg": "#a1caf1",
+  "hind upper leg": "#be0032",
+  "front lower leg R": "#c2b280",
+  "front lower leg L": "#008856",
+  "hind lower leg R": "#e68fac",
+  "hind lower leg L": "#0067a5",
+  "front hoof R outer": "#f99379",
+  "front hoof R inner": "#604e97",
+  "front hoof L outer": "#f6a600",
+  "front hoof L inner": "#b3446c",
+  "hind hoof R outer": "#dcd300",
+  "hind hoof R inner": "#882d17",
+  "hind hoof L outer": "#8db600",
+  "hind hoof L inner": "#654522",
+  "tail": "#e25822",
+  "tail tuft": "#2b3d26",
+  "ear": "#222222",
+  "ossicone": "#f8de72",
+  "ossicone knob": "#bda2c3",
+  "eye": "#f8bb72"
+ },
+ "self_check": {
+  "untextured_shape": 0.898,
+  "textured_shape": 0.898,
+  "gross_errors": [],
+  "colour_score": 0.906,
+  "views": {
+   "front": {
+    "iou": 0.861,
+    "reference_missed": 0.07,
+    "model_outside": 0.08,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.897
+   },
+   "back": {
+    "iou": 0.735,
+    "reference_missed": 0.162,
+    "model_outside": 0.143,
+    "scored": false,
+    "off_target": 0.0081,
+    "colour": 0.882
+   },
+   "side": {
+    "iou": 0.895,
+    "reference_missed": 0.059,
+    "model_outside": 0.051,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.915
+   },
+   "top": {
+    "iou": 0.901,
+    "reference_missed": 0.059,
+    "model_outside": 0.046,
+    "scored": true,
+    "off_target": 0.0006,
+    "colour": 0.81
+   }
+  }
+ },
+ "seconds": 170.2
+}

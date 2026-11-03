@@ -1,0 +1,38 @@
+start: mean outline overlap 0.860
+sweep 1: overlap 0.870 (7 changes)
+sweep 2: overlap 0.872 (5 changes)
+sweep 3: overlap 0.872 (2 changes)
+sweep 4: overlap 0.875 (5 changes)
+sweep 5: overlap 0.875 (3 changes)
+sweep 6: overlap 0.876 (3 changes)
+outline overlap per view (before -> after): front 0.83 -> 0.84, back 0.00 -> 0.00 (skipped), side 0.89 -> 0.91, top 0.00 -> 0.00 (skipped)
+  body: stations[0].z +2.574->+2.550; stations[3].z +2.464->+2.424; stations[5].z +2.564->+2.524; stations[0].half_width +0.220->+0.240; stations[0].half_height +0.315->+0.282; stations[1].half_width +0.332->+0.329; stations[1].half_height +0.552->+0.655; stations[2].half_height +0.528->+0.480; stations[3].half_width +0.440->+0.454; stations[3].half_height +0.500->+0.517; stations[4].half_width +0.365->+0.420; stations[5].half_height +0.389->+0.424
+  neck: joints[0].y +0.100->+0.405; joints[0].z +2.550->+2.855; joints[3].z +4.348->+4.324; joints[4].y -1.186->-1.162; joints[0].r +0.280->+0.230
+  head: unchanged
+  lower jaw: unchanged
+  nose: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  ear: b[y] -0.876->-0.871
+  mane: joints[0].y +0.383->+0.332; joints[2].z +3.999->+3.969; joints[0].r +0.027->+0.023; joints[1].r +0.040->+0.046
+  front shoulder A: unchanged
+  front shoulder B: unchanged
+  hind thigh C: unchanged
+  hind thigh D: unchanged
+  front leg A: unchanged
+  front leg B: unchanged
+  hind leg C: unchanged
+  hind leg D: unchanged
+  hoof A outer: unchanged
+  hoof A inner: unchanged
+  hoof B outer: unchanged
+  hoof B inner: unchanged
+  hoof C outer: unchanged
+  hoof C inner: unchanged
+  hoof D outer: unchanged
+  hoof D inner: unchanged
+  tail: unchanged
+  tail tuft: unchanged
+part checks:
+  hind leg C: 25% of it lies outside the side outline: too big, or in the wrong place
+wrote out/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/work

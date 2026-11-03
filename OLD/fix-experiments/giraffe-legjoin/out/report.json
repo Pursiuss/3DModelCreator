@@ -1,0 +1,129 @@
+{
+ "params": {
+  "refs": "../penguin-skill-test/refs/giraffe",
+  "out": "C:/Users/paris/AppData/Local/Temp/claude/C--Users-paris-Documents-School-Algoma-CS-Sem-3-Software-Engineering-GIT-Project-FIles-course-registration-api/fca9c8c9-d50f-4c81-acf8-d98ef4f8c62c/scratchpad/glegs/out",
+  "parts": "C:/Users/paris/AppData/Local/Temp/claude/C--Users-paris-Documents-School-Algoma-CS-Sem-3-Software-Engineering-GIT-Project-FIles-course-registration-api/fca9c8c9-d50f-4c81-acf8-d98ef4f8c62c/scratchpad/glegs/parts.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "legs joined",
+  "skip_view": [
+   "top",
+   "back"
+  ]
+ },
+ "method": "blockout (26 parts from parts.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 1 of 5 mesh pieces; built on a finer grid and joined on: ossicone, ossicone tip, front lower leg fwd, front lower leg back, hind lower leg fwd, hind lower leg back, tail, tail switch",
+ "voxel_mm": 17.86,
+ "triangles": 253949,
+ "extent_m": {
+  "width": 0.866,
+  "length": 3.199,
+  "height": 5.026
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 3.221,
+  "width": 0.908
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front width 0.908 m vs top width 0.718 m disagree by more than 8% (pose or framing differs)",
+  "side length 3.221 m vs top length 3.896 m disagree by more than 8% (pose or framing differs)",
+  "front and mirrored back outlines overlap only 0.76, even lined up as well as they can be: pose differs between views",
+  "a loose piece (0.5% of the model) came off and was dropped: a part (often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the part it grows from, and build a thin tail, strand or leg as a chain (thin chains are built on a finer grid, with whatever hangs from them)",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): hoof fwd fl inner, hoof back fl inner"
+ ],
+ "texture_views": {
+  "front": 0.121,
+  "back": 0.132,
+  "side": 0.284,
+  "side_mirror": 0.27,
+  "top": 0.038,
+  "unseen_filled": 0.156,
+  "duplicate_features_removed": 5,
+  "uv_islands": 29,
+  "texel_mm": 3.52,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "lower jaw": "#f38400",
+  "nose pad": "#a1caf1",
+  "ear": "#be0032",
+  "ossicone": "#c2b280",
+  "ossicone tip": "#008856",
+  "front upper leg fwd": "#e68fac",
+  "front upper leg back": "#0067a5",
+  "front lower leg fwd": "#f99379",
+  "front lower leg back": "#604e97",
+  "thigh fwd": "#f6a600",
+  "thigh back": "#b3446c",
+  "hind lower leg fwd": "#dcd300",
+  "hind lower leg back": "#882d17",
+  "hoof fwd fl outer": "#8db600",
+  "hoof fwd fl inner": "#654522",
+  "hoof back fl outer": "#e25822",
+  "hoof back fl inner": "#2b3d26",
+  "hoof fwd hl outer": "#222222",
+  "hoof fwd hl inner": "#f8de72",
+  "hoof back hl outer": "#bda2c3",
+  "hoof back hl inner": "#f8bb72",
+  "tail": "#cbe1f7",
+  "tail switch": "#db728e"
+ },
+ "self_check": {
+  "untextured_shape": 0.867,
+  "textured_shape": 0.867,
+  "gross_errors": [
+   "top"
+  ],
+  "colour_score": 0.893,
+  "views": {
+   "front": {
+    "iou": 0.864,
+    "reference_missed": 0.093,
+    "model_outside": 0.052,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.872
+   },
+   "back": {
+    "iou": 0.699,
+    "reference_missed": 0.177,
+    "model_outside": 0.177,
+    "scored": false,
+    "off_target": 0.0051,
+    "colour": 0.872
+   },
+   "side": {
+    "iou": 0.871,
+    "reference_missed": 0.081,
+    "model_outside": 0.057,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.912
+   },
+   "top": {
+    "iou": 0.655,
+    "reference_missed": 0.135,
+    "model_outside": 0.271,
+    "scored": true,
+    "off_target": 0.0438,
+    "colour": 0.873
+   }
+  }
+ },
+ "seconds": 311.4
+}

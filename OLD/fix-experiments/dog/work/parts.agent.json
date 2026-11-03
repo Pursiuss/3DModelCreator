@@ -1,0 +1,776 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "loft",
+   "stations": [
+    [
+     0.0,
+     -0.34,
+     0.47,
+     0.116,
+     0.145
+    ],
+    [
+     0.0,
+     -0.22,
+     0.44,
+     0.125,
+     0.19
+    ],
+    [
+     0.0,
+     -0.09,
+     0.44,
+     0.121,
+     0.185
+    ],
+    [
+     0.0,
+     0.045,
+     0.445,
+     0.142,
+     0.165
+    ],
+    [
+     0.0,
+     0.13,
+     0.467,
+     0.148,
+     0.153
+    ],
+    [
+     0.0,
+     0.22,
+     0.45,
+     0.114,
+     0.162
+    ],
+    [
+     0.0,
+     0.33,
+     0.464,
+     0.096,
+     0.107
+    ]
+   ],
+   "caps": [
+    0.05,
+    0.04
+   ],
+   "fit": false
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.21,
+    0.55
+   ],
+   "b": [
+    0.0,
+    -0.32,
+    0.68
+   ],
+   "ra": 0.11,
+   "rb": 0.085,
+   "aspect": 1.15,
+   "droop": 0.0,
+   "blend": 0.05,
+   "fit": false
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.37,
+    0.728
+   ],
+   "radii": [
+    0.085,
+    0.095,
+    0.072
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.04,
+   "fit": false
+  },
+  {
+   "name": "upper jaw",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.42,
+    0.7
+   ],
+   "b": [
+    0.0,
+    -0.52,
+    0.698
+   ],
+   "ra": 0.045,
+   "rb": 0.026,
+   "aspect": 1.15,
+   "droop": 0.0,
+   "blend": 0.02,
+   "fit": false
+  },
+  {
+   "name": "lower jaw",
+   "type": "capsule",
+   "a": [
+    0.0,
+    -0.4,
+    0.63
+   ],
+   "b": [
+    0.0,
+    -0.495,
+    0.62
+   ],
+   "ra": 0.022,
+   "rb": 0.015,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.01,
+   "fit": false
+  },
+  {
+   "name": "tongue",
+   "type": "ellipsoid",
+   "center": [
+    0.0,
+    -0.47,
+    0.645
+   ],
+   "radii": [
+    0.025,
+    0.05,
+    0.012
+   ],
+   "rotate": [
+    -20.0,
+    0.0,
+    0.0
+   ],
+   "blend": 0.005,
+   "fit": false
+  },
+  {
+   "name": "ear",
+   "type": "paddle",
+   "a": [
+    0.075,
+    -0.33,
+    0.77
+   ],
+   "b": [
+    0.118,
+    -0.325,
+    0.645
+   ],
+   "ra": 0.045,
+   "rb": 0.034,
+   "thick": 0.009,
+   "normal": [
+    0.9,
+    -0.45,
+    0.0
+   ],
+   "bend": 0.0,
+   "curl": 0.009,
+   "mirror": true,
+   "blend": 0.005,
+   "root_blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "front upper leg",
+   "type": "capsule",
+   "a": [
+    0.073,
+    -0.2,
+    0.46
+   ],
+   "b": [
+    0.06,
+    -0.215,
+    0.24
+   ],
+   "ra": 0.065,
+   "rb": 0.05,
+   "aspect": 0.8,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.06,
+   "fit": false
+  },
+  {
+   "name": "front lower leg",
+   "type": "chain",
+   "joints": [
+    [
+     0.06,
+     -0.212,
+     0.28,
+     0.047
+    ],
+    [
+     0.058,
+     -0.21,
+     0.15,
+     0.04
+    ],
+    [
+     0.057,
+     -0.22,
+     0.07,
+     0.032
+    ],
+    [
+     0.057,
+     -0.232,
+     0.04,
+     0.03
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "front pad",
+   "type": "ellipsoid",
+   "center": [
+    0.058,
+    -0.24,
+    0.026
+   ],
+   "radii": [
+    0.032,
+    0.035,
+    0.025
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "fit": false
+  },
+  {
+   "name": "front toe 1",
+   "type": "capsule",
+   "a": [
+    0.04,
+    -0.245,
+    0.0372
+   ],
+   "b": [
+    0.033,
+    -0.285,
+    0.018
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006
+  },
+  {
+   "name": "front toe 2",
+   "type": "capsule",
+   "a": [
+    0.052,
+    -0.25,
+    0.0394
+   ],
+   "b": [
+    0.05,
+    -0.2974,
+    0.018
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006
+  },
+  {
+   "name": "front toe 3",
+   "type": "capsule",
+   "a": [
+    0.065,
+    -0.25,
+    0.034
+   ],
+   "b": [
+    0.067,
+    -0.292,
+    0.018
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006
+  },
+  {
+   "name": "front toe 4",
+   "type": "capsule",
+   "a": [
+    0.077,
+    -0.245,
+    0.032
+   ],
+   "b": [
+    0.081,
+    -0.2798,
+    0.0108
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006
+  },
+  {
+   "name": "front claw 1",
+   "type": "chain",
+   "joints": [
+    [
+     0.033,
+     -0.292,
+     0.016,
+     0.005
+    ],
+    [
+     0.033,
+     -0.3,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw 2",
+   "type": "chain",
+   "joints": [
+    [
+     0.05,
+     -0.299,
+     0.016,
+     0.005
+    ],
+    [
+     0.05,
+     -0.307,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw 3",
+   "type": "chain",
+   "joints": [
+    [
+     0.067,
+     -0.299,
+     0.016,
+     0.005
+    ],
+    [
+     0.067,
+     -0.307,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw 4",
+   "type": "chain",
+   "joints": [
+    [
+     0.081,
+     -0.292,
+     0.016,
+     0.005
+    ],
+    [
+     0.081,
+     -0.3,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "thigh",
+   "type": "capsule",
+   "a": [
+    0.07,
+    0.29,
+    0.42
+   ],
+   "b": [
+    0.08,
+    0.255,
+    0.28
+   ],
+   "ra": 0.085,
+   "rb": 0.055,
+   "aspect": 0.75,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.08,
+   "fit": false
+  },
+  {
+   "name": "hind lower leg",
+   "type": "chain",
+   "joints": [
+    [
+     0.078,
+     0.265,
+     0.29,
+     0.058
+    ],
+    [
+     0.078,
+     0.36,
+     0.16,
+     0.045
+    ],
+    [
+     0.078,
+     0.352,
+     0.065,
+     0.031
+    ],
+    [
+     0.078,
+     0.342,
+     0.04,
+     0.029
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.03,
+   "fit": false,
+   "ignore_views": [
+    "back"
+   ]
+  },
+  {
+   "name": "hind pad",
+   "type": "ellipsoid",
+   "center": [
+    0.08,
+    0.335,
+    0.026
+   ],
+   "radii": [
+    0.032,
+    0.037,
+    0.025
+   ],
+   "rotate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mirror": true,
+   "blend": 0.01,
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe 1",
+   "type": "capsule",
+   "a": [
+    0.062,
+    0.325,
+    0.032
+   ],
+   "b": [
+    0.057,
+    0.2901,
+    0.0078
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe 2",
+   "type": "capsule",
+   "a": [
+    0.074,
+    0.32,
+    0.034
+   ],
+   "b": [
+    0.073,
+    0.2834,
+    0.018
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe 3",
+   "type": "capsule",
+   "a": [
+    0.087,
+    0.32,
+    0.0664
+   ],
+   "b": [
+    0.089,
+    0.2726,
+    0.0342
+   ],
+   "ra": 0.0194,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe 4",
+   "type": "capsule",
+   "a": [
+    0.099,
+    0.325,
+    0.032
+   ],
+   "b": [
+    0.0978,
+    0.2902,
+    0.0212
+   ],
+   "ra": 0.015,
+   "rb": 0.013,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw 1",
+   "type": "chain",
+   "joints": [
+    [
+     0.057,
+     0.278,
+     0.016,
+     0.005
+    ],
+    [
+     0.057,
+     0.27,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw 2",
+   "type": "chain",
+   "joints": [
+    [
+     0.073,
+     0.271,
+     0.016,
+     0.005
+    ],
+    [
+     0.073,
+     0.263,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw 3",
+   "type": "chain",
+   "joints": [
+    [
+     0.089,
+     0.271,
+     0.016,
+     0.005
+    ],
+    [
+     0.089,
+     0.263,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw 4",
+   "type": "chain",
+   "joints": [
+    [
+     0.103,
+     0.278,
+     0.016,
+     0.005
+    ],
+    [
+     0.103,
+     0.27,
+     0.005,
+     0.0035
+    ]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "back",
+    "top"
+   ]
+  },
+  {
+   "name": "tail",
+   "type": "chain",
+   "joints": [
+    [
+     0.0,
+     0.29,
+     0.56,
+     0.04
+    ],
+    [
+     0.0,
+     0.36,
+     0.5,
+     0.035
+    ],
+    [
+     0.0,
+     0.405,
+     0.4,
+     0.04
+    ],
+    [
+     0.0,
+     0.455,
+     0.3,
+     0.055
+    ],
+    [
+     0.0,
+     0.47,
+     0.23,
+     0.055
+    ],
+    [
+     0.0,
+     0.5,
+     0.165,
+     0.02
+    ]
+   ],
+   "aspect": 1.0,
+   "blend": 0.03,
+   "fit": false
+  }
+ ]
+}

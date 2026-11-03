@@ -1,0 +1,57 @@
+start: mean outline overlap 0.818
+sweep 1: overlap 0.888 (88 changes)
+sweep 2: overlap 0.911 (40 changes)
+sweep 3: overlap 0.925 (35 changes)
+sweep 4: overlap 0.929 (16 changes)
+sweep 5: overlap 0.936 (25 changes)
+sweep 6: overlap 0.939 (14 changes)
+outline overlap per view (before -> after): front 0.84 -> 0.94, back 0.00 -> 0.00 (skipped), side 0.80 -> 0.94, top 0.00 -> 0.00 (skipped)
+  body: stations[0].z +2.670->+2.740; stations[1].z +2.575->+2.505; stations[2].z +2.570->+2.542; stations[3].z +2.540->+2.512; stations[5].z +2.540->+2.625; stations[6].z +2.475->+2.450; stations[7].z +2.490->+2.337; stations[0].half_width +0.300->+0.314; stations[0].half_height +0.380->+0.398; stations[1].half_width +0.400->+0.378; stations[1].half_height +0.575->+0.621; stations[2].half_width +0.440->+0.374; stations[2].half_height +0.580->+0.567; stations[3].half_width +0.440->+0.400; stations[3].half_height +0.560->+0.547; stations[4].half_width +0.420->+0.428; stations[5].half_width +0.380->+0.323; stations[5].half_height +0.390->+0.332; stations[6].half_height +0.275->+0.337; stations[7].half_height +0.190->+0.218
+  neck: joints[0].y -0.100->+0.115; joints[0].z +2.750->+2.769; joints[1].y -0.350->-0.157; joints[1].z +3.300->+3.205; joints[3].y -0.820->-0.788; joints[3].z +4.400->+4.459; joints[4].y -0.950->-1.197; joints[0].r +0.400->+0.475; joints[1].r +0.270->+0.300; joints[2].r +0.210->+0.208; joints[3].r +0.170->+0.162; joints[4].r +0.140->+0.170
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: a[x] +0.120->+0.159; a[z] +4.740->+4.715; b[y] -0.880->-0.855; rb +0.060->+0.069; thick +0.015->+0.021
+  ossicone: joints[1].y -1.020->-1.074; joints[2].x +0.100->+0.127; joints[2].y -1.030->-1.003
+  ossicone tip: center[x] +0.100->+0.105
+  front upper leg fwd: b[z] +1.650->+1.554; ra +0.200->+0.170
+  front upper leg back: a[x] -0.150->-0.246; a[y] +0.050->-0.008; b[y] +0.120->+0.024; b[z] +1.650->+1.554
+  front lower leg fwd: joints[1].z +1.050->+1.373; joints[2].z +0.600->+0.123; joints[3].x +0.115->-0.006; joints[3].y -0.040->+0.041; joints[3].z +0.220->+0.422; joints[4].x +0.115->+0.236; joints[4].y -0.100->-0.005; joints[0].r +0.090->+0.103; joints[1].r +0.070->+0.069; joints[2].r +0.055->+0.060; joints[4].r +0.045->+0.060
+  front lower leg back: joints[0].x -0.120->-0.149; joints[0].y +0.120->-0.037; joints[0].z +1.750->+1.896; joints[1].x -0.115->-0.131; joints[1].y +0.120->+0.094; joints[1].z +1.050->+0.729; joints[2].y +0.125->+0.109; joints[2].z +0.600->+0.126; joints[3].x -0.115->+0.005; joints[3].y +0.130->-0.015; joints[3].z +0.220->+0.427; joints[4].x -0.115->-0.316; joints[4].y +0.100->-0.221; joints[4].z +0.080->+0.008; joints[0].r +0.090->+0.113; joints[1].r +0.070->+0.074; joints[2].r +0.055->+0.061; joints[3].r +0.050->+0.053
+  thigh fwd: a[x] +0.170->+0.279; a[y] +1.020->+0.911; a[z] +2.500->+2.391; b[y] +1.120->+1.229; b[z] +1.600->+1.491; ra +0.250->+0.242; rb +0.100->+0.115
+  thigh back: a[x] -0.170->-0.280; a[y] +1.120->+1.089; a[z] +2.500->+2.390; b[y] +1.300->+1.260; b[z] +1.600->+1.490; ra +0.250->+0.228; rb +0.100->+0.115
+  hind lower leg fwd: joints[0].y +1.100->+1.218; joints[0].z +1.700->+1.818; joints[1].z +1.250->+0.856; joints[2].z +0.750->+0.435; joints[3].y +1.120->+1.002; joints[3].z +0.250->+0.053; joints[4].x +0.180->+0.377; joints[4].y +1.070->+0.873; joints[4].z +0.080->-0.117; joints[0].r +0.100->+0.098; joints[1].r +0.070->+0.074; joints[2].r +0.055->+0.077; joints[3].r +0.050->+0.066
+  hind lower leg back: joints[0].x -0.180->-0.062; joints[0].y +1.300->+1.103; joints[0].z +1.700->+1.539; joints[1].x -0.180->-0.223; joints[1].y +1.380->+1.406; joints[1].z +1.250->+1.297; joints[2].y +1.320->+1.305; joints[2].z +0.750->+0.876; joints[3].z +0.250->+0.053; joints[4].x -0.180->-0.251; joints[4].y +1.250->+1.053; joints[4].z +0.080->+0.395; joints[1].r +0.070->+0.081; joints[2].r +0.055->+0.062; joints[3].r +0.050->+0.052; joints[4].r +0.045->+0.043
+  hoof fwd fl outer: unchanged
+  hoof fwd fl inner: unchanged
+  hoof back fl outer: a[y] +0.080->+0.070
+  hoof back fl inner: unchanged
+  hoof fwd hl outer: unchanged
+  hoof fwd hl inner: a[x] +0.150->+0.156; b[y] +0.970->+0.960; b[z] +0.015->+0.025
+  hoof back hl outer: unchanged
+  hoof back hl inner: unchanged
+  tail: joints[0].y +1.330->+1.203; joints[1].y +1.480->+1.226; joints[1].z +2.620->+2.366; joints[2].y +1.520->+1.474; joints[2].z +2.250->+1.996; joints[3].y +1.520->+1.421; joints[3].z +1.720->+1.704
+  tail switch: joints[0].y +1.520->+1.456; joints[1].z +1.350->+1.229; joints[2].y +1.550->+1.472; joints[1].r +0.075->+0.094
+part checks:
+  ear: thinnest radius 21.1 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  front upper leg fwd: lies against a bigger part along 90% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  front upper leg back: lies against a bigger part along 100% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  hoof fwd fl outer: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof fwd fl inner: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof back fl outer: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof back fl inner: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof fwd hl outer: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof fwd hl inner: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof back hl outer: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  hoof back hl inner: thinnest radius 25.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  tail switch: 30% of it lies outside the front outline: too big, or in the wrong place
+  front upper leg back: the back of its root end bulges 7.7 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead
+  thigh fwd: the back of its root end bulges 17.1 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead
+  body: stations[6].half_height grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  neck: joints[4].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  ear: thick grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  front lower leg fwd: joints[4].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  front lower leg back: joints[0].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  hind lower leg fwd: joints[2].r, joints[3].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  tail switch: joints[1].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+wrote out/giraffe/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/giraffe/work

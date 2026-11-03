@@ -1,0 +1,36 @@
+start: mean outline overlap 0.890
+sweep 1: overlap 0.891 (3 changes)
+sweep 2: overlap 0.891 (0 changes)
+outline overlap per view (before -> after): front 0.90 -> 0.90, back 0.00 -> 0.00 (skipped), side 0.88 -> 0.88, top 0.00 -> 0.00 (skipped)
+  body: stations[0].half_height +0.433->+0.368; stations[2].half_width +0.374->+0.318; stations[3].half_width +0.364->+0.310
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: unchanged
+  ossicone: unchanged
+  ossicone tip: unchanged
+  front upper leg fwd: unchanged
+  front upper leg back: unchanged
+  front lower leg fwd: unchanged
+  front lower leg back: unchanged
+  thigh fwd: unchanged
+  thigh back: unchanged
+  hind lower leg fwd: unchanged
+  hind lower leg back: unchanged
+  hoof fwd fl outer: unchanged
+  hoof fwd fl inner: unchanged
+  hoof back fl outer: unchanged
+  hoof back fl inner: unchanged
+  hoof fwd hl outer: unchanged
+  hoof fwd hl inner: unchanged
+  hoof back hl outer: unchanged
+  hoof back hl inner: unchanged
+  tail: unchanged
+  tail switch: unchanged
+part checks:
+  front upper leg fwd: lies against a bigger part along 100% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  front upper leg back: lies against a bigger part along 80% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  front lower leg back: 34% of it lies outside the side outline: too big, or in the wrong place
+  thigh back: lies against a bigger part along 70% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  tail switch: 27% of it lies outside the front outline: too big, or in the wrong place

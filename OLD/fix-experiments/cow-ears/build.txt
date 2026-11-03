@@ -1,0 +1,122 @@
+{
+ "params": {
+  "refs": "../penguin-skill-test/refs/cow",
+  "out": "tests/work/cow-ears/out",
+  "parts": "tests/work/cow-ears/parts.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "leaf ears",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "method": "blockout (24 parts from parts.json) grown 0.0 mm, trimmed to the outlines (7.66 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: horn, tail, tail switch",
+ "voxel_mm": 7.66,
+ "triangles": 310234,
+ "extent_m": {
+  "width": 0.654,
+  "length": 2.024,
+  "height": 1.594
+ },
+ "subject_m": {
+  "height": 1.6,
+  "length": 2.03,
+  "width": 0.678
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.82, even lined up as well as they can be: pose differs between views",
+  "views ignored for parts they disagree with (one view would have cut deep into a part the others draw whole): body: top; ear: top; hind thigh R: top; hind thigh L: top; hind lower leg R: top; hind hoof R: top",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): hind hoof L, teat front"
+ ],
+ "texture_views": {
+  "front": 0.079,
+  "back": 0.116,
+  "side": 0.236,
+  "side_mirror": 0.238,
+  "top": 0.114,
+  "unseen_filled": 0.217,
+  "duplicate_features_removed": 8,
+  "uv_islands": 28,
+  "texel_mm": 1.79,
+  "palette_colours": 3
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "lower jaw": "#f38400",
+  "nose": "#a1caf1",
+  "ear": "#be0032",
+  "horn": "#c2b280",
+  "front upper leg R": "#008856",
+  "front upper leg L": "#e68fac",
+  "hind thigh R": "#0067a5",
+  "hind thigh L": "#f99379",
+  "front lower leg R": "#604e97",
+  "front lower leg L": "#f6a600",
+  "hind lower leg R": "#b3446c",
+  "hind lower leg L": "#dcd300",
+  "front hoof R": "#882d17",
+  "front hoof L": "#8db600",
+  "hind hoof R": "#654522",
+  "hind hoof L": "#e25822",
+  "udder": "#2b3d26",
+  "teat front": "#222222",
+  "teat back": "#f8de72",
+  "tail": "#bda2c3",
+  "tail switch": "#f8bb72"
+ },
+ "self_check": {
+  "untextured_shape": 0.895,
+  "textured_shape": 0.895,
+  "gross_errors": [],
+  "colour_score": 0.854,
+  "views": {
+   "front": {
+    "iou": 0.864,
+    "reference_missed": 0.094,
+    "model_outside": 0.051,
+    "scored": true,
+    "off_target": 0.0075,
+    "colour": 0.835
+   },
+   "back": {
+    "iou": 0.795,
+    "reference_missed": 0.152,
+    "model_outside": 0.073,
+    "scored": false,
+    "off_target": 0.0,
+    "colour": 0.77
+   },
+   "side": {
+    "iou": 0.927,
+    "reference_missed": 0.034,
+    "model_outside": 0.042,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.873
+   },
+   "top": {
+    "iou": 0.848,
+    "reference_missed": 0.062,
+    "model_outside": 0.102,
+    "scored": true,
+    "off_target": 0.011,
+    "colour": 0.823
+   }
+  }
+ },
+ "seconds": 441.9
+}

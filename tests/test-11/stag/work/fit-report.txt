@@ -1,0 +1,53 @@
+start: mean outline overlap 0.795
+sweep 1: overlap 0.852 (95 changes)
+sweep 2: overlap 0.889 (70 changes)
+sweep 3: overlap 0.904 (39 changes)
+sweep 4: overlap 0.912 (28 changes)
+sweep 5: overlap 0.915 (16 changes)
+sweep 6: overlap 0.918 (11 changes)
+outline overlap per view (before -> after): front 0.70 -> 0.92, back 0.00 -> 0.00 (skipped), side 0.82 -> 0.93, top 0.86 -> 0.90
+  body: stations[0].z +0.730->+0.807; stations[1].z +0.740->+0.754; stations[2].z +0.720->+0.730; stations[4].z +0.720->+0.725; stations[5].z +0.730->+0.744; stations[0].half_width +0.100->+0.085; stations[0].half_height +0.130->+0.123; stations[1].half_width +0.140->+0.170; stations[1].half_height +0.180->+0.211; stations[2].half_width +0.155->+0.169; stations[2].half_height +0.190->+0.176; stations[3].half_width +0.155->+0.144; stations[3].half_height +0.185->+0.191; stations[4].half_width +0.150->+0.147; stations[4].half_height +0.178->+0.175; stations[5].half_width +0.140->+0.137; stations[5].half_height +0.165->+0.156; stations[6].half_width +0.100->+0.093
+  neck: joints[0].y -0.160->-0.179; joints[1].y -0.240->-0.267; joints[1].z +0.900->+0.883; joints[2].y -0.270->-0.298; joints[2].z +1.020->+1.076; joints[3].y -0.280->-0.291; joints[3].z +1.120->+1.166; joints[1].r +0.100->+0.115; joints[2].r +0.075->+0.086; joints[3].r +0.070->+0.068
+  head: unchanged
+  lower jaw: unchanged
+  nose: unchanged
+  ear: a[y] -0.235->-0.252; a[z] +1.190->+1.155; b[x] +0.210->+0.175; b[y] -0.200->-0.181; b[z] +1.225->+1.208; ra +0.018->+0.024; rb +0.040->+0.038; thick +0.007->+0.009
+  thigh R: a[y] +0.330->+0.273; a[z] +0.720->+0.680; b[x] +0.075->+0.085; b[y] +0.420->+0.374; b[z] +0.500->+0.454; ra +0.110->+0.100; rb +0.050->+0.061
+  thigh L: a[y] +0.330->+0.346; a[z] +0.720->+0.747; b[z] +0.500->+0.510
+  shoulder: b[y] -0.110->-0.083; b[z] +0.480->+0.453; ra +0.080->+0.068
+  front leg: joints[1].x +0.068->+0.072; joints[1].z +0.390->+0.336; joints[2].y -0.096->-0.092; joints[2].z +0.290->+0.323; joints[3].y -0.094->-0.087; joints[3].z +0.190->+0.157; joints[4].x +0.080->+0.113; joints[5].x +0.080->+0.093; joints[5].y -0.125->-0.138; joints[0].r +0.042->+0.037; joints[2].r +0.031->+0.028; joints[3].r +0.022->+0.030; joints[4].r +0.027->+0.031
+  hind leg R: joints[0].y +0.420->+0.385; joints[0].z +0.500->+0.465; joints[2].y +0.495->+0.460; joints[2].z +0.360->+0.381; joints[3].z +0.250->+0.309; joints[6].y +0.440->+0.419; joints[6].z +0.035->+0.027; joints[0].r +0.050->+0.055; joints[1].r +0.035->+0.030; joints[3].r +0.021->+0.028; joints[4].r +0.021->+0.024; joints[5].r +0.026->+0.027; joints[6].r +0.020->+0.023
+  hind leg L: joints[0].x -0.075->-0.054; joints[0].y +0.390->+0.355; joints[0].z +0.500->+0.486; joints[1].x -0.075->-0.040; joints[1].z +0.420->+0.385; joints[2].x -0.075->-0.040; joints[2].y +0.420->+0.385; joints[2].z +0.360->+0.325; joints[3].x -0.075->-0.061; joints[3].z +0.280->+0.294; joints[4].x -0.075->-0.054; joints[5].x -0.075->-0.040; joints[5].z +0.140->+0.105; joints[7].x -0.075->-0.040; joints[0].r +0.050->+0.054; joints[3].r +0.022->+0.025; joints[4].r +0.021->+0.024; joints[5].r +0.022->+0.021; joints[6].r +0.026->+0.025; joints[7].r +0.020->+0.018
+  front hoof outer: a[y] -0.125->-0.120
+  front hoof inner: a[x] +0.068->+0.063
+  hind hoof R outer: b[z] +0.012->+0.017
+  hind hoof R inner: a[y] +0.445->+0.440
+  hind hoof L outer: a[x] -0.088->-0.079
+  hind hoof L inner: unchanged
+  tail: joints[0].y +0.450->+0.423; joints[1].y +0.510->+0.483; joints[1].z +0.760->+0.733; joints[2].y +0.530->+0.487; joints[2].z +0.680->+0.653; joints[3].y +0.525->+0.476; joints[3].z +0.610->+0.621; joints[2].r +0.025->+0.021; joints[3].r +0.015->+0.017
+  antler beam: joints[1].x +0.120->+0.158; joints[1].y -0.220->-0.228; joints[2].x +0.200->+0.238; joints[2].y -0.160->-0.168; joints[2].z +1.330->+1.316; joints[3].y -0.100->-0.086; joints[4].y -0.050->-0.026; joints[4].z +1.470->+1.494; joints[5].x +0.235->+0.230; joints[5].y -0.025->-0.020; joints[0].r +0.022->+0.029; joints[1].r +0.019->+0.021; joints[2].r +0.017->+0.024; joints[3].r +0.015->+0.020; joints[4].r +0.012->+0.013; joints[5].r +0.007->+0.009
+  brow tine: joints[0].x +0.085->+0.075; joints[0].z +1.240->+1.244; joints[1].y -0.330->-0.385; joints[1].z +1.300->+1.272; joints[2].x +0.110->+0.121; joints[2].y -0.410->-0.404; joints[0].r +0.013->+0.018; joints[1].r +0.010->+0.013
+  bez tine: joints[0].x +0.130->+0.161; joints[0].y -0.220->-0.251; joints[0].z +1.280->+1.287; joints[1].x +0.160->+0.210; joints[1].z +1.310->+1.279; joints[2].x +0.170->+0.220; joints[2].y -0.460->-0.410; joints[1].r +0.009->+0.011
+  upper tine: joints[0].x +0.250->+0.238; joints[0].y -0.120->-0.133; joints[0].z +1.390->+1.377; joints[2].z +1.540->+1.528; joints[0].r +0.012->+0.016
+  back tine: joints[0].x +0.265->+0.284; joints[0].y -0.070->-0.066; joints[0].z +1.410->+1.387; joints[1].y +0.010->+0.022; joints[1].z +1.420->+1.439; joints[2].x +0.270->+0.289; joints[2].y +0.090->+0.071; joints[0].r +0.012->+0.012; joints[1].r +0.009->+0.008
+  rear tine: joints[0].z +1.420->+1.406; joints[1].x +0.270->+0.284; joints[1].y +0.040->+0.054; joints[1].z +1.455->+1.463; joints[2].x +0.270->+0.284; joints[2].y +0.080->+0.094; joints[0].r +0.010->+0.011; joints[1].r +0.008->+0.007
+part checks:
+  nose: 46% of it lies outside the top outline: too big, or in the wrong place
+  ear: 55% of it lies outside the top outline: too big, or in the wrong place
+  shoulder: lies against a bigger part along 90% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  hind leg R: 21% of it lies outside the top outline: too big, or in the wrong place
+  front hoof outer: 21% of it lies outside the front outline: too big, or in the wrong place
+  hind hoof R outer: 30% of it lies outside the top outline: too big, or in the wrong place
+  hind hoof R inner: 28% of it lies outside the front outline: too big, or in the wrong place
+  hind hoof L outer: 75% of it lies outside the side outline: too big, or in the wrong place
+  hind hoof L inner: 73% of it lies outside the side outline: too big, or in the wrong place
+  back tine: 27% of it lies outside the front outline: too big, or in the wrong place
+  body: stations[1].half_width grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  ear: ra, thick grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  thigh R: rb grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  front leg: joints[3].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  hind leg R: joints[3].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  antler beam: joints[0].r, joints[2].r, joints[3].r, joints[5].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  brow tine: joints[0].r, joints[1].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  bez tine: joints[1].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big
+  upper tine: joints[0].r grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big

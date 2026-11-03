@@ -1,0 +1,122 @@
+{
+ "params": {
+  "refs": "refs/cow",
+  "out": "out/cow",
+  "parts": "out/cow/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "cow round 5: hind legs and tail switch locked to measured joints; back view skipped",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "method": "blockout (24 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (7.66 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: horn, tail, tail switch",
+ "voxel_mm": 7.66,
+ "triangles": 311512,
+ "extent_m": {
+  "width": 0.627,
+  "length": 2.017,
+  "height": 1.563
+ },
+ "subject_m": {
+  "height": 1.6,
+  "length": 2.03,
+  "width": 0.678
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.82, even lined up as well as they can be: pose differs between views",
+  "views ignored for parts they disagree with (one view would have cut deep into a part the others draw whole): thigh back: top; hind lower leg back: top; hind hoof back outer: top; hind hoof back inner: top",
+  "kept untrimmed, because trimming to the outlines would have removed most of them (they are off their drawn place; move them onto it in parts-on-refs.png): front teat, hind hoof fwd outer, hind hoof fwd inner"
+ ],
+ "texture_views": {
+  "front": 0.072,
+  "back": 0.097,
+  "side": 0.235,
+  "side_mirror": 0.237,
+  "top": 0.126,
+  "unseen_filled": 0.234,
+  "duplicate_features_removed": 6,
+  "uv_islands": 31,
+  "texel_mm": 1.83,
+  "palette_colours": 3
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "head": "#875692",
+  "lower jaw": "#f38400",
+  "nose pad": "#a1caf1",
+  "ear": "#be0032",
+  "horn": "#c2b280",
+  "udder": "#008856",
+  "front teat": "#e68fac",
+  "rear teat": "#0067a5",
+  "front upper leg": "#f99379",
+  "front lower leg": "#604e97",
+  "front hoof outer": "#f6a600",
+  "front hoof inner": "#b3446c",
+  "thigh fwd": "#dcd300",
+  "thigh back": "#882d17",
+  "hind lower leg fwd": "#8db600",
+  "hind lower leg back": "#654522",
+  "hind hoof fwd outer": "#e25822",
+  "hind hoof fwd inner": "#2b3d26",
+  "hind hoof back outer": "#222222",
+  "hind hoof back inner": "#f8de72",
+  "tail": "#bda2c3",
+  "tail switch": "#f8bb72"
+ },
+ "self_check": {
+  "untextured_shape": 0.906,
+  "textured_shape": 0.906,
+  "gross_errors": [],
+  "colour_score": 0.837,
+  "views": {
+   "front": {
+    "iou": 0.907,
+    "reference_missed": 0.063,
+    "model_outside": 0.034,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.795
+   },
+   "back": {
+    "iou": 0.815,
+    "reference_missed": 0.134,
+    "model_outside": 0.067,
+    "scored": false,
+    "off_target": 0.0092,
+    "colour": 0.76
+   },
+   "side": {
+    "iou": 0.894,
+    "reference_missed": 0.073,
+    "model_outside": 0.038,
+    "scored": true,
+    "off_target": 0.0036,
+    "colour": 0.856
+   },
+   "top": {
+    "iou": 0.905,
+    "reference_missed": 0.042,
+    "model_outside": 0.058,
+    "scored": true,
+    "off_target": 0.0108,
+    "colour": 0.818
+   }
+  }
+ },
+ "seconds": 246.3
+}

@@ -1,0 +1,29 @@
+start: mean outline overlap 0.904
+sweep 1: overlap 0.923 (17 changes)
+sweep 2: overlap 0.925 (7 changes)
+sweep 3: overlap 0.927 (9 changes)
+sweep 4: overlap 0.929 (8 changes)
+sweep 5: overlap 0.930 (4 changes)
+sweep 6: overlap 0.931 (6 changes)
+outline overlap per view (before -> after): front 0.89 -> 0.93, back 0.00 -> 0.00 (skipped), side 0.90 -> 0.93, top 0.92 -> 0.93
+  body: stations[0].z +0.560->+0.616; stations[1].z +0.545->+0.562; stations[2].z +0.520->+0.514; stations[3].z +0.520->+0.514; stations[5].z +0.530->+0.520; stations[6].z +0.550->+0.560; stations[0].half_width +0.140->+0.119; stations[0].half_height +0.170->+0.172; stations[1].half_width +0.180->+0.173; stations[1].half_height +0.215->+0.260; stations[2].half_height +0.220->+0.227; stations[4].half_width +0.225->+0.216; stations[5].half_width +0.190->+0.196; stations[5].half_height +0.200->+0.218; stations[6].half_width +0.130->+0.111; stations[6].half_height +0.130->+0.118
+  neck: a[y] -0.240->-0.253; a[z] +0.600->+0.582; b[y] -0.370->-0.344; b[z] +0.770->+0.799; ra +0.150->+0.167
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: a[z] +0.855->+0.842; b[x] +0.165->+0.174; b[z] +0.872->+0.846; ra +0.028->+0.030; rb +0.020->+0.021
+  tail: a[y] +0.500->+0.478; a[z] +0.660->+0.638; b[y] +0.548->+0.526; b[z] +0.480->+0.502; rb +0.040->+0.034
+  front leg: unchanged
+  front hoof outer: unchanged
+  front hoof inner: unchanged
+  hind leg: unchanged
+  hind hoof outer: unchanged
+  hind hoof inner: unchanged
+part checks:
+  ear: 64% of it lies outside the top outline: too big, or in the wrong place
+  front hoof outer: 33% of it lies outside the side outline: too big, or in the wrong place
+  front hoof inner: 33% of it lies outside the side outline: too big, or in the wrong place
+  hind hoof outer: 22% of it lies outside the side outline: too big, or in the wrong place
+  hind hoof inner: 22% of it lies outside the side outline: too big, or in the wrong place
+  lower jaw: starts 10 cm from the end of head, which stops short of it: the leg gets a lump or a kink there (a bulge at the hip or shoulder where an upper leg sticks out sideways). Make them meet: put head's tip end (b) on lower jaw's first joint, with its tip radius about that joint's, whenever you move either of them
+  body: stations[1].half_height grew by 20% or more (the fitter allows 25%). Check in parts-on-refs.png whether it now covers where another part is drawn (ears beside a head, a neck under it): if so, put the size back, add or enlarge that other part and give this one "fit": false; if it really is that big, write it that big

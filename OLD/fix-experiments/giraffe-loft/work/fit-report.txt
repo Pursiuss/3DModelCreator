@@ -1,0 +1,30 @@
+start: mean outline overlap 0.886
+sweep 1: overlap 0.896 (9 changes)
+sweep 2: overlap 0.901 (6 changes)
+sweep 3: overlap 0.902 (5 changes)
+sweep 4: overlap 0.905 (6 changes)
+sweep 5: overlap 0.905 (2 changes)
+sweep 6: overlap 0.907 (6 changes)
+outline overlap per view (before -> after): front 0.87 -> 0.91, back 0.00 -> 0.00 (skipped), side 0.90 -> 0.90, top 0.00 -> 0.00 (skipped)
+  body: stations[1].z +2.620->+2.649; stations[2].z +2.670->+2.688; stations[3].z +2.520->+2.460; stations[5].z +2.500->+2.460; stations[6].z +2.420->+2.391; stations[0].half_width +0.200->+0.230; stations[0].half_height +0.260->+0.214; stations[1].half_width +0.300->+0.269; stations[1].half_height +0.620->+0.752; stations[2].half_width +0.360->+0.289; stations[2].half_height +0.680->+0.674; stations[3].half_width +0.400->+0.435; stations[3].half_height +0.540->+0.546; stations[4].half_width +0.400->+0.413; stations[4].half_height +0.430->+0.425; stations[5].half_height +0.380->+0.437; stations[6].half_height +0.310->+0.278
+  neck: ra +0.315->+0.287; rb +0.152->+0.160
+  cranium: unchanged
+  upper jaw: unchanged
+  lower jaw: unchanged
+  eye: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  ear: unchanged
+  hind thigh: unchanged
+  front leg R: unchanged
+  hind leg R: unchanged
+  front leg L: unchanged
+  hind leg L: unchanged
+  front hoof R: unchanged
+  front hoof L: unchanged
+  hind hoof R: unchanged
+  hind hoof L: unchanged
+  tail: unchanged
+  tail tuft: unchanged
+part checks:
+  tail tuft: 37% of it lies outside the front outline: too big, or in the wrong place

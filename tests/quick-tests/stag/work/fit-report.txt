@@ -1,0 +1,40 @@
+start: mean outline overlap 0.743
+sweep 1: overlap 0.772 (26 changes)
+sweep 2: overlap 0.776 (8 changes)
+sweep 3: overlap 0.781 (11 changes)
+sweep 4: overlap 0.782 (5 changes)
+sweep 5: overlap 0.783 (5 changes)
+sweep 6: overlap 0.784 (5 changes)
+outline overlap per view (before -> after): front 0.69 -> 0.76, back 0.00 -> 0.00 (skipped), side 0.81 -> 0.83, top 0.73 -> 0.76
+  body: stations[0].z +0.760->+0.789; stations[4].z +0.710->+0.720; stations[5].z +0.720->+0.709; stations[0].half_width +0.130->+0.136; stations[0].half_height +0.200->+0.218; stations[1].half_width +0.160->+0.188; stations[1].half_height +0.200->+0.206; stations[2].half_width +0.155->+0.144; stations[2].half_height +0.185->+0.178; stations[3].half_width +0.150->+0.148; stations[4].half_width +0.145->+0.134; stations[5].half_width +0.110->+0.093
+  neck: joints[0].y -0.170->-0.209; joints[0].z +0.800->+0.815; joints[1].y -0.250->-0.297; joints[1].z +0.950->+1.014; joints[2].z +1.100->+1.162; joints[0].r +0.110->+0.127; joints[1].r +0.085->+0.098; joints[2].r +0.075->+0.085
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: a[x] +0.055->+0.084; a[y] -0.260->-0.246; a[z] +1.200->+1.171; b[x] +0.170->+0.199; b[z] +1.225->+1.219; ra +0.035->+0.040; rb +0.020->+0.019
+  antler beam: unchanged
+  brow tine: unchanged
+  upper tine: unchanged
+  tail: joints[1].y +0.490->+0.481; joints[1].z +0.750->+0.787; joints[2].y +0.520->+0.497; joints[2].z +0.650->+0.687; joints[1].r +0.030->+0.034
+  front leg: unchanged
+  front hoof outer: unchanged
+  front hoof inner: unchanged
+  hind leg fwd: unchanged
+  hind leg back: unchanged
+  hind hoof fwd outer: unchanged
+  hind hoof fwd inner: unchanged
+  hind hoof back outer: unchanged
+  hind hoof back inner: unchanged
+part checks:
+  ear: 60% of it lies outside the top outline: too big, or in the wrong place
+  antler beam: 24% of it lies outside the front outline: too big, or in the wrong place
+  antler beam: 25% of it lies outside the side outline: too big, or in the wrong place
+  antler beam: 43% of it lies outside the top outline: too big, or in the wrong place
+  brow tine: 31% of it lies outside the front outline: too big, or in the wrong place
+  brow tine: 53% of it lies outside the side outline: too big, or in the wrong place
+  brow tine: 60% of it lies outside the top outline: too big, or in the wrong place
+  upper tine: 61% of it lies outside the front outline: too big, or in the wrong place
+  tail: lies against a bigger part along 100% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  neck: the back of its root end bulges 6.7 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead
+  hind leg fwd: the back of its root end bulges 3.0 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead
+  hind leg back: the back of its root end bulges 3.9 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead

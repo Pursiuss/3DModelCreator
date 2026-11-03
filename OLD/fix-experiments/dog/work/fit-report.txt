@@ -1,0 +1,30 @@
+outline overlap per view (before -> after): front 0.90 -> 0.90, back 0.00 -> 0.00 (skipped), side 0.89 -> 0.89, top 0.92 -> 0.92
+  body: unchanged
+  neck: unchanged
+  head: unchanged
+  upper jaw: unchanged
+  nose: unchanged
+  lower jaw: unchanged
+  mouth: unchanged
+  tongue: unchanged
+  ear: unchanged
+  front upper leg: unchanged
+  front lower leg: unchanged
+  front paw: unchanged
+  front toe 1: unchanged
+  front toe 2: unchanged
+  front toe 3: unchanged
+  front toe 4: unchanged
+  thigh: unchanged
+  hind lower leg: unchanged
+  hind paw: unchanged
+  hind toe 1: unchanged
+  hind toe 2: unchanged
+  hind toe 3: unchanged
+  hind toe 4: unchanged
+  tail: unchanged
+part checks:
+  ear: 23% of it lies outside the front outline: too big, or in the wrong place
+  ear: 21% of it lies outside the top outline: too big, or in the wrong place
+  thigh: 32% of it lies outside the top outline: too big, or in the wrong place
+  hind lower leg: 38% of it lies outside the top outline: too big, or in the wrong place

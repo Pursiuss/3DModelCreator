@@ -1,0 +1,121 @@
+{
+ "params": {
+  "refs": "tests/animals/giraffe",
+  "out": "tests/work/giraffe-chest/out",
+  "parts": "tests/work/giraffe-chest/parts.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "neck blend",
+  "skip_view": [
+   "top",
+   "back"
+  ]
+ },
+ "method": "blockout (20 parts from parts.json) grown 0.0 mm, trimmed to the outlines (17.86 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: front leg R, hind leg R, front leg L, hind leg L, front hoof R, front hoof L, hind hoof R, hind hoof L, tail, tail tuft",
+ "voxel_mm": 17.86,
+ "triangles": 188521,
+ "extent_m": {
+  "width": 0.882,
+  "length": 3.16,
+  "height": 4.982
+ },
+ "subject_m": {
+  "height": 5.0,
+  "length": 3.221,
+  "width": 0.908
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front width 0.908 m vs top width 0.718 m disagree by more than 8% (pose or framing differs)",
+  "side length 3.221 m vs top length 3.896 m disagree by more than 8% (pose or framing differs)",
+  "front and mirrored back outlines overlap only 0.76, even lined up as well as they can be: pose differs between views"
+ ],
+ "texture_views": {
+  "front": 0.121,
+  "back": 0.116,
+  "side": 0.281,
+  "side_mirror": 0.277,
+  "top": 0.042,
+  "unseen_filled": 0.163,
+  "duplicate_features_removed": 4,
+  "uv_islands": 25,
+  "texel_mm": 3.22,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "cranium": "#875692",
+  "upper jaw": "#f38400",
+  "lower jaw": "#a1caf1",
+  "eye": "#be0032",
+  "ossicone": "#c2b280",
+  "ossicone knob": "#008856",
+  "ear": "#e68fac",
+  "hind thigh": "#0067a5",
+  "front leg R": "#f99379",
+  "hind leg R": "#604e97",
+  "front leg L": "#f6a600",
+  "hind leg L": "#b3446c",
+  "front hoof R": "#dcd300",
+  "front hoof L": "#882d17",
+  "hind hoof R": "#8db600",
+  "hind hoof L": "#654522",
+  "tail": "#e25822",
+  "tail tuft": "#2b3d26"
+ },
+ "self_check": {
+  "untextured_shape": 0.881,
+  "textured_shape": 0.881,
+  "gross_errors": [
+   "top"
+  ],
+  "colour_score": 0.895,
+  "views": {
+   "front": {
+    "iou": 0.88,
+    "reference_missed": 0.077,
+    "model_outside": 0.05,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.862
+   },
+   "back": {
+    "iou": 0.69,
+    "reference_missed": 0.173,
+    "model_outside": 0.194,
+    "scored": false,
+    "off_target": 0.0034,
+    "colour": 0.861
+   },
+   "side": {
+    "iou": 0.882,
+    "reference_missed": 0.081,
+    "model_outside": 0.043,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.917
+   },
+   "top": {
+    "iou": 0.636,
+    "reference_missed": 0.153,
+    "model_outside": 0.282,
+    "scored": true,
+    "off_target": 0.059,
+    "colour": 0.874
+   }
+  }
+ },
+ "seconds": 131.7
+}
