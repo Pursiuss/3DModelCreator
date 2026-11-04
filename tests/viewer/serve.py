@@ -1,14 +1,14 @@
 """A local 3D model viewer for the skill's output: open http://localhost:8765 to turn, zoom and inspect any .glb.
 
 usage: python tests/viewer/serve.py [--port 8765]
-Serves the viewer page and every .glb under the kit folder and the test workspace (../penguin-skill-test), listed
+Serves the viewer page and every .glb under the kit folder and the test projects folder (../TEST-KIT), listed
 newest first at /models.json. Nothing is written anywhere.
 """
 import argparse, http.server, json, os, socketserver, urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 KIT = os.path.dirname(os.path.dirname(HERE))
-ROOTS = {"kit": KIT, "test": os.path.join(os.path.dirname(KIT), "penguin-skill-test")}
+ROOTS = {"kit": KIT, "test": os.path.join(os.path.dirname(KIT), "TEST-KIT")}
 SKIP = {".venv", ".venv-skill", ".git", "__pycache__", "selfcheck"}
 
 

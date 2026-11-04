@@ -1,7 +1,7 @@
 """Create or refresh a clean folder for testing the skill in a fresh Claude Code conversation.
 
 usage: python tests/make_test_workspace.py [WORKSPACE] [--fresh]
-  default WORKSPACE: ../penguin-skill-test (next to the kit folder)
+  default WORKSPACE: ../TEST-KIT/skill-test (TEST-KIT sits next to the kit folder and holds every test project)
 
 The workspace holds only what a judged run would get:
   .claude/skills/animal-model-from-views/   copy of skill/ (Claude Code finds project skills here)
@@ -21,7 +21,7 @@ ANIMALS = {name: os.path.join(REFS, name)                       # miku: a charac
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    ws = os.path.abspath(args[0] if args else os.path.join(KIT, "..", "penguin-skill-test"))
+    ws = os.path.abspath(args[0] if args else os.path.join(KIT, "..", "TEST-KIT", "skill-test"))
     os.makedirs(ws, exist_ok=True)
     if "--fresh" in sys.argv:
         for d in ("out", ".venv-skill"): shutil.rmtree(os.path.join(ws, d), ignore_errors=True)
