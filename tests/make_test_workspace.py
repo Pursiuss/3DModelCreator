@@ -16,7 +16,7 @@ KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_FILES = ["front.png", "side.png", "back.png", "top.png", "final.png", "subject.json"]
 REFS = os.path.join(KIT, "references")
 ANIMALS = {name: os.path.join(REFS, name)                       # miku: a character sheet with no top view (local only)
-           for name in ("penguin", "cow", "giraffe", "dog", "stag", "sheep", "miku")}
+           for name in ("penguin", "cow", "giraffe", "dog", "stag", "sheep", "dragon", "miku")}
 
 
 def main():
