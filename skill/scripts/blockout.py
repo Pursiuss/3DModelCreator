@@ -74,7 +74,10 @@ class Fitter:
         # A chain's joint moves at most a quarter of its shorter segment, so the joints keep their order (a long leg
         # chain could otherwise swap its knee and fetlock); a part off the centre line stays on its own side, no
         # nearer the middle than its own radius (legs drifted onto the centre line and crossed); nothing sinks
-        # below the ground.
+        # below the ground. A chain bends sideways no more than it was written, give or take 30% of a joint's
+        # thickness (side_kinks): a stag's fetlock pushed out towards the wider hooves drawn below it made each
+        # front leg jog outwards above the hoof.
+        kinks0 = [side_kinks(p["joints"]) if p["type"] == "chain" else None for p in parts]
         limits = []
         for p in parts:
             s = PT.fit_scale(p); lim = {}
@@ -112,6 +115,8 @@ class Fitter:
                         lo, hi = limits[pi][(k, i)]
                         if not lo <= v <= hi: continue
                         q = dict(p); PT.put(q, k, i, v)
+                        if k == "joints" and kinks0[pi] is not None and \
+                                (side_kinks(q["joints"]) > kinks0[pi] + 0.3 * q["joints"][:, 3]).any(): continue
                         d = PT.sdf_part(q, self.P); sc = self.score(np.minimum(others, d))
                         if sc > best + 1e-5:
                             parts[pi] = p = q; D[pi] = d; best = sc; ok = True; changed += 1; break
@@ -119,6 +124,17 @@ class Fitter:
             log(f"sweep {sweep + 1}: overlap {best:.3f} ({changed} changes)")
             if not changed: break
         return parts, best
+
+
+def side_kinks(J):
+    """Per joint of a chain, how far it sits sideways (in x) off the straight line between its two neighbours,
+    taken where it lies along them in y and z; 0 for the end joints."""
+    J = np.asarray(J, float); out = np.zeros(len(J))
+    for k in range(1, len(J) - 1):
+        a, b, c = J[k - 1, :3], J[k, :3], J[k + 1, :3]
+        e = c[1:] - a[1:]; t = float(np.clip((b[1:] - a[1:]) @ e / max(e @ e, 1e-12), 0, 1))
+        out[k] = abs(b[0] - (a[0] + t * (c[0] - a[0])))
+    return out
 
 
 def orient(a, view):

@@ -1,0 +1,48 @@
+start: mean outline overlap 0.897
+sweep 1: overlap 0.900 (9 changes)
+sweep 2: overlap 0.901 (7 changes)
+sweep 3: overlap 0.902 (5 changes)
+sweep 4: overlap 0.903 (4 changes)
+sweep 5: overlap 0.904 (4 changes)
+sweep 6: overlap 0.905 (4 changes)
+outline overlap per view (before -> after): front 0.86 -> 0.87, back 0.00 -> 0.00 (skipped), side 0.93 -> 0.94, top 0.90 -> 0.91
+  body: stations[1].z +0.744->+0.729; stations[0].half_width +0.091->+0.108; stations[0].half_height +0.137->+0.135; stations[1].half_width +0.164->+0.185; stations[1].half_height +0.211->+0.203; stations[2].half_width +0.139->+0.140; stations[4].half_width +0.146->+0.144
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose: unchanged
+  ear: unchanged
+  front upper leg: unchanged
+  front lower leg: unchanged
+  front hoof inner: unchanged
+  front hoof outer: unchanged
+  front dewclaw: unchanged
+  near hind thigh: b[x] +0.085->+0.095
+  near hind lower leg: unchanged
+  near hind hoof inner: unchanged
+  near hind hoof outer: unchanged
+  near hind dewclaw: unchanged
+  far hind thigh: b[y] +0.316->+0.338; b[z] +0.538->+0.516
+  far hind lower leg: unchanged
+  far hind hoof inner: unchanged
+  far hind hoof outer: unchanged
+  far hind dewclaw: unchanged
+  tail: unchanged
+  antler beam: joints[1].y -0.325->-0.314; joints[2].y -0.203->-0.185; joints[4].z +1.450->+1.443; joints[3].r +0.022->+0.025
+  antler tall tine: joints[0].x +0.285->+0.276; joints[0].y -0.070->-0.055; joints[0].z +1.381->+1.366; joints[2].y -0.020->-0.014; joints[0].r +0.010->+0.010
+  antler mid tine: joints[0].x +0.278->+0.275; joints[1].y -0.130->-0.139; joints[2].y -0.172->-0.149; joints[1].r +0.011->+0.013
+  antler back tine: unchanged
+  antler bez tine: joints[0].y -0.265->-0.271; joints[0].z +1.240->+1.224
+  antler brow tine: unchanged
+  antler second tine: joints[2].x +0.105->+0.119; joints[2].y -0.390->-0.367; joints[2].z +1.385->+1.362
+part checks:
+  nose: 33% of it lies outside the top outline: too big, or in the wrong place
+  ear: 61% of it lies outside the top outline: too big, or in the wrong place
+  front hoof outer: 20% of it lies outside the front outline: too big, or in the wrong place
+  near hind lower leg: 24% of it lies outside the top outline: too big, or in the wrong place
+  near hind hoof inner: 40% of it lies outside the front outline: too big, or in the wrong place
+  near hind dewclaw: 100% of it lies outside the top outline: too big, or in the wrong place
+  tail: 24% of it lies outside the top outline: too big, or in the wrong place
+  near hind dewclaw: 100% of it is inside other parts, so it changes nothing. If the parts around it already make its drawn shape (a rump that bulges where the tail lies on it, a head whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move it out until it stands as proud of them as the drawing shows
+  far hind dewclaw: 99% of it is inside other parts, so it changes nothing. If the parts around it already make its drawn shape (a rump that bulges where the tail lies on it, a head whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move it out until it stands as proud of them as the drawing shows
+wrote out/work\parts.fitted.json, blockout-overlay.png, blockout-parts.png, parts-on-refs.png, parts-on-refs-detail.png, fit-report.txt in out/work

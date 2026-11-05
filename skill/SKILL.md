@@ -335,8 +335,9 @@ Modelling rules that matter for how the result looks:
 PY SKILL_DIR/scripts/blockout.py REFS out/work/parts.json out/work [--skip-view VIEW ...]
 ```
 It nudges every part (within limits around what you wrote: a chain's joints keep their order, move at most a
-quarter of a segment, stay on their side of the centre line and above the ground, so legs written in the right
-place do not need `"fit": false`) to match the outlines and writes
+quarter of a segment, stay on their side of the centre line and above the ground, and bend sideways no more than
+you wrote them, so legs written in the right place and straight do not need `"fit": false`) to match the outlines
+and writes
 `out/work/parts.fitted.json`, `fit-report.txt`, `blockout-overlay.png`, `blockout-parts.png`,
 `parts-on-refs.png` and `parts-on-refs-detail.png`.
 
