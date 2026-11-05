@@ -1,0 +1,221 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "ellipsoid",
+   "center": [0.0, 0.005, 0.335],
+   "radii": [0.093, 0.097, 0.282],
+   "rotate": [7.0, 0.0, 0.0],
+   "fit": false
+  },
+  {
+   "name": "lower body",
+   "type": "ellipsoid",
+   "center": [0.0, 0.032, 0.1668],
+   "radii": [0.0929, 0.0787, 0.117],
+   "rotate": [11.328, 0.0, 0.0],
+   "blend": 0.05
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [0.0, -0.0329, 0.627],
+   "radii": [0.057, 0.069, 0.0619],
+   "rotate": [-40.0, 0.0, 0.0],
+   "blend": 0.04
+  },
+  {
+   "name": "tail",
+   "type": "paddle",
+   "a": [0.0, 0.104, 0.1063],
+   "b": [0.0, 0.1357, 0.038],
+   "ra": 0.035,
+   "rb": 0.0102,
+   "thick": 0.0103,
+   "normal": [0.0, 0.94, 0.35],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.005,
+   "root_blend": 0.03
+  },
+  {
+   "name": "flipper",
+   "type": "paddle",
+   "a": [0.072, -0.005, 0.47],
+   "b": [0.118, 0.028, 0.21],
+   "ra": 0.027,
+   "rb": 0.02,
+   "thick": 0.008,
+   "normal": [1.0, 0.0, 0.18],
+   "bend": -0.01,
+   "curl": 0.007,
+   "mirror": true,
+   "blend": 0.005,
+   "root_blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "leg",
+   "type": "chain",
+   "joints": [
+    [0.045, 0.015, 0.14, 0.02],
+    [0.049, 0.012, 0.075, 0.018],
+    [0.049, 0.012, 0.026, 0.017]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.02,
+   "root_blend": 0.03,
+   "colour": "#ef9898",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "web",
+   "type": "paddle",
+   "a": [0.048, -0.005, 0.015],
+   "b": [0.058, -0.06, 0.015],
+   "ra": 0.018,
+   "rb": 0.024,
+   "thick": 0.005,
+   "normal": [0.0, 0.0, 1.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "mirror": true,
+   "blend": 0.005,
+   "colour": "#ef9898",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "inner toe",
+   "type": "capsule",
+   "a": [0.044, -0.005, 0.022],
+   "b": [0.021, -0.078, 0.016],
+   "ra": 0.009,
+   "rb": 0.007,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.004,
+   "colour": "#ef9898",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "middle toe",
+   "type": "capsule",
+   "a": [0.048, -0.005, 0.022],
+   "b": [0.06, -0.084, 0.018],
+   "ra": 0.009,
+   "rb": 0.007,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.004,
+   "colour": "#ef9898",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "outer toe",
+   "type": "capsule",
+   "a": [0.052, -0.005, 0.022],
+   "b": [0.095, -0.074, 0.024],
+   "ra": 0.009,
+   "rb": 0.007,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.004,
+   "colour": "#ef9898",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "inner claw",
+   "type": "chain",
+   "joints": [
+    [0.021, -0.076, 0.017, 0.005],
+    [0.015, -0.087, 0.01, 0.0035],
+    [0.012, -0.095, 0.004, 0.0015]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "middle claw",
+   "type": "chain",
+   "joints": [
+    [0.06, -0.082, 0.02, 0.005],
+    [0.062, -0.095, 0.016, 0.0035],
+    [0.064, -0.106, 0.012, 0.0015]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "outer claw",
+   "type": "chain",
+   "joints": [
+    [0.095, -0.072, 0.025, 0.005],
+    [0.101, -0.082, 0.021, 0.0035],
+    [0.106, -0.091, 0.015, 0.0015]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.002,
+   "colour": "#2e2932",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "upper beak",
+   "type": "capsule",
+   "a": [0.0, -0.092, 0.65],
+   "b": [0.0, -0.148, 0.64],
+   "ra": 0.013,
+   "rb": 0.004,
+   "aspect": 1.0,
+   "droop": 0.004,
+   "blend": 0.006,
+   "fit": false
+  },
+  {
+   "name": "lower beak",
+   "type": "capsule",
+   "a": [0.0, -0.092, 0.636],
+   "b": [0.0, -0.136, 0.636],
+   "ra": 0.008,
+   "rb": 0.003,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "blend": 0.004,
+   "fit": false
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+outline overlap per view (before -> after): front 0.88 -> 0.88, back 0.88 -> 0.88, side 0.95 -> 0.95, top 0.89 -> 0.89
+  body: unchanged
+  lower body: unchanged
+  head: unchanged
+  tail: unchanged
+  flipper: unchanged
+  leg: unchanged
+  web: unchanged
+  inner toe: unchanged
+  middle toe: unchanged
+  outer toe: unchanged
+  inner claw: unchanged
+  middle claw: unchanged
+  outer claw: unchanged
+  upper beak: unchanged
+  lower beak: unchanged
+part checks:
+  no problems found

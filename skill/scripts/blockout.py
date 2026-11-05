@@ -27,7 +27,7 @@ PALETTE = np.array([(230, 90, 70), (70, 140, 230), (90, 190, 90), (240, 190, 50)
 
 class Fitter:
     def __init__(self, refs, res, skip=()):
-        size, _ = load_subject(refs); self.skip = tuple(skip)
+        size, _ = load_subject(refs); self.skip = tuple(skip); self.size = size
         self.maps = view_maps(refs, size)
         self.axes, self.voxel = make_grid(self.maps, size, capped_res(self.maps, size, res, 250_000))
         self.L = {v: sample(self.maps[v], self.axes) for v in VIEWS}
@@ -280,7 +280,38 @@ def part_checks(parts, f, build_voxel):
             out.append(f"  {p['name']}: the back of its root end bulges {out_by * 100:.1f} cm out of the body, a "
                        f"lump at the shoulder, hip or chest: start it deeper inside (its root at least "
                        f"its root radius in from the surface) and join it with root_blend; where the drawing really "
-                       f"is that wide there, widen the body there instead")
+                       f"is that wide there, widen the body there instead"
+                       + (" (for a flat part: sink only its root end, by tilting it, not the whole plate along the body)"
+                          if p["type"] == "paddle" else ""))
+    # flat parts sunk into the body along their length: a flipper, wing or fin laid flat against a rounded body is
+    # inside it wherever the body bulges past the plate (near the shoulder, on an egg-shaped penguin), so only its
+    # tip stands out. The texture still paints its drawn shape onto the body there, which looks right in the
+    # pictures, but the model's flipper is the wrong shape
+    longest = max(f.size[k] for k in ("width", "length", "height"))
+    for i, p in enumerate(parts):
+        if p["type"] != "paddle" or p.get("fur"): continue
+        one = dict(p, mirror=False); L = float(np.linalg.norm(p["b"] - p["a"]))
+        if L < 0.15 * longest: continue                              # (hooves and ears are short, sunk at the root)
+        lo, hi = PT.bounds(one); g = [np.linspace(lo[k], hi[k], 40) for k in range(3)]
+        G = np.stack(np.meshgrid(*g, indexing="ij"), -1).reshape(-1, 3); S = G[PT.sdf_part(one, G) < 0]
+        if len(S) < 50: continue
+        t = (S - p["a"]) @ (p["b"] - p["a"]) / L ** 2
+        depth = -PT.sdf([q for j, q in enumerate(parts) if j != i], S, smooth=False); inside = depth > 0
+        share = float(inside[t >= 0.2].mean()) if (t >= 0.2).any() else 0.0
+        if share <= 0.2: continue
+        band = lambda k: inside[(t >= k / 10) & (t < (k + 1) / 10)]
+        free = next((k / 10 for k in range(2, 10) if len(band(k)) and band(k).mean() < 0.1), 1.0)
+        def need(sel):                                                # how far out that stretch must move to clear
+            d = depth[sel & inside]; return 100 * float(np.percentile(d, 90)) if len(d) else 0.0
+        up, down = need((t >= 0.2) & (t < 0.6)), need(t >= 0.6)
+        out.append(f"  {p['name']}: sunk into the body along its length: {share:.0%} of it past its root end lies "
+                   f"inside other parts, and it only stands clear of them from {free:.0%} of the way to its tip, so "
+                   f"only that end of it shows. The texture paints the rest of its drawn shape onto the body, so the "
+                   f"pictures look right while the model's {p['name']} is the wrong shape. Move it out onto the "
+                   f"body's surface: about {up:.0f} cm out along its root half and {down:.0f} cm along its tip half "
+                   f"(move a and b outward, a further than b where the body bulges near the root: tilt it), keeping "
+                   f"only its root end inside, joined with root_blend. Lying against a rounded body it touches it "
+                   f"along a line and stands off a little elsewhere; that is right")
     # buried parts: a part almost wholly inside others never shows (a tail swallowed by the rump, a nose pad inside the
     # tip of the head, a ruff inside the chest). Upper legs, necks and roots are meant to be mostly inside (up to about
     # 90%), so only nearly complete burial counts
