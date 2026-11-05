@@ -112,9 +112,14 @@ def main():
         warnings.append("views ignored for parts they disagree with (one view would have cut deep into a part the "
                         "others draw whole): " + "; ".join(f"{k}: {', '.join(v)}" for k, v in S["auto_ignored"].items()))
     if S.get("dropped_piece", 0) > 0.002:
-        warnings.append(f"a loose piece ({S['dropped_piece']:.1%} of the model) came off and was dropped: a part "
-                        f"(often a tail, ear or horn) joins the body only where trimming cuts it; start it inside the "
-                        f"part it grows from, and build a thin tail, strand or leg as a chain (thin chains are built on "
+        groups = {}                                                  # (a mirrored part loses a piece on each side)
+        for d in S.get("dropped_parts", []): groups.setdefault(tuple(d["parts"]), []).append(d["length_m"])
+        what = "; ".join((f"{len(ls)} pieces" if len(ls) > 1 else "a piece") + f" {100 * max(ls):.0f} cm long, from "
+                         + " and ".join(names) for names, ls in groups.items()) or "a small piece"
+        warnings.append(f"loose pieces came off and were dropped ({what}): trimming to the outlines cut them off the "
+                        f"part they hang from, or the part joins the body only where trimming cuts it. Lay those parts "
+                        f"over their drawn shape in every view they keep (parts-on-refs.png), start each inside the part "
+                        f"it grows from, and build a thin tail, strand, tine or leg as a chain (thin chains are built on "
                         f"a finer grid, with whatever hangs from them)")
     if S.get("untrimmed"):
         warnings.append("kept untrimmed, because trimming to the outlines would have removed most of them (they are "
@@ -136,7 +141,7 @@ def main():
     ext =S["V"].max(0) - S["V"].min(0)
     report = {"params": vars(a), "method": method, "voxel_mm": round(S["voxel"] * 1000, 2), "triangles": len(S["F"]),
               "extent_m": {"width": round(ext[0], 3), "length": round(ext[1], 3), "height": round(ext[2], 3)},
-              "subject_m": S["size"], "silhouettes": S["notes"], "warnings": warnings,
+              "subject_m": S["size"], "silhouettes": S["notes"], "warnings": warnings, "dropped_parts": S.get("dropped_parts", []),
               "texture_views": tstats, "part_colours": key, "self_check": {"untextured_shape": s_shape["shape_score"],
               "textured_shape": s_tex["shape_score"], "gross_errors": s_shape.get("gross_errors", []),
               "colour_score": s_tex.get("colour_score"), "views": s_tex["views"]}, "seconds": round(time.time() - t0, 1)}

@@ -106,17 +106,21 @@ def previous_results(label):
 
 
 def table(results, prev, prev_label):
-    def delta(a, b): return "" if a is None or b is None else f" ({a - b:+.3f})" if abs(a - b) >= 0.0005 else " (=)"
+    def delta(a, b, new=False):
+        if new: return " (new test)"
+        return "" if a is None or b is None else f" ({a - b:+.3f})" if abs(a - b) >= 0.0005 else " (=)"
     rows = ["| animal | from | shape | front / side / top IoU | gross errors | colour | pass |",
             "|---|---|---|---|---|---|---|"]
     for r in results:
         if "error" in r: rows.append(f"| {r['animal']} | {r.get('source', '')} | {r['error']} | | | | |"); continue
         p = prev.get(r["animal"], {})
+        if p and p.get("source") != r["source"]: p = {"new": True}          # rebuilt from a newer test: not comparable
         iou = " / ".join(f"{r['iou'][v]:.3f}" for v in ("front", "side", "top"))
-        rows.append(f"| {r['animal']} | {r['source']} | {r['shape']:.3f}{delta(r['shape'], p.get('shape'))} | {iou} | "
-                    f"{', '.join(r['gross_errors']) or 'none'} | {r['colour']:.3f}{delta(r['colour'], p.get('colour'))} | "
+        rows.append(f"| {r['animal']} | {r['source']} | {r['shape']:.3f}{delta(r['shape'], p.get('shape'), p.get('new'))} | {iou} | "
+                    f"{', '.join(r['gross_errors']) or 'none'} | {r['colour']:.3f}{delta(r['colour'], p.get('colour'), p.get('new'))} | "
                     f"{'yes' if r['pass'] else 'NO'} |")
-    note = f"changes in brackets are against run '{prev_label}'" if prev_label else "first run: nothing to compare with"
+    note = (f"changes in brackets are against run '{prev_label}' (\"new test\": that animal is now rebuilt from a newer "
+            f"saved test, so its scores are not comparable)") if prev_label else "first run: nothing to compare with"
     return "\n".join(rows) + f"\n\nScored with the kit's score_glb.py; pass = shape >= {BAR}, no gross errors, colour >= {BAR}; {note}.\n"
 
 

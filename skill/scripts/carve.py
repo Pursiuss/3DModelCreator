@@ -206,24 +206,39 @@ def field_normals(field, V, origin, voxel):
     return N / np.maximum(np.linalg.norm(N, axis=1, keepdims=True), 1e-12)
 
 
+def dropped_pieces(V, lab, counts, drop, main):
+    """[(share of the main piece's triangles, sample of the piece's points)] for each dropped piece worth naming."""
+    out = []
+    for c in np.nonzero(drop)[0]:
+        share = float(counts[c] / main)
+        if share < NAME_SHARE: continue
+        pts = V[lab == c]; out.append((share, pts[:: max(1, len(pts) // 400)]))
+    return out
+
+
+NAME_SHARE = 0.002    # dropped pieces at least this big (share of what they came off) are named in the warning
+
+
 def keep_main_pieces(V, F, min_share=0.02):
-    """Drop loose fragments: mesh pieces with under min_share of the largest piece's triangles."""
+    """Drop loose fragments: mesh pieces with under min_share of the largest piece's triangles. The dropped pieces
+    are kept in keep_main_pieces.lost (see dropped_pieces), so the build can say which parts they came from."""
     from scipy.sparse.csgraph import connected_components
     n = len(V); e = np.r_[F[:, [0, 1]], F[:, [1, 2]]]
     g = sparse.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n))
     _, lab = connected_components(g, directed=False)
-    fl = lab[F[:, 0]]; counts = np.bincount(fl)
+    fl = lab[F[:, 0]]; counts = np.bincount(fl, minlength=lab.max() + 1)
     keep = counts[fl] >= min_share * counts.max()
     used = np.unique(F[keep]); remap = -np.ones(n, np.int64); remap[used] = np.arange(len(used))
-    dropped = counts[counts < min_share * counts.max()]
+    dropped = counts[(counts > 0) & (counts < min_share * counts.max())]
     keep_main_pieces.biggest_dropped = float(dropped.max() / counts.max()) if len(dropped) else 0.0
-    return V[used], remap[F[keep]], int((counts >= min_share * counts.max()).sum()), int(len(counts))
+    keep_main_pieces.lost = dropped_pieces(V, lab, counts, (counts > 0) & (counts < min_share * counts.max()), counts.max())
+    return V[used], remap[F[keep]], int((counts >= min_share * counts.max()).sum()), int((counts > 0).sum())
 
 
 def keep_attached(V, F, field, origin, voxel, reach):
     """In a box of fine parts, keep the pieces that reach the body (within `reach` of its surface, where they are
     joined on) and drop the rest: an antler tip or a tine end that trimming cut off its chain floats in the air.
-    Returns (V, F, share of the triangles dropped)."""
+    Returns (V, F, share of the triangles dropped); the dropped pieces are in keep_attached.lost."""
     from scipy.sparse.csgraph import connected_components
     n = len(V); e = np.r_[F[:, [0, 1]], F[:, [1, 2]]]
     _, lab = connected_components(sparse.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n)), directed=False)
@@ -231,10 +246,23 @@ def keep_attached(V, F, field, origin, voxel, reach):
     near = np.zeros(lab.max() + 1, bool); np.logical_or.at(near, lab, dist < reach)
     fl = lab[F[:, 0]]; counts = np.bincount(fl, minlength=len(near))
     near[np.argmax(counts)] = True                     # never drop the main piece
-    keep = near[fl]
+    keep = near[fl]; keep_attached.lost = []
     if keep.all(): return V, F, 0.0
+    keep_attached.lost = dropped_pieces(V, lab, counts, ~near & (counts > 0), counts.max())
     used = np.unique(F[keep]); remap = -np.ones(n, np.int64); remap[used] = np.arange(len(used))
     return V[used], remap[F[keep]], float(counts[~near].max() / counts.max())
+
+
+def name_pieces(parts, lost):
+    """What each dropped piece was: [{"parts": names that make up at least a fifth of it, "length_m": its longest
+    side, "share": its size against what it came off}], biggest first."""
+    import parts as PT
+    out = []
+    for share, pts in sorted(lost, key=lambda x: -x[0]):
+        pid = PT.nearest_part(parts, pts); n = np.bincount(pid, minlength=len(parts))
+        names = [parts[i]["name"] for i in np.argsort(-n) if n[i] >= 0.2 * len(pts)]
+        out.append({"parts": names, "length_m": round(float(np.ptp(pts, 0).max()), 3), "share": round(share, 4)})
+    return out
 
 
 TRUNK_THICK = 0.06      # a part at least this thick (share of the animal's largest size) belongs to the trunk
@@ -347,7 +375,8 @@ def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore
     (blend) onto the body as the coarse build made it, sunk half a coarse voxel so that the edge of the fillet lies
     just under the body's own surface. Only the fine parts and their fillets are kept from that mesh; the body
     surface in the box comes from the coarse mesh. occ and ignore (coarse grids) are updated in place so texturing
-    sees the fine parts. Returns (meshes [(V, F, N)], untrimmed part names, largest dropped share)."""
+    sees the fine parts. Returns (meshes [(V, F, N)], untrimmed part names, largest dropped share, dropped pieces
+    [(share, points)])."""
     import parts as PT
     fp = [parts[i] for i in fine]
     kmax = max([max(p["blend"], p.get("root_blend", 0)) for p in fp] + [voxel])
@@ -366,7 +395,7 @@ def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore
                     del boxes[b]; merged = True; break
             if merged: break
     origin = np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
-    meshes, untrimmed, dropped = [], set(), 0.0
+    meshes, untrimmed, dropped, lost = [], set(), 0.0, []
     for lo, hi in boxes:
         vf = max(voxel / FINE_STEP, float(np.prod(hi - lo) / FINE_MAX_POINTS) ** (1 / 3))
         ax = {a: np.arange(lo[k], hi[k] + vf, vf) for k, a in enumerate("xyz")}
@@ -406,9 +435,9 @@ def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore
         used = np.unique(F); remap = -np.ones(len(V), np.int64); remap[used] = np.arange(len(used))
         V, F = V[used], remap[F]
         V, F, _, _ = keep_main_pieces(V, F)
-        dropped = max(dropped, keep_main_pieces.biggest_dropped)
+        dropped = max(dropped, keep_main_pieces.biggest_dropped); lost += keep_main_pieces.lost
         V, F, cut_off = keep_attached(V, F, field, origin, voxel, kb + 2 * voxel)
-        dropped = max(dropped, cut_off)
+        dropped = max(dropped, cut_off); lost += keep_attached.lost
         meshes.append((V, F, field_normals(d, V, o, vf)))
         # the coarse grids that texturing reads: where the fine shape is, and which views ignore it there
         sl = tuple(slice(np.searchsorted(axes[a], lo[q]), np.searchsorted(axes[a], hi[q])) for q, a in enumerate("xyz"))
@@ -421,7 +450,7 @@ def build_fine(maps, axes, voxel, field, parts, fine, skip, tol_max, occ, ignore
             ids = [j for j, p in enumerate(here) if v in p.get("ignore", [])]
             if ids:
                 ignore.setdefault(v, np.zeros(occ.shape, bool))[sl] |= inside & np.isin(near_pid, ids)
-    return meshes, sorted(untrimmed), dropped
+    return meshes, sorted(untrimmed), dropped, lost
 
 
 def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, skip=()):
@@ -486,20 +515,20 @@ def build_shape_parts(refs, parts, res=280, grow=0.0, blur=1.0, smooth_iters=8, 
     F = faces[:, ::-1].astype(np.int64)
     V, F, kept, pieces = keep_main_pieces(V, F)
     if smooth_iters: V = taubin(V, F, smooth_iters)
-    dropped = keep_main_pieces.biggest_dropped
+    dropped = keep_main_pieces.biggest_dropped; lost = list(keep_main_pieces.lost)
     origin = np.array([axes["x"][0], axes["y"][0], axes["z"][0]])
     N = field_normals(field, V, origin, voxel)
     occ = field < 0
     untrimmed = [parts[i]["name"] for i in protected]
     if fine:
-        meshes, fine_untrimmed, fine_dropped = build_fine(maps, axes, voxel, field, all_parts, fine, skip, tol_max,
+        meshes, fine_untrimmed, fine_dropped, fine_lost = build_fine(maps, axes, voxel, field, all_parts, fine, skip, tol_max,
                                                           occ, ignore)
         for Vf, Ff, Nf in meshes:
             F = np.r_[F, Ff + len(V)]; V = np.r_[V, Vf]; N = np.r_[N, Nf]
-        untrimmed += fine_untrimmed; dropped = max(dropped, fine_dropped)
+        untrimmed += fine_untrimmed; dropped = max(dropped, fine_dropped); lost += fine_lost
     return dict(size=size, maps=maps, notes=notes, axes=axes, voxel=voxel, hull=hull, occ=occ, V=V, F=F, N=N,
                 grow=grow, pieces=(kept, pieces), parts=all_parts, ignored_space=ignore,
-                untrimmed=untrimmed, dropped_piece=dropped, fine=[all_parts[i]["name"] for i in fine],
+                untrimmed=untrimmed, dropped_piece=dropped, dropped_parts=name_pieces(all_parts, lost), fine=[all_parts[i]["name"] for i in fine],
                 auto_ignored={parts[i]["name"]: list(v) for i, v in auto.items()})
 
 
