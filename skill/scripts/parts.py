@@ -401,6 +401,44 @@ def bounds(p):
     return np.min(los, 0), np.max(his, 0)
 
 
+def cull_box(p, pad=0.0):
+    """A box sure to hold the whole part (bounds(), widened for what it leaves out: an oval cross-section, a
+    drooping tip, a loft's curve swelling between its stations), grown by pad."""
+    lo, hi = bounds(p); extra = 0.0
+    if p["type"] in ("capsule", "chain"):
+        r = float(p["joints"][:, 3].max()) if p["type"] == "chain" else float(max(p["ra"], p["rb"]))
+        extra += max(float(p.get("aspect", 1.0)) - 1.0, 0.0) * r + abs(float(p.get("droop", 0.0)))
+    if p["type"] == "loft": extra += 0.1 * float(np.max(hi - lo))
+    return lo - pad - extra, hi + pad + extra
+
+
+def grid_box(axes, lo, hi):
+    """Index slices of a regular grid (axes["x"], ["y"], ["z"], increasing) covering the box lo..hi."""
+    return tuple(slice(int(np.searchsorted(axes[a], lo[k], "left")), int(np.searchsorted(axes[a], hi[k], "right")))
+                 for k, a in enumerate("xyz"))
+
+
+def sdf_part_grid(p, P3, axes, pad):
+    """sdf_part on a regular grid (P3: the grid's points, shaped (nx, ny, nz, 3), over axes), worked out only in a box
+    round the part (cull_box, grown by pad) and +inf elsewhere: exact for which points are inside the part, which is
+    all the fitter needs (not for distances outside the box: an oval part's distance is understated away from it).
+    A leg covers a few percent of the grid, so this is many times faster than the whole grid."""
+    out = np.full(P3.shape[:3], np.inf)
+    sl = grid_box(axes, *cull_box(p, pad)); Q = P3[sl]
+    if Q.size: out[sl] = sdf_part(p, Q.reshape(-1, 3)).reshape(Q.shape[:3])
+    return out
+
+
+def occupancy(parts, axes):
+    """Which points of the regular grid over axes lie inside the blockout (any part; no blending)."""
+    X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij"); P3 = np.stack([X, Y, Z], -1); del X, Y, Z
+    occ = np.zeros(P3.shape[:3], bool)
+    for p in parts:
+        sl = grid_box(axes, *cull_box(p)); Q = P3[sl]
+        if Q.size: occ[sl] |= (sdf_part(p, Q.reshape(-1, 3)) < 0).reshape(Q.shape[:3])
+    return occ
+
+
 # ---- parameter vectors for fitting ---------------------------------------------------------------------------------
 
 def surface_points(p, n=32):

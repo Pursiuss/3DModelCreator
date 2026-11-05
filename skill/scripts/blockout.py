@@ -33,7 +33,7 @@ class Fitter:
         self.L = {v: sample(self.maps[v], self.axes) for v in VIEWS}
         self.shape = tuple(len(self.axes[a]) for a in "xyz")
         X, Y, Z = np.meshgrid(self.axes["x"], self.axes["y"], self.axes["z"], indexing="ij")
-        self.P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
+        self.P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]; self.P3 = self.P.reshape(self.shape + (3,))
         self.care = {v: np.ones_like(self.L[v]) & (v not in self.skip) for v in VIEWS}
 
     def set_ignores(self, parts):
@@ -44,6 +44,14 @@ class Fitter:
             if not ign: self.care[v] = np.ones_like(self.L[v]); continue
             near = self.projections(np.min([PT.sdf_part(p, self.P) for p in ign], 0) - 2 * self.voxel)[v]
             self.care[v] = ~ndimage.binary_dilation(near, iterations=2)
+
+    def part_d(self, p):
+        """A part's distance on the fitter's grid, worked out only round the part: exact inside/outside."""
+        return PT.sdf_part_grid(p, self.P3, self.axes, self.voxel).ravel()
+
+    def occ_d(self, parts):
+        """The whole blockout on the grid as -1 inside, +1 outside (all that projections and ious look at)."""
+        return np.where(PT.occupancy(parts, self.axes).ravel(), -1.0, 1.0)
 
     def projections(self, d):
         o = (d < 0).reshape(self.shape)
@@ -61,7 +69,7 @@ class Fitter:
         return float(np.mean([x for v, x in self.ious(d).items() if v not in self.skip]))
 
     def fit(self, parts, sweeps=6, log=print):
-        D = [PT.sdf_part(p, self.P) for p in parts]
+        D = [self.part_d(p) for p in parts]
         best = self.score(np.min(D, 0))
         log(f"start: mean outline overlap {best:.3f}")
         steps = []
@@ -117,7 +125,7 @@ class Fitter:
                         q = dict(p); PT.put(q, k, i, v)
                         if k == "joints" and kinks0[pi] is not None and \
                                 (side_kinks(q["joints"]) > kinks0[pi] + 0.3 * q["joints"][:, 3]).any(): continue
-                        d = PT.sdf_part(q, self.P); sc = self.score(np.minimum(others, d))
+                        d = self.part_d(q); sc = self.score(np.minimum(others, d))
                         if sc > best + 1e-5:
                             parts[pi] = p = q; D[pi] = d; best = sc; ok = True; changed += 1; break
                     if not ok: steps[pi][(k, i)] = st * 0.6
@@ -145,7 +153,7 @@ def orient(a, view):
 
 
 def overlay(f, parts, path):
-    d = PT.sdf(parts, f.P, smooth=False); pr = f.projections(d); tiles = []
+    d = f.occ_d(parts); pr = f.projections(d); tiles = []
     for v in ("front", "side", "back", "top"):
         s, m = orient(pr[v], v), orient(f.L[v], v)
         img = np.full(s.shape + (3,), 245, np.uint8)
@@ -343,10 +351,7 @@ CAMERA = {"front": (1, False), "back": (1, True), "side": (0, True), "top": (2, 
 def first_hit_labels(parts, axes, axis, high, occ=None):
     """For a camera looking along `axis` (from its high end if `high`): which part it sees first at each cell of the
     other two axes (-1 = nothing). The grid may be coarser along the viewing axis than across it."""
-    if occ is None:
-        X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij")
-        P = np.c_[X.ravel(), Y.ravel(), Z.ravel()]
-        occ = (PT.sdf(parts, P, smooth=False) < 0).reshape(X.shape)
+    if occ is None: occ = PT.occupancy(parts, axes)
     o = np.moveaxis(occ, axis, -1); n = o.shape[-1]; has = o.any(-1)
     first = (n - 1 - np.argmax(o[..., ::-1], -1)) if high else np.argmax(o, -1)
     other = [a for a in range(3) if a != axis]
@@ -436,9 +441,7 @@ def parts_on_refs(parts, refs, size, maps, path, res=200, height=520, detail_pat
     detail_path: a second sheet, zoomed in on each group of small parts (a foot's toes and claws, a beak) and drawn
     on a fine grid, because at the whole-animal scale a claw is two or three grid cells."""
     axes, voxel = make_grid(maps, size, capped_res(maps, size, res, 600_000))
-    X, Y, Z = np.meshgrid(axes["x"], axes["y"], axes["z"], indexing="ij")
-    occ = (PT.sdf(parts, np.c_[X.ravel(), Y.ravel(), Z.ravel()], smooth=False) < 0).reshape(X.shape)
-    del X, Y, Z
+    occ = PT.occupancy(parts, axes)
     tiles = []
     for v in ("front", "side", "back", "top"):
         vm = maps[v]; axis, high = CAMERA[v]; b = vm.box; H, W = vm.sil.shape
@@ -494,9 +497,9 @@ def main():
     f = Fitter(a.refs, a.res, a.skip_view); f.set_ignores(parts)
     lines = []
     def log(s): print(s); lines.append(s)
-    before = f.ious(PT.sdf(parts, f.P, smooth=False))
+    before = f.ious(f.occ_d(parts))
     if not a.no_fit: parts, _ = f.fit(parts, a.sweeps, log)
-    after = f.ious(PT.sdf(parts, f.P, smooth=False))
+    after = f.ious(f.occ_d(parts))
     log("outline overlap per view (before -> after): " + ", ".join(
         f"{v} {before[v]:.2f} -> {after[v]:.2f}" + (" (skipped)" if v in f.skip else "") for v in VIEWS))
     for p0, p1 in zip(start, parts):
