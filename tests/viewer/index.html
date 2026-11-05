@@ -22,12 +22,21 @@
   label { display: flex; gap: 5px; align-items: center; color: var(--muted); }
   #view { position: fixed; top: 52px; left: 0; right: 0; bottom: 0; }
   #info { position: fixed; left: 12px; bottom: 10px; color: var(--muted); font-size: 12px; pointer-events: none; }
-  @media (max-width: 600px) { #view { top: 96px; } }
+  #drop { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 3;
+          background: color-mix(in srgb, var(--accent) 18%, transparent); border: 3px dashed var(--accent);
+          font-size: 20px; pointer-events: none; }
+  body.dragging #drop { display: flex; }
+  #msg { position: fixed; right: 12px; bottom: 10px; color: var(--muted); font-size: 12px; max-width: 60%;
+         text-align: right; }
+  button:disabled { opacity: 0.45; cursor: default; border-color: var(--line); }
+  @media (max-width: 600px) { #view { top: 130px; } #msg { max-width: 90%; bottom: 28px; } }
 </style>
 </head>
 <body>
 <div id="bar">
   <select id="model" title="Model"></select>
+  <button id="open" title="Open any .glb file on this computer (it is added to Recently opened)">Open file…</button>
+  <button id="forget" title="Remove the selected file from Recently opened (the file itself is not touched)" disabled>Forget</button>
   <button id="reload" title="Reload the model list and the current model">Reload</button>
   <button id="tex" class="on" title="Show the texture">Texture</button>
   <button id="wire" title="Show the triangle mesh">Wireframe</button>
@@ -36,7 +45,9 @@
   <button data-cam="back">Back</button><button data-cam="top">Top</button><button data-cam="three">3/4</button>
 </div>
 <div id="view"></div>
-<div id="info">Drag to turn · scroll to zoom · right-drag to pan</div>
+<div id="info">Drag to turn · scroll to zoom · right-drag to pan · drop a .glb here to open it</div>
+<div id="msg"></div>
+<div id="drop">Drop a .glb file to open it</div>
 
 <script type="importmap">
 { "imports": {
@@ -92,31 +103,89 @@ function view(name) {
   camera.position.copy(c).add(v); controls.target.copy(c); controls.update();
 }
 
-async function load(url) {
+const HDR = { "X-Viewer": "1" };                              // the server only opens files for this page
+const sel = document.getElementById("model"), msg = document.getElementById("msg");
+const dropped = new Map();                                     // dropped files: kept for this page only
+function say(t) { msg.textContent = t || ""; }
+function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function stored(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+async function bytes(value) {                                  // value: "url:/kit/...", "file:C:\...", "drop:N"
+  const [kind, rest] = [value.slice(0, value.indexOf(":")), value.slice(value.indexOf(":") + 1)];
+  if (kind === "drop") return dropped.get(rest).arrayBuffer();
+  const url = kind === "file" ? "/file?path=" + encodeURIComponent(rest) : rest;
+  const r = await fetch(url, { headers: HDR, cache: "no-store" });
+  if (!r.ok) throw new Error(r.status === 404 ? "file not found (moved or deleted?)" : "could not load (" + r.status + ")");
+  return r.arrayBuffer();
+}
+
+async function load(value) {
+  say("loading…");
+  let gltf;
+  try { gltf = await new GLTFLoader().parseAsync(await bytes(value), ""); }
+  catch (e) { say("Could not open it: " + e.message); return; }
+  say(value.startsWith("drop:") ? "Dropped files are not added to Recently opened (the browser does not say where " +
+      "they are): use Open file… to keep one there." : "");
   if (model) { scene.remove(model); maps.clear(); }
-  const gltf = await new GLTFLoader().loadAsync(url + "?t=" + Date.now());
   model = gltf.scene; scene.add(model);
   const box = new THREE.Box3().setFromObject(model);
   size = box.getSize(new THREE.Vector3()).length(); box.getCenter(centre);
   grid.position.y = box.min.y; grid.scale.setScalar(Math.max(size / 4, 0.1));
   camera.near = size / 200; camera.far = size * 50; camera.updateProjectionMatrix();
   applyLook(); view("three");
+  if (!value.startsWith("drop:")) store("viewer.last", value);
+  document.getElementById("forget").disabled = !value.startsWith("file:");
 }
 
-async function list(keep) {
-  const sel = document.getElementById("model"), prev = keep ? sel.value : null;
-  const ms = await (await fetch("/models.json", { cache: "no-store" })).json();
+function group(label) { const g = document.createElement("optgroup"); g.label = label; sel.appendChild(g); return g; }
+function option(g, value, text, disabled) {
+  const o = document.createElement("option"); o.value = value; o.textContent = text; o.disabled = !!disabled;
+  g.appendChild(o); return o;
+}
+const when = t => new Date(t * 1000).toLocaleString();
+
+async function list(want) {
+  const [ms, rs] = await Promise.all([
+    fetch("/models.json", { cache: "no-store" }).then(r => r.json()),
+    fetch("/recent.json", { cache: "no-store" }).then(r => r.json())]);
   sel.innerHTML = "";
-  for (const m of ms) {
-    const o = document.createElement("option"); o.value = m.url;
-    o.textContent = m.label + "  (" + new Date(m.mtime * 1000).toLocaleString() + ")"; sel.appendChild(o);
+  if (dropped.size) { const g = group("Dropped (this page only)"); for (const [k, f] of dropped) option(g, "drop:" + k, f.name); }
+  if (rs.length) {
+    const g = group("Recently opened");
+    for (const r of rs) option(g, "file:" + r.path, r.path + (r.missing ? "  (missing)" : "  (opened " + when(r.opened) + ")"), r.missing);
   }
-  if (prev && ms.some(m => m.url === prev)) sel.value = prev;
-  if (sel.value) await load(sel.value);
+  const g = group("Kit and tests");
+  for (const m of ms) option(g, "url:" + m.url, m.label + "  (" + when(m.mtime) + ")");
+  const ok = v => v && [...sel.options].some(o => o.value === v && !o.disabled);
+  sel.value = ok(want) ? want : ok(stored("viewer.last")) ? stored("viewer.last") : "url:" + (ms[0] || {}).url;
+  if (sel.value && sel.selectedIndex >= 0) await load(sel.value);
+  else document.getElementById("forget").disabled = true;
 }
 
-document.getElementById("model").onchange = e => load(e.target.value);
-document.getElementById("reload").onclick = () => list(true);
+sel.onchange = e => load(e.target.value);
+document.getElementById("reload").onclick = () => list(sel.value);
+document.getElementById("open").onclick = async () => {
+  say("choose a file in the window that opened (it may be behind this one)…");
+  const r = await (await fetch("/pick", { method: "POST", headers: HDR })).json();
+  if (!r.chosen) { say(""); return; }
+  if (!r.path) { say("That is not a .glb file."); return; }
+  await list("file:" + r.path);
+};
+document.getElementById("forget").onclick = async () => {
+  if (!sel.value.startsWith("file:")) return;
+  await fetch("/forget?path=" + encodeURIComponent(sel.value.slice(5)), { method: "POST", headers: HDR });
+  await list(null);
+};
+let depth = 0;                                                  // drag and drop a .glb onto the page
+window.addEventListener("dragenter", e => { e.preventDefault(); depth++; document.body.classList.add("dragging"); });
+window.addEventListener("dragleave", () => { if (--depth <= 0) { depth = 0; document.body.classList.remove("dragging"); } });
+window.addEventListener("dragover", e => e.preventDefault());
+window.addEventListener("drop", async e => {
+  e.preventDefault(); depth = 0; document.body.classList.remove("dragging");
+  const f = [...e.dataTransfer.files].find(f => f.name.toLowerCase().endsWith(".glb"));
+  if (!f) { say("Only .glb files can be opened."); return; }
+  const k = String(dropped.size); dropped.set(k, f); await list("drop:" + k);
+});
 const toggle = (id, fn) => { const b = document.getElementById(id); b.onclick = () => b.classList.toggle("on", fn()); };
 toggle("tex", () => { textured = !textured; applyLook(); return textured; });
 toggle("wire", () => { wire = !wire; applyLook(); return wire; });
@@ -128,7 +197,7 @@ renderer.setAnimationLoop(() => {
   if (spin && model) model.rotation.y += 0.01;
   controls.update(); renderer.render(scene, camera);
 });
-list(false);
+list(null);
 </script>
 </body>
 </html>

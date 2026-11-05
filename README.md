@@ -48,10 +48,16 @@ http://localhost:8765 in the browser; close its window to stop it. Or, from the 
 .venv/Scripts/python tests/viewer/serve.py
 ```
 then open http://localhost:8765. The drop-down lists every `.glb` in this folder and in the test projects folder next to
-it (`../TEST-KIT`), newest first; press **Reload** after a new run. Drag to turn, scroll to zoom,
+it (`../TEST-KIT`), newest first; press **Reload** after a new run. To look at any other `.glb` on the computer,
+press **Open file…** (a Windows file dialog opens; it may come up behind the browser): the file is added to
+**Recently opened** at the top of the drop-down, which is kept between sessions (in `tests/viewer/recent.json`, not
+in git); **Forget** removes the selected file from that list. A `.glb` dropped onto the page opens too, but is not
+remembered (the browser does not say where the file is). The viewer also reopens the last model you looked at.
+Drag to turn, scroll to zoom,
 right-drag to pan; the buttons switch the texture (or the part colours) on and off, show the wireframe, spin the
 model and jump to the front, side, back, top and 3/4 views. Use `--port` for another port. The page loads three.js
-from a CDN, so it needs an internet connection; nothing is uploaded, and the server only answers on this computer.
+from a CDN, so it needs an internet connection; nothing is uploaded, and the server only answers on this computer
+(and opens files elsewhere on it only for the viewer page itself, and only `.glb` files).
 
 **Without the viewer.** A `.glb` also opens in Blender (File > Import > glTF 2.0), or by dragging it onto an online glTF viewer such as https://gltf-viewer.donmccurdy.com (the file
 stays in the browser). Each run's `preview-textured.png`, `preview-untextured.png` and `preview-parts.png` show the
