@@ -1,0 +1,37 @@
+start: mean outline overlap 0.885
+sweep 1: overlap 0.886 (2 changes)
+sweep 2: overlap 0.886 (0 changes)
+outline overlap per view (before -> after): front 0.87 -> 0.87, back 0.00 -> 0.00 (skipped), side 0.92 -> 0.92, top 0.86 -> 0.87
+  body: stations[0].half_width +0.303->+0.348; stations[0].half_height +0.255->+0.293
+  neck: unchanged
+  head: unchanged
+  brow: unchanged
+  lower jaw: unchanged
+  mane: unchanged
+  ossicone: unchanged
+  ossicone knob: unchanged
+  ear: unchanged
+  tail: unchanged
+  tail switch: unchanged
+  near front upper leg: unchanged
+  near front lower leg: unchanged
+  near front hoof in: unchanged
+  near front hoof out: unchanged
+  far front upper leg: unchanged
+  far front lower leg: unchanged
+  far front hoof in: unchanged
+  far front hoof out: unchanged
+  near hind upper leg: unchanged
+  near hind lower leg: unchanged
+  near hind hoof in: unchanged
+  near hind hoof out: unchanged
+  far hind upper leg: unchanged
+  far hind lower leg: unchanged
+  far hind hoof in: unchanged
+  far hind hoof out: unchanged
+part checks:
+  lower jaw: 20% of it lies outside the side outline: too big, or in the wrong place
+  mane: 47% of it lies outside the side outline: too big, or in the wrong place
+  ossicone knob: 20% of it lies outside the front outline: too big, or in the wrong place
+  ear: thinnest radius 20.0 mm is under 1.5 build voxels (26.8 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  ear: 86% of it lies outside the top outline: too big, or in the wrong place

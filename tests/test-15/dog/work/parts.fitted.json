@@ -1,0 +1,422 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "loft",
+   "stations": [
+    [0.0, -0.32, 0.4832, 0.1192, 0.163],
+    [0.0, -0.22, 0.4589, 0.1281, 0.2293],
+    [0.0, -0.1, 0.4435, 0.1199, 0.1907],
+    [0.0, 0.0, 0.444, 0.129, 0.1724],
+    [0.0, 0.1, 0.4638, 0.149, 0.1558],
+    [0.0, 0.2, 0.4314, 0.1209, 0.1817],
+    [0.0, 0.3, 0.3862, 0.091, 0.1959],
+    [0.0, 0.37, 0.4453, 0.07, 0.0786]
+   ],
+   "caps": [0.05, 0.05]
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [0.0, -0.2, 0.5],
+   "b": [0.0, -0.3, 0.69],
+   "ra": 0.125,
+   "rb": 0.085,
+   "aspect": 1.1,
+   "droop": 0.0,
+   "blend": 0.11,
+   "fit": false
+  },
+  {
+   "name": "chest ruff",
+   "type": "ellipsoid",
+   "center": [0.0, -0.3173, 0.4794],
+   "radii": [0.085, 0.0727, 0.1661],
+   "rotate": [16.0, 0.0, 0.0],
+   "blend": 0.05
+  },
+  {
+   "name": "head",
+   "type": "ellipsoid",
+   "center": [0.0, -0.355, 0.715],
+   "radii": [0.092, 0.09, 0.085],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.05,
+   "fit": false
+  },
+  {
+   "name": "snout",
+   "type": "capsule",
+   "a": [0.0, -0.4, 0.71],
+   "b": [0.0, -0.493, 0.695],
+   "ra": 0.048,
+   "rb": 0.028,
+   "aspect": 1.6,
+   "droop": 0.0,
+   "blend": 0.02,
+   "fit": false
+  },
+  {
+   "name": "nose",
+   "type": "ellipsoid",
+   "center": [0.0, -0.516, 0.697],
+   "radii": [0.024, 0.018, 0.021],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "front"
+   ]
+  },
+  {
+   "name": "lower jaw",
+   "type": "capsule",
+   "a": [0.0, -0.39, 0.627],
+   "b": [0.0, -0.47, 0.624],
+   "ra": 0.024,
+   "rb": 0.016,
+   "aspect": 1.8,
+   "droop": 0.0,
+   "blend": 0.012,
+   "fit": false
+  },
+  {
+   "name": "mouth",
+   "type": "capsule",
+   "a": [0.0, -0.395, 0.648],
+   "b": [0.0, -0.468, 0.645],
+   "ra": 0.017,
+   "rb": 0.014,
+   "aspect": 2.0,
+   "droop": 0.0,
+   "blend": 0.003,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "tongue",
+   "type": "capsule",
+   "a": [0.0, -0.42, 0.64],
+   "b": [0.0, -0.49, 0.638],
+   "ra": 0.012,
+   "rb": 0.011,
+   "aspect": 2.5,
+   "droop": 0.0,
+   "blend": 0.002,
+   "colour": "#d98a8f",
+   "fit": false
+  },
+  {
+   "name": "ear",
+   "type": "paddle",
+   "a": [0.08, -0.325, 0.75],
+   "b": [0.118, -0.335, 0.675],
+   "ra": 0.03,
+   "rb": 0.043,
+   "thick": 0.012,
+   "normal": [0.92, -0.3, 0.25],
+   "bend": 0.0,
+   "curl": 0.01,
+   "mirror": true,
+   "blend": 0.005,
+   "root_blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "front lower leg",
+   "type": "chain",
+   "joints": [
+    [0.0851, -0.2011, 0.4, 0.0556],
+    [0.0732, -0.1919, 0.1583, 0.0547],
+    [0.0573, -0.203, 0.1473, 0.0388],
+    [0.062, -0.225, 0.0399, 0.0368],
+    [0.078, -0.266, 0.0341, 0.0345]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.03,
+   "root_blend": 0.07
+  },
+  {
+   "name": "front feathering",
+   "type": "paddle",
+   "a": [0.072, -0.165, 0.3],
+   "b": [0.072, -0.175, 0.085],
+   "ra": 0.06,
+   "rb": 0.025,
+   "thick": 0.02,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "mirror": true,
+   "blend": 0.015,
+   "fit": false,
+   "fur": true
+  },
+  {
+   "name": "front paw",
+   "type": "ellipsoid",
+   "center": [0.06, -0.252, 0.026],
+   "radii": [0.04, 0.048, 0.026],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.012,
+   "fit": false
+  },
+  {
+   "name": "front toe inner",
+   "type": "ellipsoid",
+   "center": [0.033, -0.272, 0.018],
+   "radii": [0.011, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false
+  },
+  {
+   "name": "front toe mid inner",
+   "type": "ellipsoid",
+   "center": [0.052, -0.286, 0.018],
+   "radii": [0.011, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false
+  },
+  {
+   "name": "front toe mid outer",
+   "type": "ellipsoid",
+   "center": [0.071, -0.286, 0.018],
+   "radii": [0.011, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false
+  },
+  {
+   "name": "front toe outer",
+   "type": "ellipsoid",
+   "center": [0.09, -0.272, 0.018],
+   "radii": [0.011, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false
+  },
+  {
+   "name": "front claw inner",
+   "type": "chain",
+   "joints": [
+    [0.034, -0.284, 0.014, 0.004],
+    [0.034, -0.296, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw mid inner",
+   "type": "chain",
+   "joints": [
+    [0.058, -0.292, 0.014, 0.004],
+    [0.058, -0.301, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw mid outer",
+   "type": "chain",
+   "joints": [
+    [0.072, -0.292, 0.014, 0.004],
+    [0.072, -0.301, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "front claw outer",
+   "type": "chain",
+   "joints": [
+    [0.09, -0.284, 0.014, 0.004],
+    [0.09, -0.296, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false
+  },
+  {
+   "name": "hind thigh",
+   "type": "capsule",
+   "a": [0.05, 0.24, 0.46],
+   "b": [0.0639, 0.3661, 0.21],
+   "ra": 0.085,
+   "rb": 0.0468,
+   "aspect": 0.75,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.08,
+   "root_blend": 0.08,
+   "fit": false
+  },
+  {
+   "name": "hind lower leg",
+   "type": "chain",
+   "joints": [
+    [0.0639, 0.3661, 0.21, 0.0468],
+    [0.0639, 0.3359, 0.16, 0.0357],
+    [0.0795, 0.3348, 0.0789, 0.0341],
+    [0.085, 0.3585, 0.0761, 0.0322],
+    [0.0715, 0.3606, 0.0373, 0.032]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.03,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "trousers",
+   "type": "paddle",
+   "a": [0.082, 0.365, 0.38],
+   "b": [0.085, 0.375, 0.13],
+   "ra": 0.05,
+   "rb": 0.02,
+   "thick": 0.02,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "mirror": true,
+   "blend": 0.015,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ],
+   "fur": true
+  },
+  {
+   "name": "hind paw",
+   "type": "ellipsoid",
+   "center": [0.077, 0.325, 0.026],
+   "radii": [0.034, 0.046, 0.026],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.012,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe inner",
+   "type": "ellipsoid",
+   "center": [0.054, 0.303, 0.018],
+   "radii": [0.01, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe mid inner",
+   "type": "ellipsoid",
+   "center": [0.071, 0.29, 0.018],
+   "radii": [0.01, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe mid outer",
+   "type": "ellipsoid",
+   "center": [0.088, 0.29, 0.018],
+   "radii": [0.01, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind toe outer",
+   "type": "ellipsoid",
+   "center": [0.104, 0.303, 0.018],
+   "radii": [0.01, 0.02, 0.018],
+   "rotate": [0.0, 0.0, 0.0],
+   "mirror": true,
+   "blend": 0.003,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw mid inner",
+   "type": "chain",
+   "joints": [
+    [0.071, 0.282, 0.014, 0.004],
+    [0.071, 0.274, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "hind claw mid outer",
+   "type": "chain",
+   "joints": [
+    [0.088, 0.282, 0.014, 0.004],
+    [0.088, 0.274, 0.006, 0.002]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.001,
+   "colour": "#523726",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "tail",
+   "type": "chain",
+   "joints": [
+    [0.0, 0.29, 0.49, 0.04],
+    [0.0, 0.3512, 0.4026, 0.0595],
+    [0.0, 0.4126, 0.3136, 0.0741],
+    [0.0, 0.4436, 0.267, 0.0614],
+    [0.0, 0.4891, 0.1781, 0.0297]
+   ],
+   "aspect": 1.1,
+   "blend": 0.04,
+   "fit": false
+  }
+ ]
+}

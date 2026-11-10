@@ -1,0 +1,24 @@
+start: mean outline overlap 0.921
+sweep 1: overlap 0.922 (4 changes)
+sweep 2: overlap 0.922 (0 changes)
+outline overlap per view (before -> after): front 0.92 -> 0.92, back 0.00 -> 0.00 (skipped), side 0.94 -> 0.94, top 0.91 -> 0.91
+  body: stations[0].half_width +0.158->+0.181; stations[1].half_width +0.171->+0.145; stations[7].half_width +0.100->+0.115; stations[7].half_height +0.098->+0.083
+  neck: unchanged
+  wool cap: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: unchanged
+  tail: unchanged
+  front leg: unchanged
+  front hoof in: unchanged
+  front hoof out: unchanged
+  front dewclaw: unchanged
+  hind leg: unchanged
+  hind hoof in: unchanged
+  hind hoof out: unchanged
+  hind dewclaw: unchanged
+part checks:
+  nose pad: 100% of it lies outside the top outline: too big, or in the wrong place
+  ear: 51% of it lies outside the top outline: too big, or in the wrong place
+  hind hoof out: 30% of it lies outside the front outline: too big, or in the wrong place

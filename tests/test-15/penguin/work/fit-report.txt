@@ -1,0 +1,28 @@
+start: mean outline overlap 0.906
+sweep 1: overlap 0.906 (0 changes)
+outline overlap per view (before -> after): front 0.92 -> 0.92, back 0.91 -> 0.91, side 0.93 -> 0.93, top 0.86 -> 0.86
+  body: unchanged
+  rump: unchanged
+  lower belly: unchanged
+  neck: unchanged
+  head: unchanged
+  upper beak: unchanged
+  lower beak: unchanged
+  flipper: unchanged
+  tail: unchanged
+  tail feather centre: unchanged
+  tail feather mid: unchanged
+  tail feather outer: unchanged
+  ankle: unchanged
+  heel: unchanged
+  web: unchanged
+  inner toe: unchanged
+  middle toe: unchanged
+  outer toe: unchanged
+  inner claw: unchanged
+  middle claw: unchanged
+  outer claw: unchanged
+part checks:
+  web: 25% of it lies outside the front outline: too big, or in the wrong place
+  outer claw: 20% of it lies outside the front outline: too big, or in the wrong place
+  rump: 99% of it is inside other parts, so it changes nothing. If the parts around it already make its drawn shape (a rump that bulges where the tail lies on it, a head whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move it out until it stands as proud of them as the drawing shows

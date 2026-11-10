@@ -2,10 +2,15 @@
 
 usage: python measure.py REFS_DIR WORK_DIR
        python measure.py REFS_DIR WORK_DIR --zoom VIEW H0 V0 H1 V1   (a close-up with a 1 cm grid)
+       python measure.py REFS_DIR WORK_DIR --colours VIEW V0 V1        (the colours across each level, in metres)
 Writes WORK_DIR/ruler-{front,side,back,top}.png, WORK_DIR/palette.png and WORK_DIR/profiles.txt (also printed).
 --zoom writes WORK_DIR/zoom-VIEW.png: the box from (H0, V0) to (H1, V1) in model metres (front/back: x, z;
 side: y, z; top: x, y), enlarged, with a grid every centimetre (coarser for big boxes), for small parts (beak, toes,
 claws, eyes, ears, antlers).
+--colours writes WORK_DIR/colours-VIEW.txt (also printed): for every centimetre (coarser for long spans) from V0 to
+V1 (front/back/side: z; top: y), the stretches of each palette colour across the picture, in model metres. The
+outline cannot show where a part lies inside the body's outline (a flipper or wing seen from the side, a marking):
+these stretches can (the flipper's front and back edges are where its colour starts and stops on each level).
 palette.png and the end of profiles.txt list the few colours the animal is painted in, with their "#rrggbb" codes,
 for parts' "colour" in parts.json.
 Grid labels are model coordinates (see parts.py): x across (front view: right = +x), y along (nose at -y),
@@ -123,6 +128,46 @@ def zoom(refs, vm, box, path, px=1200):
     crop.save(path)
 
 
+def colour_lines(refs, vm, v0, v1, min_m=0.004):
+    """Per level from v0 to v1: the stretches of each palette colour across the picture (inside the outline), as
+    'code h[from, to]'. Stretches narrower than min_m (specks, feather strokes) join their neighbours."""
+    from texture import palette
+    P, feat, pal_f = palette(refs)
+    codes = ["#%02x%02x%02x" % tuple(int(c) for c in q) for q in P]
+    im = np.asarray(load_rgba(refs, vm.view)).astype(float); inside = im[..., 3] >= 128
+    span = abs(v1 - v0); step = next((s for s in (0.01, 0.02, 0.05, 0.1) if span / s <= 40), 0.2)
+    ha, _, va, _ = VIEWS[vm.view]; min_px = max(2, int(round(min_m * vm.sc))); out = []
+    for v in np.arange(max(v0, v1), min(v0, v1) - 1e-9, -step):
+        r = int(round(to_pixel(vm, None, v)[1]))
+        if not 0 <= r < im.shape[0] or not inside[r].any(): out.append(f"  {va} = {v:+.3f}: outside the picture"); continue
+        cols = np.nonzero(inside[r])[0]; c0, c1 = cols[0], cols[-1] + 1
+        rows = im[max(r - 1, 0):r + 2, c0:c1, :3].mean(0)              # three rows, so one stroke does not decide
+        lab = np.argmin(((feat(rows)[:, None] - pal_f[None]) ** 2).sum(2), 1)
+        lab[~inside[r, c0:c1]] = -1                                    # gaps between legs, under the belly
+        runs = []                                                      # [label, start, end) in columns
+        for k in range(len(lab)):
+            if runs and runs[-1][0] == lab[k]: runs[-1][2] = k + 1
+            else: runs.append([lab[k], k, k + 1])
+        merged = True
+        while merged and len(runs) > 1:                                # thin stretches join a neighbour
+            merged = False
+            for i, (l, a, b) in enumerate(runs):
+                if b - a < min_px and l != -1:
+                    j = i - 1 if i > 0 and (i == len(runs) - 1 or runs[i - 1][2] - runs[i - 1][1] >= runs[i + 1][2] - runs[i + 1][1]) else i + 1
+                    runs[j][1], runs[j][2] = min(runs[j][1], a), max(runs[j][2], b); del runs[i]
+                    if j > i: runs[i][1] = a
+                    merged = True; break
+            for i in range(len(runs) - 1, 0, -1):                      # neighbours of one colour become one
+                if runs[i][0] == runs[i - 1][0]: runs[i - 1][2] = runs[i][2]; del runs[i]
+        parts = []
+        for l, a, b in runs:
+            if l == -1: continue
+            h0 = to_model(vm, c0 + a)[0]; h1 = to_model(vm, c0 + b - 1)[0]
+            parts.append(f"{codes[l]} {ha}[{min(h0, h1):+.3f}, {max(h0, h1):+.3f}]")
+        out.append(f"  {va} = {v:+.3f}: " + "  ".join(parts))
+    return out
+
+
 def palette_sheet(refs, path):
     """The few colours the animal is painted in, as swatches with their codes (for parts' "colour")."""
     from texture import palette
@@ -144,6 +189,15 @@ def main():
         vm = view_maps(refs, size)[v]; path = os.path.join(work, f"zoom-{v}.png")
         if vm.missing: sys.exit(f"there is no {v} picture to zoom into")
         zoom(refs, vm, box, path); print("wrote", path); return
+    if len(sys.argv) > 3 and sys.argv[3] == "--colours":
+        v = sys.argv[4]; v0, v1 = float(sys.argv[5]), float(sys.argv[6])
+        vm = view_maps(refs, size)[v]
+        if vm.missing: sys.exit(f"there is no {v} picture")
+        ha, _, va, _ = VIEWS[v]
+        lines = [f"{v} view: the colours across each level, {va} from {max(v0, v1):+.3f} down to {min(v0, v1):+.3f}, "
+                 f"left to right in the picture ({ha} in metres; codes as in palette.png)"] + colour_lines(refs, vm, v0, v1)
+        path = os.path.join(work, f"colours-{v}.txt"); open(path, "w").write("\n".join(lines) + "\n")
+        print("\n".join(lines)); print("wrote", path); return
     out = [f"subject (m): width {size['width']} (x), length {size['length']} (y), height {size['height']} (z)",
            "Each line lists the solid stretches of the outline across that level (separate stretches = separate parts,",
            "e.g. two legs). Model coordinates in metres; nose towards -y; front view right = +x.", ""]

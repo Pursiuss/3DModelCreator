@@ -1,0 +1,48 @@
+start: mean outline overlap 0.929
+sweep 1: overlap 0.929 (0 changes)
+outline overlap per view (before -> after): front 0.89 -> 0.89, back 0.00 -> 0.00 (skipped), side 0.94 -> 0.94, top 0.96 -> 0.96
+  body: unchanged
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: unchanged
+  horn: unchanged
+  udder: unchanged
+  front teat: unchanged
+  rear teat: unchanged
+  tail: unchanged
+  tail switch: unchanged
+  near front upper leg: unchanged
+  near front lower leg: unchanged
+  near front hoof in: unchanged
+  near front hoof out: unchanged
+  near front dewclaw in: unchanged
+  near front dewclaw out: unchanged
+  far front upper leg: unchanged
+  far front lower leg: unchanged
+  far front hoof in: unchanged
+  far front hoof out: unchanged
+  far front dewclaw in: unchanged
+  far front dewclaw out: unchanged
+  near hind upper leg: unchanged
+  near hind lower leg: unchanged
+  near hind hoof in: unchanged
+  near hind hoof out: unchanged
+  near hind dewclaw in: unchanged
+  near hind dewclaw out: unchanged
+  far hind upper leg: unchanged
+  far hind lower leg: unchanged
+  far hind hoof in: unchanged
+  far hind hoof out: unchanged
+  far hind dewclaw in: unchanged
+  far hind dewclaw out: unchanged
+part checks:
+  ear: 64% of it lies outside the top outline: too big, or in the wrong place
+  horn: 21% of it lies outside the front outline: too big, or in the wrong place
+  far front dewclaw in: 29% of it lies outside the side outline: too big, or in the wrong place
+  far front dewclaw out: 29% of it lies outside the side outline: too big, or in the wrong place
+  far hind dewclaw in: 25% of it lies outside the side outline: too big, or in the wrong place
+  far hind dewclaw out: 25% of it lies outside the side outline: too big, or in the wrong place
+  near front dewclaw in: 100% of it is inside other parts, so it changes nothing. If the parts around it already make its drawn shape (a rump that bulges where the tail lies on it, a head whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move it out until it stands as proud of them as the drawing shows
+  near hind dewclaw in: 100% of it is inside other parts, so it changes nothing. If the parts around it already make its drawn shape (a rump that bulges where the tail lies on it, a head whose tip is the nose), drop it; if it should stand out as drawn (a chest ruff, a toe), move it out until it stands as proud of them as the drawing shows

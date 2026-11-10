@@ -1,0 +1,114 @@
+{
+ "params": {
+  "refs": "refs/sheep",
+  "out": "out/sheep",
+  "parts": "out/sheep/work/parts.final.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "final build: ears on the top view's line",
+  "skip_view": [
+   "back"
+  ]
+ },
+ "method": "blockout (16 parts from parts.final.json) grown 0.0 mm, trimmed to the outlines (4.04 mm voxels), smoothed; kept 1 of 1 mesh pieces",
+ "voxel_mm": 4.04,
+ "triangles": 312812,
+ "extent_m": {
+  "width": 0.479,
+  "length": 1.121,
+  "height": 0.915
+ },
+ "subject_m": {
+  "height": 0.918,
+  "length": 1.131,
+  "width": 0.462
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [
+  "front and mirrored back outlines overlap only 0.84, even lined up as well as they can be: pose differs between views",
+  "views ignored for parts they disagree with (one view would have cut deep into a part the others draw whole): nose pad: top"
+ ],
+ "dropped_parts": [],
+ "texture_views": {
+  "front": 0.071,
+  "back": 0.09,
+  "side": 0.204,
+  "side_mirror": 0.202,
+  "top": 0.159,
+  "unseen_filled": 0.275,
+  "duplicate_features_removed": 14,
+  "uv_islands": 25,
+  "texel_mm": 1.04,
+  "palette_colours": 3
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "neck": "#f3c300",
+  "wool cap": "#875692",
+  "head": "#f38400",
+  "lower jaw": "#a1caf1",
+  "nose pad": "#be0032",
+  "ear": "#c2b280",
+  "tail": "#008856",
+  "front leg": "#e68fac",
+  "front hoof in": "#0067a5",
+  "front hoof out": "#f99379",
+  "front dewclaw": "#604e97",
+  "hind leg": "#f6a600",
+  "hind hoof in": "#b3446c",
+  "hind hoof out": "#dcd300",
+  "hind dewclaw": "#882d17"
+ },
+ "self_check": {
+  "untextured_shape": 0.93,
+  "textured_shape": 0.93,
+  "gross_errors": [],
+  "colour_score": 0.878,
+  "views": {
+   "front": {
+    "iou": 0.931,
+    "reference_missed": 0.035,
+    "model_outside": 0.036,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.861
+   },
+   "back": {
+    "iou": 0.783,
+    "reference_missed": 0.152,
+    "model_outside": 0.089,
+    "scored": false,
+    "off_target": 0.005,
+    "colour": 0.885
+   },
+   "side": {
+    "iou": 0.928,
+    "reference_missed": 0.046,
+    "model_outside": 0.028,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.882
+   },
+   "top": {
+    "iou": 0.929,
+    "reference_missed": 0.04,
+    "model_outside": 0.034,
+    "scored": true,
+    "off_target": 0.0007,
+    "colour": 0.874
+   }
+  }
+ },
+ "seconds": 332.4
+}

@@ -1,0 +1,114 @@
+{
+ "params": {
+  "refs": "refs/penguin",
+  "out": "out/penguin",
+  "parts": "out/penguin/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "round 4: added lower belly so feathers reach the ankles",
+  "skip_view": []
+ },
+ "method": "blockout (21 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (2.49 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: tail feather centre, tail feather mid, tail feather outer, inner claw, middle claw, outer claw",
+ "voxel_mm": 2.49,
+ "triangles": 241337,
+ "extent_m": {
+  "width": 0.245,
+  "length": 0.295,
+  "height": 0.685
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "dropped_parts": [],
+ "texture_views": {
+  "front": 0.164,
+  "back": 0.206,
+  "side": 0.185,
+  "side_mirror": 0.185,
+  "top": 0.02,
+  "unseen_filled": 0.241,
+  "duplicate_features_removed": 14,
+  "uv_islands": 38,
+  "texel_mm": 0.51,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "rump": "#f3c300",
+  "lower belly": "#875692",
+  "neck": "#f38400",
+  "head": "#a1caf1",
+  "upper beak": "#be0032",
+  "lower beak": "#c2b280",
+  "flipper": "#008856",
+  "tail": "#e68fac",
+  "tail feather centre": "#0067a5",
+  "tail feather mid": "#f99379",
+  "tail feather outer": "#604e97",
+  "ankle": "#f6a600",
+  "heel": "#b3446c",
+  "web": "#dcd300",
+  "inner toe": "#882d17",
+  "middle toe": "#8db600",
+  "outer toe": "#654522",
+  "inner claw": "#e25822",
+  "middle claw": "#2b3d26",
+  "outer claw": "#222222"
+ },
+ "self_check": {
+  "untextured_shape": 0.93,
+  "textured_shape": 0.93,
+  "gross_errors": [],
+  "colour_score": 0.879,
+  "views": {
+   "front": {
+    "iou": 0.925,
+    "reference_missed": 0.055,
+    "model_outside": 0.022,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.83
+   },
+   "back": {
+    "iou": 0.924,
+    "reference_missed": 0.06,
+    "model_outside": 0.017,
+    "scored": false,
+    "off_target": 0.0,
+    "colour": 0.905
+   },
+   "side": {
+    "iou": 0.935,
+    "reference_missed": 0.027,
+    "model_outside": 0.04,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.929
+   },
+   "top": {
+    "iou": 0.872,
+    "reference_missed": 0.084,
+    "model_outside": 0.053,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.819
+   }
+  }
+ },
+ "seconds": 279.1
+}

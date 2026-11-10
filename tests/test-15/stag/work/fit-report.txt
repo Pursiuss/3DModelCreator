@@ -1,0 +1,59 @@
+start: mean outline overlap 0.878
+sweep 1: overlap 0.878 (0 changes)
+outline overlap per view (before -> after): front 0.80 -> 0.80, back 0.00 -> 0.00 (skipped), side 0.89 -> 0.89, top 0.95 -> 0.95
+  body: unchanged
+  neck: unchanged
+  head: unchanged
+  lower jaw: unchanged
+  nose pad: unchanged
+  ear: unchanged
+  antler beam: unchanged
+  brow tine: unchanged
+  bez tine: unchanged
+  small tine: unchanged
+  trez tine: unchanged
+  upper fork: unchanged
+  rear tine upper: unchanged
+  rear tine lower: unchanged
+  tail: unchanged
+  front leg: unchanged
+  front +x hoof in: unchanged
+  front +x hoof out: unchanged
+  front +x dewclaw: unchanged
+  front -x hoof in: unchanged
+  front -x hoof out: unchanged
+  front -x dewclaw: unchanged
+  near thigh: unchanged
+  far thigh: unchanged
+  near hind leg: unchanged
+  far hind leg: unchanged
+  near hind hoof in: unchanged
+  near hind hoof out: unchanged
+  near hind dewclaw: unchanged
+  far hind hoof in: unchanged
+  far hind hoof out: unchanged
+  far hind dewclaw: unchanged
+part checks:
+  nose pad: 48% of it lies outside the top outline: too big, or in the wrong place
+  antler beam: 25% of it lies outside the side outline: too big, or in the wrong place
+  brow tine: 59% of it lies outside the front outline: too big, or in the wrong place
+  bez tine: 43% of it lies outside the front outline: too big, or in the wrong place
+  bez tine: 22% of it lies outside the side outline: too big, or in the wrong place
+  small tine: 53% of it lies outside the front outline: too big, or in the wrong place
+  small tine: 53% of it lies outside the side outline: too big, or in the wrong place
+  upper fork: 75% of it lies outside the side outline: too big, or in the wrong place
+  tail: 34% of it lies outside the side outline: too big, or in the wrong place
+  tail: 26% of it lies outside the top outline: too big, or in the wrong place
+  front +x hoof in: 36% of it lies outside the front outline: too big, or in the wrong place
+  front +x dewclaw: thinnest radius 8.0 mm is under 1.5 build voxels (8.4 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  front -x hoof in: 21% of it lies outside the front outline: too big, or in the wrong place
+  front -x dewclaw: thinnest radius 8.0 mm is under 1.5 build voxels (8.4 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  far hind leg: 24% of it lies outside the front outline: too big, or in the wrong place
+  near hind hoof in: 51% of it lies outside the front outline: too big, or in the wrong place
+  near hind hoof in: 34% of it lies outside the side outline: too big, or in the wrong place
+  near hind hoof out: 34% of it lies outside the side outline: too big, or in the wrong place
+  near hind dewclaw: thinnest radius 8.0 mm is under 1.5 build voxels (8.4 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  near hind dewclaw: 64% of it lies outside the side outline: too big, or in the wrong place
+  far hind dewclaw: thinnest radius 8.0 mm is under 1.5 build voxels (8.4 mm), so it melts into a blob or a dent; make it a chain (built on a finer grid), or drop it and let the texture show it
+  far hind dewclaw: 81% of it lies outside the side outline: too big, or in the wrong place
+  neck: the back of its root end bulges 5.9 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead

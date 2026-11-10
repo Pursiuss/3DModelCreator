@@ -1,0 +1,539 @@
+{
+ "parts": [
+  {
+   "name": "body",
+   "type": "loft",
+   "stations": [
+    [0.0, -0.58, 0.9908, 0.1445, 0.2829],
+    [0.0, -0.42, 0.9503, 0.24, 0.41],
+    [0.0, -0.25, 0.9888, 0.2787, 0.3653],
+    [0.0, -0.085, 0.9288, 0.31, 0.4209],
+    [0.0, 0.085, 0.9436, 0.304, 0.375],
+    [0.0, 0.25, 0.953, 0.2806, 0.3789],
+    [0.0, 0.42, 1.0264, 0.2881, 0.3096],
+    [0.0, 0.6, 1.05, 0.2592, 0.3],
+    [0.0, 0.8, 1.082, 0.1, 0.2987]
+   ],
+   "caps": [0.06, 0.07]
+  },
+  {
+   "name": "neck",
+   "type": "capsule",
+   "a": [0.0, -0.42, 1.08],
+   "b": [0.0, -0.72, 1.3],
+   "ra": 0.26,
+   "rb": 0.17,
+   "aspect": 0.85,
+   "droop": 0.0,
+   "blend": 0.2,
+   "fit": false
+  },
+  {
+   "name": "head",
+   "type": "capsule",
+   "a": [0.0, -0.734, 1.439],
+   "b": [0.0, -0.945, 1.22],
+   "ra": 0.115,
+   "rb": 0.06,
+   "aspect": 1.3,
+   "droop": 0.0,
+   "blend": 0.06,
+   "fit": false
+  },
+  {
+   "name": "lower jaw",
+   "type": "capsule",
+   "a": [0.0, -0.79, 1.17],
+   "b": [0.0, -0.945, 1.145],
+   "ra": 0.05,
+   "rb": 0.032,
+   "aspect": 1.4,
+   "droop": 0.0,
+   "blend": 0.03,
+   "fit": false
+  },
+  {
+   "name": "nose pad",
+   "type": "ellipsoid",
+   "center": [0.0, -0.993, 1.2],
+   "radii": [0.07, 0.03, 0.045],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.01,
+   "colour": "drawn",
+   "fit": false,
+   "ignore_views": [
+    "front"
+   ]
+  },
+  {
+   "name": "ear",
+   "type": "paddle",
+   "a": [0.13, -0.7, 1.4],
+   "b": [0.27, -0.7, 1.405],
+   "ra": 0.03,
+   "rb": 0.06,
+   "thick": 0.012,
+   "normal": [0.1, 1.0, 0.1],
+   "bend": 0.0,
+   "curl": 0.0,
+   "mirror": true,
+   "blend": 0.005,
+   "root_blend": 0.04,
+   "fit": false
+  },
+  {
+   "name": "horn",
+   "type": "chain",
+   "joints": [
+    [0.06, -0.76, 1.47, 0.035],
+    [0.125, -0.765, 1.485, 0.034],
+    [0.2, -0.785, 1.5, 0.028],
+    [0.25, -0.81, 1.54, 0.02],
+    [0.265, -0.832, 1.6, 0.007]
+   ],
+   "aspect": 1.0,
+   "mirror": true,
+   "blend": 0.015,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "udder",
+   "type": "ellipsoid",
+   "center": [0.0, 0.47, 0.71],
+   "radii": [0.1, 0.16, 0.15],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.05,
+   "fit": false
+  },
+  {
+   "name": "front teat",
+   "type": "capsule",
+   "a": [0.06, 0.485, 0.59],
+   "b": [0.06, 0.49, 0.535],
+   "ra": 0.018,
+   "rb": 0.012,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "fit": false
+  },
+  {
+   "name": "rear teat",
+   "type": "capsule",
+   "a": [0.06, 0.58, 0.59],
+   "b": [0.06, 0.585, 0.535],
+   "ra": 0.018,
+   "rb": 0.012,
+   "aspect": 1.0,
+   "droop": 0.0,
+   "mirror": true,
+   "blend": 0.006,
+   "fit": false
+  },
+  {
+   "name": "tail",
+   "type": "chain",
+   "joints": [
+    [0.0, 0.76, 1.27, 0.06],
+    [0.0, 0.86, 1.345, 0.045],
+    [0.0, 0.925, 1.25, 0.035],
+    [0.0, 0.946, 1.04, 0.025],
+    [0.0, 0.948, 0.8, 0.021],
+    [0.0, 0.95, 0.68, 0.02]
+   ],
+   "aspect": 1.0,
+   "blend": 0.04,
+   "fit": false
+  },
+  {
+   "name": "tail switch",
+   "type": "chain",
+   "joints": [
+    [0.0, 0.95, 0.72, 0.03],
+    [0.0, 0.955, 0.5, 0.06],
+    [0.0, 0.96, 0.27, 0.01]
+   ],
+   "aspect": 1.0,
+   "blend": 0.01,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top",
+    "front"
+   ],
+   "strands": 8
+  },
+  {
+   "name": "near front upper leg",
+   "type": "capsule",
+   "a": [0.13, -0.31, 0.97],
+   "b": [0.135, -0.31, 0.58],
+   "ra": 0.15,
+   "rb": 0.075,
+   "aspect": 0.7,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "near front lower leg",
+   "type": "chain",
+   "joints": [
+    [0.135, -0.31, 0.6401, 0.0638],
+    [0.135, -0.318, 0.4601, 0.0466],
+    [0.135, -0.302, 0.25, 0.04],
+    [0.14, -0.2499, 0.15, 0.045],
+    [0.1234, -0.345, 0.09, 0.042]
+   ],
+   "aspect": 1.0,
+   "blend": 0.05,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near front hoof in",
+   "type": "paddle",
+   "a": [0.122, -0.335, 0.04],
+   "b": [0.122, -0.405, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near front hoof out",
+   "type": "paddle",
+   "a": [0.178, -0.335, 0.04],
+   "b": [0.178, -0.405, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near front dewclaw in",
+   "type": "ellipsoid",
+   "center": [0.107, -0.292, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near front dewclaw out",
+   "type": "ellipsoid",
+   "center": [0.179, -0.292, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far front upper leg",
+   "type": "capsule",
+   "a": [-0.13, -0.24, 0.97],
+   "b": [-0.135, -0.24, 0.58],
+   "ra": 0.15,
+   "rb": 0.075,
+   "aspect": 0.7,
+   "droop": 0.0,
+   "blend": 0.15,
+   "fit": false
+  },
+  {
+   "name": "far front lower leg",
+   "type": "chain",
+   "joints": [
+    [-0.135, -0.2995, 0.5419, 0.0862],
+    [-0.135, -0.248, 0.4595, 0.058],
+    [-0.135, -0.2677, 0.25, 0.04],
+    [-0.14, -0.24, 0.1857, 0.045],
+    [-0.145, -0.262, 0.09, 0.042]
+   ],
+   "aspect": 1.0,
+   "blend": 0.05,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far front hoof in",
+   "type": "paddle",
+   "a": [-0.122, -0.25, 0.04],
+   "b": [-0.122, -0.32, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top",
+    "side"
+   ]
+  },
+  {
+   "name": "far front hoof out",
+   "type": "paddle",
+   "a": [-0.178, -0.25, 0.04],
+   "b": [-0.178, -0.32, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top",
+    "side"
+   ]
+  },
+  {
+   "name": "far front dewclaw in",
+   "type": "ellipsoid",
+   "center": [-0.179, -0.215, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far front dewclaw out",
+   "type": "ellipsoid",
+   "center": [-0.107, -0.215, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near hind upper leg",
+   "type": "capsule",
+   "a": [0.11, 0.55, 0.95],
+   "b": [0.15, 0.72, 0.6],
+   "ra": 0.15,
+   "rb": 0.1,
+   "aspect": 0.7,
+   "droop": 0.0,
+   "blend": 0.16,
+   "root_blend": 0.12,
+   "fit": false
+  },
+  {
+   "name": "near hind lower leg",
+   "type": "chain",
+   "joints": [
+    [0.15, 0.72, 0.6, 0.1],
+    [0.15, 0.82, 0.4856, 0.06],
+    [0.15, 0.805, 0.3356, 0.0375],
+    [0.1358, 0.8, 0.15, 0.0518],
+    [0.15, 0.7986, 0.0529, 0.0606]
+   ],
+   "aspect": 1.0,
+   "blend": 0.05,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near hind hoof in",
+   "type": "paddle",
+   "a": [0.122, 0.785, 0.04],
+   "b": [0.122, 0.715, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near hind hoof out",
+   "type": "paddle",
+   "a": [0.178, 0.785, 0.04],
+   "b": [0.178, 0.715, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near hind dewclaw in",
+   "type": "ellipsoid",
+   "center": [0.114, 0.824, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "near hind dewclaw out",
+   "type": "ellipsoid",
+   "center": [0.186, 0.824, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far hind upper leg",
+   "type": "capsule",
+   "a": [-0.11, 0.55, 0.95],
+   "b": [-0.15, 0.7, 0.62],
+   "ra": 0.15,
+   "rb": 0.1,
+   "aspect": 0.7,
+   "droop": 0.0,
+   "blend": 0.16,
+   "root_blend": 0.12,
+   "fit": false
+  },
+  {
+   "name": "far hind lower leg",
+   "type": "chain",
+   "joints": [
+    [-0.15, 0.7, 0.62, 0.1],
+    [-0.15, 0.675, 0.4858, 0.0653],
+    [-0.15, 0.637, 0.2563, 0.041],
+    [-0.15, 0.611, 0.16, 0.0577],
+    [-0.1642, 0.5513, 0.0505, 0.0562]
+   ],
+   "aspect": 1.0,
+   "blend": 0.05,
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far hind hoof in",
+   "type": "paddle",
+   "a": [-0.122, 0.585, 0.04],
+   "b": [-0.122, 0.515, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top",
+    "side"
+   ]
+  },
+  {
+   "name": "far hind hoof out",
+   "type": "paddle",
+   "a": [-0.178, 0.585, 0.04],
+   "b": [-0.178, 0.515, 0.03],
+   "ra": 0.038,
+   "rb": 0.028,
+   "thick": 0.024,
+   "normal": [1.0, 0.0, 0.0],
+   "bend": 0.0,
+   "curl": 0.0,
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top",
+    "side"
+   ]
+  },
+  {
+   "name": "far hind dewclaw in",
+   "type": "ellipsoid",
+   "center": [-0.186, 0.629, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  },
+  {
+   "name": "far hind dewclaw out",
+   "type": "ellipsoid",
+   "center": [-0.114, 0.629, 0.12],
+   "radii": [0.014, 0.014, 0.02],
+   "rotate": [0.0, 0.0, 0.0],
+   "blend": 0.004,
+   "colour": "#4d351f",
+   "fit": false,
+   "ignore_views": [
+    "top"
+   ]
+  }
+ ]
+}

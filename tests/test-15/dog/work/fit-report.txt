@@ -1,0 +1,51 @@
+start: mean outline overlap 0.926
+sweep 1: overlap 0.930 (6 changes)
+sweep 2: overlap 0.934 (6 changes)
+sweep 3: overlap 0.936 (7 changes)
+sweep 4: overlap 0.937 (1 changes)
+sweep 5: overlap 0.939 (8 changes)
+sweep 6: overlap 0.939 (1 changes)
+outline overlap per view (before -> after): front 0.89 -> 0.93, back 0.00 -> 0.00 (skipped), side 0.95 -> 0.95, top 0.93 -> 0.93
+  body: stations[1].z +0.449->+0.459; stations[6].z +0.382->+0.386; stations[7].z +0.417->+0.445; stations[0].half_width +0.121->+0.119; stations[0].half_height +0.160->+0.163; stations[1].half_width +0.122->+0.128; stations[1].half_height +0.235->+0.229; stations[6].half_height +0.192->+0.196; stations[7].half_height +0.092->+0.079
+  neck: unchanged
+  chest ruff: unchanged
+  head: unchanged
+  snout: unchanged
+  nose: unchanged
+  lower jaw: unchanged
+  mouth: unchanged
+  tongue: unchanged
+  ear: unchanged
+  front lower leg: joints[0].x +0.055->+0.085; joints[0].y -0.205->-0.201; joints[1].y -0.199->-0.192; joints[1].z +0.151->+0.158; joints[4].x +0.060->+0.078; joints[0].r +0.050->+0.056; joints[1].r +0.050->+0.055
+  front feathering: unchanged
+  front paw: unchanged
+  front toe inner: unchanged
+  front toe mid inner: unchanged
+  front toe mid outer: unchanged
+  front toe outer: unchanged
+  front claw inner: unchanged
+  front claw mid inner: unchanged
+  front claw mid outer: unchanged
+  front claw outer: unchanged
+  hind thigh: unchanged
+  hind lower leg: unchanged
+  trousers: unchanged
+  hind paw: unchanged
+  hind toe inner: unchanged
+  hind toe mid inner: unchanged
+  hind toe mid outer: unchanged
+  hind toe outer: unchanged
+  hind claw mid inner: unchanged
+  hind claw mid outer: unchanged
+  tail: unchanged
+part checks:
+  nose: 22% of it lies outside the top outline: too big, or in the wrong place
+  ear: 30% of it lies outside the top outline: too big, or in the wrong place
+  front toe mid inner: 22% of it lies outside the side outline: too big, or in the wrong place
+  front toe mid outer: 22% of it lies outside the side outline: too big, or in the wrong place
+  front claw mid inner: 36% of it lies outside the side outline: too big, or in the wrong place
+  front claw mid outer: 37% of it lies outside the side outline: too big, or in the wrong place
+  hind thigh: lies against a bigger part along 80% of its length. If it should hang free (flipper, wing, ear, tail, fin), move it outward so only its root end goes in; lying along the body it reads as a stuck-on patch with a groove round it
+  hind toe outer: 87% of it lies outside the front outline: too big, or in the wrong place
+  hind claw mid outer: 20% of it lies outside the side outline: too big, or in the wrong place
+  front lower leg: the back of its root end bulges 2.0 cm out of the body, a lump at the shoulder, hip or chest: start it deeper inside (its root at least its root radius in from the surface) and join it with root_blend; where the drawing really is that wide there, widen the body there instead

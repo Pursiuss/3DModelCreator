@@ -70,6 +70,14 @@ Python interpreter chosen in step 1; use it for every script.
    X0 Y0 X1 Y1), which writes `out/work/zoom-side.png` (rename it before the next zoom of that view). The grid is
    every centimetre for a box up to 25 cm across, coarser for bigger boxes; keep boxes small to place small parts.
    The full rulers are too coarse to place a 2 cm part.
+4. For a part that lies inside the body's outline in some view (a flipper or wing seen from the side, a fin on a
+   flank, a marking), the outline cannot show its edges. List the colours across it:
+   `PY SKILL_DIR/scripts/measure.py REFS out/work --colours side Z0 Z1` (front, back: Z0 Z1 too; top: Y0 Y1),
+   which prints (and writes to `out/work/colours-side.txt`) each palette colour's stretch across every centimetre
+   of height. A penguin's flipper is the black stretch between the white chest in front and the white strip of
+   body behind it: its front and back edges at each height are the ends of that stretch. Shape the part to those
+   edges (for a paddle: `a`, `b`, `ra`, `rb` and `bend`, taken from where the stretch is widest, where it ends and
+   how its middle runs), not just to the right length.
 
 Model coordinates: metres; **z** up from the ground (feet at 0); **y** along the animal with the **nose at -y**;
 **x** across, where image-right in the front view is +x. The animal is centred on x = 0 and on the middle of its
@@ -259,9 +267,11 @@ Modelling rules that matter for how the result looks:
   0.04 of the animal's size and a small `blend` (about 0.005), and place the rest just outside the body: where the
   front view shows a gap, the same gap; where the drawing shows it lying against the body, touching but not sunk
   in. Use `curl` (about the plate's thickness) so a flipper lying against a round body wraps round it, and `bend`
-  to follow a crescent outline. Check its outline in `parts-on-refs.png` against the side drawing: a few
-  millimetres too far forward and the side picture paints the chest white onto it. Sunk half into the body along
-  its length, it looks glued on (the fit report warns about this).
+  to follow a crescent outline. Place its edges from `--colours` (step 2, item 4) and check its outline in
+  `parts-on-refs.png` against the side drawing: the side picture paints whatever it shows at each spot of the
+  part, so a flipper a few millimetres past its drawn front edge gets the chest's white on its outside, and one
+  past its back edge the white strip of body drawn behind it. Sunk half into the body along its length, it looks
+  glued on (the fit report warns about this).
 - A part that continues another (neck out of a body, head out of a neck, a fuller lower belly) must start inside
   it, narrower than the parent's cross-section where it starts, and get a generous blend: about half the smaller
   part's radius. If it is as wide as the parent there, its rounded end bulges out and prints a ring around the
