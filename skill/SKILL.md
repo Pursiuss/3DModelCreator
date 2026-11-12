@@ -272,13 +272,25 @@ Modelling rules that matter for how the result looks:
   part, so a flipper a few millimetres past its drawn front edge gets the chest's white on its outside, and one
   past its back edge the white strip of body drawn behind it. Sunk half into the body along its length, it looks
   glued on (the fit report warns about this).
+- Flippers and wings hanging at the sides of an upright body (a penguin, an owl at rest) are part of the front
+  view's outline: at the shoulders the outline is body plus flippers, and the body is only as wide as what lies
+  between them. Read that width from `--colours front` (a penguin: the white chest between the black flippers,
+  about ±7.5 cm at the shoulders and ±9.5 cm at the belly on a 70 cm bird), not from the outline, or the body
+  swallows the flippers. Turn the flipper's plate as the front view draws it: if the front view shows it wider
+  than its thickness (a penguin's: about 2.5-3 cm, its white underside beside its black edge), the plate is
+  turned with its back edge out by the angle whose sine is that width over its width in the side view (about 30
+  degrees: `normal` [0.87, 0.5, 0.1] for the +x flipper; the mirror copy follows). Facing straight sideways it is
+  a few millimetres wide from the front, and the fitter widens the body to fill the rest of the outline.
 - A part that continues another (neck out of a body, head out of a neck, a fuller lower belly) must start inside
   it, narrower than the parent's cross-section where it starts, and get a generous blend: about half the smaller
   part's radius. If it is as wide as the parent there, its rounded end bulges out and prints a ring around the
   animal; then make the parent reach further instead. A neck joining a four-legged body needs more: a blend about
   as big as its root radius, and its root as wide as the front view draws the neck where it meets the shoulders
   (`aspect` about 0.9-1.1; a neck much narrower than tall sits on the chest as an oval patch with a groove round it).
-- The torso is one `loft` (an ellipsoid only when the body really is an egg, as a penguin's is). Put a station
+- The torso is one `loft` (lofts run along the animal's length, so an upright body is built from ellipsoids
+  instead: one when it really is an egg, but an upright body with flippers or wings at its sides, as a penguin's,
+  is two, a narrower upper body with the shoulders between the flippers and a wider belly below, each as wide as
+  `--colours front` shows the body between them; see the flipper rule above). Put a station
   wherever the outline changes: the front of the chest, behind the front legs, the withers or shoulders, mid
   barrel, the flank in front of the hind legs, the hips, the back end of the rump; 5 to 8 stations. Read each one's
   top and bottom from profiles.txt's side table at its y (half_height = half the gap, z = the middle) and its width

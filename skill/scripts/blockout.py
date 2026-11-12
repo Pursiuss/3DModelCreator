@@ -311,7 +311,10 @@ def part_checks(parts, f, build_voxel):
                    f"body's surface: about {up:.0f} cm out along its root half and {down:.0f} cm along its tip half "
                    f"(move a and b outward, a further than b where the body bulges near the root: tilt it), keeping "
                    f"only its root end inside, joined with root_blend. Lying against a rounded body it touches it "
-                   f"along a line and stands off a little elsewhere; that is right")
+                   f"along a line and stands off a little elsewhere; that is right. If moving it out would put it past "
+                   f"the outline, the body is too wide there: in the front view a flipper or wing at the side is part "
+                   f"of the outline, so narrow the body to what lies between them (measure.py --colours front), and "
+                   f"turn the plate as the front view draws it (the flipper rule in SKILL.md)")
     # buried parts: a part almost wholly inside others never shows (a tail swallowed by the rump, a nose pad inside the
     # tip of the head, a ruff inside the chest). Upper legs, necks and roots are meant to be mostly inside (up to about
     # 90%), so only nearly complete burial counts

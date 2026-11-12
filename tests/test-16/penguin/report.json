@@ -1,0 +1,108 @@
+{
+ "params": {
+  "refs": "refs/penguin",
+  "out": "out",
+  "parts": "out/work/parts.fitted.json",
+  "hull_only": false,
+  "grow": null,
+  "round": 2.0,
+  "res": 280,
+  "blur": null,
+  "smooth": null,
+  "tol": 3,
+  "quick": false,
+  "note": "final full build: lower beak lowered to show below upper beak",
+  "skip_view": []
+ },
+ "method": "blockout (15 parts from parts.fitted.json) grown 0.0 mm, trimmed to the outlines (2.49 mm voxels), smoothed; kept 1 of 1 mesh pieces; built on a finer grid and joined on: inner claw, middle claw, outer claw",
+ "voxel_mm": 2.49,
+ "triangles": 202205,
+ "extent_m": {
+  "width": 0.242,
+  "length": 0.284,
+  "height": 0.683
+ },
+ "subject_m": {
+  "height": 0.7,
+  "length": 0.3,
+  "width": 0.25
+ },
+ "silhouettes": {
+  "front": "alpha channel",
+  "back": "alpha channel",
+  "side": "alpha channel",
+  "top": "alpha channel"
+ },
+ "warnings": [],
+ "dropped_parts": [],
+ "texture_views": {
+  "front": 0.169,
+  "back": 0.183,
+  "side": 0.2,
+  "side_mirror": 0.2,
+  "top": 0.021,
+  "unseen_filled": 0.226,
+  "duplicate_features_removed": 12,
+  "uv_islands": 24,
+  "texel_mm": 0.48,
+  "palette_colours": 5
+ },
+ "part_colours": {
+  "body": "#c8c8c8",
+  "lower belly": "#f3c300",
+  "head": "#875692",
+  "tail": "#f38400",
+  "upper beak": "#a1caf1",
+  "lower beak": "#be0032",
+  "flipper": "#c2b280",
+  "leg": "#008856",
+  "foot web": "#e68fac",
+  "inner toe": "#0067a5",
+  "middle toe": "#f99379",
+  "outer toe": "#604e97",
+  "inner claw": "#f6a600",
+  "middle claw": "#b3446c",
+  "outer claw": "#dcd300"
+ },
+ "self_check": {
+  "untextured_shape": 0.917,
+  "textured_shape": 0.917,
+  "gross_errors": [],
+  "colour_score": 0.884,
+  "views": {
+   "front": {
+    "iou": 0.91,
+    "reference_missed": 0.067,
+    "model_outside": 0.026,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.827
+   },
+   "back": {
+    "iou": 0.911,
+    "reference_missed": 0.071,
+    "model_outside": 0.021,
+    "scored": false,
+    "off_target": 0.0,
+    "colour": 0.881
+   },
+   "side": {
+    "iou": 0.925,
+    "reference_missed": 0.045,
+    "model_outside": 0.033,
+    "scored": true,
+    "off_target": 0.0,
+    "colour": 0.941
+   },
+   "top": {
+    "iou": 0.832,
+    "reference_missed": 0.147,
+    "model_outside": 0.029,
+    "scored": true,
+    "off_target": 0.0004,
+    "colour": 0.782
+   }
+  }
+ },
+ "seconds": 269.5
+}

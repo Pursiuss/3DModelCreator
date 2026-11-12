@@ -1,0 +1,20 @@
+start: mean outline overlap 0.911
+sweep 1: overlap 0.911 (0 changes)
+outline overlap per view (before -> after): front 0.93 -> 0.93, back 0.92 -> 0.92, side 0.95 -> 0.95, top 0.85 -> 0.85
+  body: unchanged
+  lower belly: unchanged
+  head: unchanged
+  tail: unchanged
+  upper beak: unchanged
+  lower beak: unchanged
+  flipper: unchanged
+  leg: unchanged
+  foot web: unchanged
+  inner toe: unchanged
+  middle toe: unchanged
+  outer toe: unchanged
+  inner claw: unchanged
+  middle claw: unchanged
+  outer claw: unchanged
+part checks:
+  flipper: sunk into the body along its length: 33% of it past its root end lies inside other parts, and it only stands clear of them from 60% of the way to its tip, so only that end of it shows. The texture paints the rest of its drawn shape onto the body, so the pictures look right while the model's flipper is the wrong shape. Move it out onto the body's surface: about 1 cm out along its root half and 0 cm along its tip half (move a and b outward, a further than b where the body bulges near the root: tilt it), keeping only its root end inside, joined with root_blend. Lying against a rounded body it touches it along a line and stands off a little elsewhere; that is right
