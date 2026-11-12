@@ -1,0 +1,156 @@
+{
+ "label": "2026-11-12_flipper-lining",
+ "quick": false,
+ "animals": [
+  {
+   "animal": "cow",
+   "source": "tests/test-15/cow",
+   "shape": 0.912,
+   "colour": 0.857,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.888,
+    "side": 0.936,
+    "back": 0.832,
+    "top": 0.885
+   },
+   "view_colour": {
+    "front": 0.778,
+    "side": 0.889,
+    "back": 0.781,
+    "top": 0.825
+   },
+   "pass": true,
+   "build_seconds": 666.5,
+   "options": [
+    "--skip-view",
+    "back"
+   ]
+  },
+  {
+   "animal": "dog",
+   "source": "tests/test-15/dog",
+   "shape": 0.934,
+   "colour": 0.891,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.925,
+    "side": 0.944,
+    "back": 0.771,
+    "top": 0.908
+   },
+   "view_colour": {
+    "front": 0.872,
+    "side": 0.895,
+    "back": 0.867,
+    "top": 0.886
+   },
+   "pass": true,
+   "build_seconds": 569.7,
+   "options": [
+    "--skip-view",
+    "back"
+   ]
+  },
+  {
+   "animal": "giraffe",
+   "source": "tests/test-15/giraffe",
+   "shape": 0.899,
+   "colour": 0.905,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.852,
+    "side": 0.912,
+    "back": 0.737,
+    "top": 0.886
+   },
+   "view_colour": {
+    "front": 0.891,
+    "side": 0.919,
+    "back": 0.88,
+    "top": 0.82
+   },
+   "pass": true,
+   "build_seconds": 460.3,
+   "options": [
+    "--skip-view",
+    "back"
+   ]
+  },
+  {
+   "animal": "penguin",
+   "source": "tests/test-17/penguin",
+   "shape": 0.915,
+   "colour": 0.894,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.935,
+    "side": 0.896,
+    "back": 0.935,
+    "top": 0.845
+   },
+   "view_colour": {
+    "front": 0.863,
+    "side": 0.925,
+    "back": 0.869,
+    "top": 0.804
+   },
+   "pass": true,
+   "build_seconds": 355.8,
+   "options": []
+  },
+  {
+   "animal": "sheep",
+   "source": "tests/test-15/sheep",
+   "shape": 0.93,
+   "colour": 0.878,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.931,
+    "side": 0.928,
+    "back": 0.783,
+    "top": 0.929
+   },
+   "view_colour": {
+    "front": 0.861,
+    "side": 0.882,
+    "back": 0.885,
+    "top": 0.874
+   },
+   "pass": true,
+   "build_seconds": 455.8,
+   "options": [
+    "--skip-view",
+    "back"
+   ]
+  },
+  {
+   "animal": "stag",
+   "source": "tests/test-15/stag",
+   "shape": 0.855,
+   "colour": 0.891,
+   "gross_errors": [],
+   "iou": {
+    "front": 0.84,
+    "side": 0.871,
+    "back": 0.731,
+    "top": 0.719
+   },
+   "view_colour": {
+    "front": 0.872,
+    "side": 0.909,
+    "back": 0.875,
+    "top": 0.843
+   },
+   "pass": true,
+   "build_seconds": 584.5,
+   "options": [
+    "--skip-view",
+    "back"
+   ]
+  }
+ ],
+ "left_out": [
+  "miku"
+ ]
+}

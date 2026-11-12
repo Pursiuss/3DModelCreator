@@ -74,10 +74,13 @@ Python interpreter chosen in step 1; use it for every script.
    flank, a marking), the outline cannot show its edges. List the colours across it:
    `PY SKILL_DIR/scripts/measure.py REFS out/work --colours side Z0 Z1` (front, back: Z0 Z1 too; top: Y0 Y1),
    which prints (and writes to `out/work/colours-side.txt`) each palette colour's stretch across every centimetre
-   of height. A penguin's flipper is the black stretch between the white chest in front and the white strip of
-   body behind it: its front and back edges at each height are the ends of that stretch. Shape the part to those
-   edges (for a paddle: `a`, `b`, `ra`, `rb` and `bend`, taken from where the stretch is widest, where it ends and
-   how its middle runs), not just to the right length.
+   of height. A part can be more than one colour: a penguin's flipper is the black stretch behind the white chest
+   AND the thin white stretch behind that (its white trailing edge, the same white as the body), up to where the
+   black back starts. Seen from the side, the camera looks straight at the flipper, so no body shows between it and
+   the back: a light stretch there is the flipper's own edge. Its front and back edges at each height are the
+   front of the black and the back of the white. Shape the part to those edges (for a paddle: `a`, `b`, `ra`,
+   `rb`, `widest` and `bend`, taken from where the stretch is widest, where it ends and how its middle runs), not
+   just to the right length.
 
 Model coordinates: metres; **z** up from the ground (feet at 0); **y** along the animal with the **nose at -y**;
 **x** across, where image-right in the front view is +x. The animal is centred on x = 0 and on the middle of its
@@ -114,8 +117,10 @@ Part types (all sizes in metres):
 - `paddle`: a flat tapered plate from its root `a` to its tip `b`: half-width `ra` at the root narrowing to `rb`
   at the tip, half-thickness `thick`, flat faces turned towards `normal` (default `[1, 0, 0]`, facing sideways),
   optional `bend` (metres the middle bows within the plate: a crescent flipper; negative bows towards the nose for
-  a part on the +x side) and `curl` (metres the long edges curl back towards the body, so it wraps round it). For
-  flippers, wings, fins, ears, flat fan tails: anything flat that grows out of the body at one end.
+  a part on the +x side) and `curl` (metres the long edges curl back towards the body, so it wraps round it).
+  Optional `widest`: [t, half_width]: the plate is widest t of the way from `a` to `b` and narrows to `ra` at the
+  root and `rb` at the tip (without it, it is widest at the root). For flippers, wings, fins, ears, flat fan tails:
+  anything flat that grows out of the body at one end.
 - `chain`: a limb, tail or neck grown joint by joint, the way a modeller extrudes one. `joints`: a list of
   [x, y, z, radius] from the root (inside the part it grows from) to the tip, one joint at every bend (hip, knee,
   hock, fetlock; the base, middle and end of a tail). Neighbouring joints are joined by round cones, so the
@@ -251,7 +256,10 @@ Modelling rules that matter for how the result looks:
   part hidden or small in every picture (an inner toe behind the outer one) gets its shadow colour. Only give a
   part one colour if its edge is where the colour changes: a bird's leg capsule that runs up under the belly
   feathers would paint pink over the white feathers drawn hanging over it; leave such a part uncoloured, or make
-  it end where the feathers begin.
+  it end where the feathers begin. Never give one colour to a part drawn in two: a flipper or wing (a penguin's is
+  black outside with a white trailing edge and a white underside), an ear with a pale inside, a marked tail. One
+  colour paints over everything else drawn on it; shape it to its drawn edges instead (`--colours`, step 2), so
+  the pictures paint each colour where it is drawn.
 - When two views disagree about how small parts are laid out (the claws spread twice as wide in the front view as
   in the top view), do not place them halfway: then they match neither picture, and both paint their claws onto
   the wrong spots. Lay them out from the view that shows them largest and least overlapped, and put the other view
@@ -264,14 +272,15 @@ Modelling rules that matter for how the result looks:
   stiff spike.
 - A part that hangs free (flipper, wing, ear, tail fin, a limb held away from the body) grows out of the body only
   at its root. Put the paddle's root `a` just inside the body at the shoulder, give it `root_blend` of about
-  0.04 of the animal's size and a small `blend` (about 0.005), and place the rest just outside the body: where the
+  0.04 of the animal's size (0.015 for a flipper or wing, jointed like an arm: see below) and a small `blend`
+  (about 0.005), and place the rest just outside the body: where the
   front view shows a gap, the same gap; where the drawing shows it lying against the body, touching but not sunk
   in. Use `curl` (about the plate's thickness) so a flipper lying against a round body wraps round it, and `bend`
   to follow a crescent outline. Place its edges from `--colours` (step 2, item 4) and check its outline in
   `parts-on-refs.png` against the side drawing: the side picture paints whatever it shows at each spot of the
   part, so a flipper a few millimetres past its drawn front edge gets the chest's white on its outside, and one
-  past its back edge the white strip of body drawn behind it. Sunk half into the body along its length, it looks
-  glued on (the fit report warns about this).
+  short of its back edge loses its white trailing edge to the body behind it. Sunk half into the body along its
+  length, it looks glued on (the fit report warns about this).
 - Flippers and wings hanging at the sides of an upright body (a penguin, an owl at rest) are part of the front
   view's outline: at the shoulders the outline is body plus flippers, and the body is only as wide as what lies
   between them. Read that width from `--colours front` (a penguin: the white chest between the black flippers,
@@ -280,7 +289,13 @@ Modelling rules that matter for how the result looks:
   than its thickness (a penguin's: about 2.5-3 cm, its white underside beside its black edge), the plate is
   turned with its back edge out by the angle whose sine is that width over its width in the side view (about 30
   degrees: `normal` [0.87, 0.5, 0.1] for the +x flipper; the mirror copy follows). Facing straight sideways it is
-  a few millimetres wide from the front, and the fitter widens the body to fill the rest of the outline.
+  a few millimetres wide from the front, and the fitter widens the body to fill the rest of the outline. A plate
+  turned by that angle looks narrower from the side (by its cosine: 13% at 30 degrees), so give it the side view's
+  widths divided by the cosine, and check its edges against `--colours side` again after turning it.
+- A flipper or wing is jointed like an arm: narrow where it meets the shoulder, widest about a third of the way
+  down, then tapering to the tip. Give it `widest` [0.3, its widest half-width] and a root `ra` of about 0.4 of
+  that, and a small `root_blend` (about 0.015 of the animal's size): a plate widest at its root, with a large
+  root blend, grows out of the shoulder along its whole top edge like a fin glued on, with no joint.
 - A part that continues another (neck out of a body, head out of a neck, a fuller lower belly) must start inside
   it, narrower than the parent's cross-section where it starts, and get a generous blend: about half the smaller
   part's radius. If it is as wide as the parent there, its rounded end bulges out and prints a ring around the

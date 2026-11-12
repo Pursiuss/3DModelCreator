@@ -4,6 +4,9 @@ Every triangle belongs to the blockout part it lies on (each side of a mirrored 
 unrolled along its own shape:
 - capsule (limb, neck, beak, toe): unrolled like a sleeve: across = around the tube, along = down the tube, with the
   rounded ends continuing the strip;
+- paddle (flipper, wing, fin, ear): unrolled like a flat sleeve: across = over its outer face from one long edge to the
+  other, round that edge and back over its inner face (an angle round its middle line would squeeze each whole face
+  into a strip as wide as the plate is thick, too few pixels for a flipper's white trailing edge);
 - chain (a limb or tail of several segments): the same sleeve, following the bends from joint to joint;
 - loft (a torso): a sleeve slice by slice: along = down the body through the slices, across = around each slice,
   with the cut underneath;
@@ -65,8 +68,15 @@ class Unroller:
                 E1.append(e1)
             self.E1 = np.array(E1); self.E2 = np.cross(self.axs, self.E1)
             self.segs = PT.segments(inst)
+        elif t == "paddle":
+            self.kind = "plate"; a, b = inst["a"], inst["b"]; L = float(np.linalg.norm(b - a))
+            self.a, self.L = a, max(L, 1e-6); self.ra, self.rb = float(inst["ra"]), float(inst["rb"])
+            self.ax, self.w, n = PT.paddle_frame(inst)
+            self.n = n if (abs(n[0]) < 0.5 or n[0] * a[0] >= 0) else -n  # (sideways plates: + away from the body)
+            self.R = max(self.ra, self.rb, float(np.max(inst.get("widest", [0, 0])[1:]))) + float(inst["thick"])
+            self.bend = float(inst["bend"])
         elif t in PT.TUBES:
-            self.kind = t = "capsule"                                     # a paddle unrolls like a flat sleeve
+            self.kind = t = "capsule"
             a, b = inst["a"], inst["b"]; L = float(np.linalg.norm(b - a))
             self.a, self.L = a, max(L, 1e-6); self.ra, self.rb = float(inst["ra"]), float(inst["rb"])
             self.ax = (b - a) / self.L if L > 1e-9 else np.array([0, 0, 1.0])
@@ -86,6 +96,11 @@ class Unroller:
 
     def angles(self, X):
         """(angle around the part, position along it, face id for boxes). Angles in (-pi, pi]."""
+        if self.kind == "plate":                                          # lap: outer face, edge, inner face
+            q = X - self.a; s = q @ self.ax; tt = np.clip(s / self.L, 0, 1)
+            across = q @ self.w - self.bend * 4 * tt * (1 - tt); up = q @ self.n; R = self.R
+            lap = np.where(up >= 0, R - across, 3 * R + across)           # 0 .. 4R
+            return lap / (4 * R) * 2 * np.pi - np.pi, s, np.zeros(len(X), int), np.full(len(X), 4 * R / (2 * np.pi))
         if self.kind == "capsule":
             w = X - self.a; s = w @ self.ax; w = w - s[:, None] * self.ax
             th = np.arctan2(w @ self.e2, w @ self.e1)
@@ -116,7 +131,7 @@ class Unroller:
     def to_metres(self, th, along, rho):
         """Unrolled coordinates in metres from angles (th may have been unwrapped past +-pi); rho = distance from
         the axis (capsules only)."""
-        if self.kind in ("capsule", "chain", "loft"):
+        if self.kind in ("capsule", "chain", "loft", "plate"):
             s = along
             u = th * rho
             v = s.copy()

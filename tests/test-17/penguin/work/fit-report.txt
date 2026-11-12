@@ -1,0 +1,21 @@
+start: mean outline overlap 0.904
+sweep 1: overlap 0.904 (0 changes)
+outline overlap per view (before -> after): front 0.94 -> 0.94, back 0.94 -> 0.94, side 0.90 -> 0.90, top 0.84 -> 0.84
+  belly: unchanged
+  upper body: unchanged
+  lower belly: unchanged
+  head: unchanged
+  upper beak: unchanged
+  lower beak: unchanged
+  flipper: unchanged
+  tail: unchanged
+  leg: unchanged
+  web: unchanged
+  inner toe: unchanged
+  middle toe: unchanged
+  outer toe: unchanged
+  inner claw: unchanged
+  middle claw: unchanged
+  outer claw: unchanged
+part checks:
+  no problems found

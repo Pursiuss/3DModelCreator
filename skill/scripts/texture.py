@@ -142,6 +142,28 @@ def paddle_shadow(parts, pid_face, cen, n, cand, size, rel=0.02):
             cand[mine[side & ((n[mine] @ out) < -0.3)]] = False
 
 
+def behind_paddles(parts, pid_face, cen, cand, k, d, voxel):
+    """A flipper or wing stands a centimetre or two off the body, closer than the depth check's tolerance (a few
+    voxels), so the camera facing it counted the body right behind it as seen, and painted the flipper's drawn
+    colours a second time on the body there: from an angle, a black flipper shape on the white body beside the
+    real one. Here each spot of another part is followed towards the camera; if it passes through a paddle, this
+    camera does not see it."""
+    import parts as PT
+    for i, p in enumerate(parts):
+        if p["type"] != "paddle": continue
+        lo, hi = PT.bounds(p); ax = int(np.argmax(np.abs(d)))
+        other = [a for a in range(3) if a != ax]
+        sel = np.nonzero((pid_face != i) & cand[:, k] &
+                         np.all((cen[:, other] >= lo[other]) & (cen[:, other] <= hi[other]), 1))[0]
+        if not len(sel): continue
+        reach = float(np.max(hi - lo)) + voxel; hit = np.zeros(len(sel), bool)
+        for s in np.arange(0.5 * voxel, reach, 0.5 * voxel):
+            todo = ~hit
+            if not todo.any(): break
+            hit[todo] = PT.sdf_part(p, cen[sel[todo]] + s * d) < 0
+        cand[sel[hit], k] = False
+
+
 def end_on(parts, pid_face, cen, cand, k, d):
     """A long part pointing at a camera (a beak, snout or horn seen tip-on) is drawn by that camera as a small blob
     squashed into its own base. Projected back, that blob paints the part's colours in a ring onto the face around
@@ -666,6 +688,7 @@ def texture_mesh(refs, S, tol=3, debug=None):
                 fn = PT.paddle_frame(p)[2]
                 if abs(fn @ np.array(d, float)) < 0.5: cand[pid_face == i, k] = False
             end_on(parts, pid_face, cen, cand, k, np.array(d, float))
+            behind_paddles(parts, pid_face, cen, cand, k, np.array(d, float), voxel)
             edge[:, k] = near_other_part(parts, occ, origin, voxel, axis, high, pid_face, cen, margin)
         c, r = maps[view].project(cen); im = imgs[view]
         col[:, k] = im[np.clip(r.astype(int), 0, im.shape[0] - 1), np.clip(c.astype(int), 0, im.shape[1] - 1)]

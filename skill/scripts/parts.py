@@ -32,6 +32,9 @@ paddle: a flat tapered plate from a to b (flippers, wings, fins, ears, flat tail
 rb at b, half-thickness "thick", flat faces turned towards "normal" (default [1, 0, 0]: facing sideways), and
 "bend": metres the middle bows out sideways within the plate (a crescent flipper), default 0, and "curl":
 metres the long edges curl back away from the "normal" side, so the plate wraps round the body it lies on, default 0.
+"widest": [t, half_width] (optional): the plate is widest t of the way from a to b (0 to 1), half_width wide there,
+and narrows to ra at a and rb at b: a flipper joined like an arm, narrow at the shoulder ("widest": [0.3, 0.04] with
+a small ra). Without it the plate is widest at a.
 Optional on every part: "mirror": true (adds a copy at -x), "blend": metres (smooth join into the parts before it;
 default 0 = sharp), "root_blend" (capsules and paddles): a larger blend used only near the root end a, so a
 free-hanging part flows out of the body at its root and stands apart from it everywhere else, "colour": the
@@ -47,10 +50,10 @@ import json, re
 import numpy as np
 
 TYPES = {"ellipsoid": ["center", "radii", "rotate"], "capsule": ["a", "b", "ra", "rb", "aspect", "droop"],
-         "paddle": ["a", "b", "ra", "rb", "thick", "normal", "bend", "curl"], "box": ["center", "half", "rotate", "round"],
+         "paddle": ["a", "b", "ra", "rb", "thick", "normal", "bend", "curl", "widest"], "box": ["center", "half", "rotate", "round"],
          "chain": ["joints", "aspect"], "loft": ["stations", "caps"]}
 DEFAULTS = {"rotate": [0, 0, 0], "round": 0.0, "normal": [1, 0, 0], "bend": 0.0, "curl": 0.0, "aspect": 1.0,
-            "droop": 0.0, "caps": [0.0, 0.0]}
+            "droop": 0.0, "caps": [0.0, 0.0], "widest": [0.0, 0.0]}
 TUBES = ("capsule", "paddle")                       # parts running from a root a to a tip b
 LONG = TUBES + ("chain",)                           # parts with a root end and a tip end (see ends())
 
@@ -215,6 +218,23 @@ def sdf_loft(p, P):
     return out
 
 
+def paddle_outline(p, inset=0.0):
+    """A paddle's outline as round cones in its plane: root to tip, or root to its widest point to tip."""
+    a, b = p["a"], p["b"]; t, rw = (np.asarray(p.get("widest", [0.0, 0.0]), float).tolist() + [0.0, 0.0])[:2]
+    cone = lambda A, B, r1, r2: {"type": "capsule", "a": A, "b": B, "ra": max(r1 - inset, 1e-4), "rb": max(r2 - inset, 1e-4)}
+    if not (0 < t < 1 and rw > 0): return [cone(a, b, float(p["ra"]), float(p["rb"]))]
+    m = a + t * (b - a)
+    return [cone(a, m, float(p["ra"]), rw), cone(m, b, rw, float(p["rb"]))]
+
+
+def paddle_width(p, tt):
+    """A paddle's half-width at fractions tt (0 at a, 1 at b) of its length."""
+    t, rw = (np.asarray(p.get("widest", [0.0, 0.0]), float).tolist() + [0.0, 0.0])[:2]
+    ra, rb = float(p["ra"]), float(p["rb"])
+    if not (0 < t < 1 and rw > 0): return ra + (rb - ra) * tt
+    return np.where(tt < t, ra + (rw - ra) * tt / t, rw + (rb - rw) * (tt - t) / (1 - t))
+
+
 def sdf_one(p, P):
     t = p["type"]
     if t == "loft": return sdf_loft(p, P)
@@ -224,12 +244,10 @@ def sdf_one(p, P):
         u, w, n = paddle_frame(p); L = float(np.linalg.norm(p["b"] - p["a"]))
         q = P - p["a"]; s = q @ u; x = q @ w; z = q @ n
         tt = np.clip(s / max(L, 1e-9), 0, 1); x = x - p["bend"] * 4 * tt * (1 - tt)
-        r_here = np.maximum(float(p["ra"]) + (float(p["rb"]) - float(p["ra"])) * tt, 1e-4)
+        r_here = np.maximum(paddle_width(p, tt), 1e-4)
         z = z + p["curl"] * np.minimum((x / r_here) ** 2, 1.5)     # long edges curl back, wrapping round the body
-        h = float(p["thick"])
-        flat = {"type": "capsule", "a": p["a"], "b": p["b"], "ra": max(float(p["ra"]) - h, 1e-4),
-                "rb": max(float(p["rb"]) - h, 1e-4)}
-        d2 = sdf_one(flat, p["a"] + np.outer(s, u) + np.outer(x, w))     # outline, inset by the edge rounding
+        h = float(p["thick"]); Q = p["a"] + np.outer(s, u) + np.outer(x, w)
+        d2 = np.min([sdf_one(c, Q) for c in paddle_outline(p, h)], 0)  # outline, inset by the edge rounding
         az = np.abs(z)                                                   # rounded extrusion, edge radius = h
         return np.minimum(np.maximum(d2, az), 0) + np.hypot(np.maximum(d2, 0), np.maximum(az, 0)) - h
     if t == "capsule" and (float(p.get("aspect", 1.0)) != 1.0 or float(p.get("droop", 0.0)) != 0.0):
@@ -391,7 +409,8 @@ def bounds(p):
             S = q["stations"]; r = float(S[:, 3:].max()) + float(np.max(q.get("caps", [0, 0])))
             lo, hi = S[:, :3].min(0) - r, S[:, :3].max(0) + r
         elif q["type"] in TUBES:
-            r = max(q["ra"], q["rb"]) + (abs(q["bend"]) + abs(q["curl"]) if q["type"] == "paddle" else 0)
+            r = max(q["ra"], q["rb"]) + (abs(q["bend"]) + abs(q["curl"]) + float(np.max(q.get("widest", [0, 0])[1:]))
+                                         if q["type"] == "paddle" else 0)
             lo, hi = np.minimum(q["a"], q["b"]) - r, np.maximum(q["a"], q["b"]) + r
         else:
             R = q.get("_R"); R = rot(q["rotate"]) if R is None else R
@@ -476,6 +495,8 @@ def params(p):
                [("joints", (j, 3), "size") for j in range(len(p["joints"]))]
     if p["type"] in TUBES:
         out = [("a", i, "pos") for i in axes] + [("b", i, "pos") for i in axes] + [("ra", None, "size"), ("rb", None, "size")]
+        if p["type"] == "paddle" and 0 < float(p["widest"][0]) < 1 and float(p["widest"][1]) > 0:
+            out.append(("widest", 1, "size"))                      # (its half-width; where it is stays put)
         return out + ([("thick", None, "size")] if p["type"] == "paddle" else [])
     size = "radii" if p["type"] == "ellipsoid" else "half"
     turns = (0,) if on_centre_line(p) else (0, 1, 2)           # ... nor turn about y or z
@@ -487,6 +508,7 @@ def params(p):
 def label(key, i):
     """A tunable number's name for reports: center[x], ra, joints[2].z"""
     if i is None: return key
+    if key == "widest": return "widest half-width"
     if isinstance(i, tuple):
         return f"{key}[{i[0]}]." + (["x", "y", "z", "half_width", "half_height"] if key == "stations" else list("xyzr"))[i[1]]
     return f"{key}[{'xyz'[i]}]"
